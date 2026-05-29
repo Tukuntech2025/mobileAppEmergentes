@@ -25,17 +25,17 @@ class StepAccount extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _buildLabel('Email'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 2),
           _buildTextField('you@example.com'),
           const SizedBox(height: 20),
           _buildLabel('Password'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 2),
           _buildTextField('••••••••', obscureText: true),
           const SizedBox(height: 20),
           _buildLabel('Confirm password'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 2),
           _buildTextField('••••••••', obscureText: true),
-          const SizedBox(height: 32),
+          const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -44,7 +44,7 @@ class StepAccount extends StatelessWidget {
                 icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 18),
                 label: const Text(
                   'Back',
-                  style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 16),
+                  style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 14),
                 ),
               ),
               Flexible(
@@ -53,9 +53,9 @@ class StepAccount extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     elevation: 0,
                   ),
@@ -65,7 +65,7 @@ class StepAccount extends StatelessWidget {
                       Flexible(
                         child: Text(
                           'Continue',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -101,7 +101,7 @@ class StepAccount extends StatelessWidget {
         hintStyle: const TextStyle(color: Colors.black38),
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade300),

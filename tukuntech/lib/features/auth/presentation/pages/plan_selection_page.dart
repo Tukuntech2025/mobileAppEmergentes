@@ -39,7 +39,6 @@ class PlanSelectionPage extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      constraints: isMobile ? const BoxConstraints(minHeight: 300) : null,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -48,7 +47,7 @@ class PlanSelectionPage extends StatelessWidget {
           stops: [0.0, 0.8],
         ),
       ),
-      padding: EdgeInsets.all(isMobile ? 32.0 : 64.0),
+      padding: EdgeInsets.symmetric(horizontal: isMobile ? 16.0 : 64.0, vertical: isMobile ? 16.0 : 64.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -78,22 +77,22 @@ class PlanSelectionPage extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 48),
+          SizedBox(height: isMobile ? 12 : 48),
           Text(
             'Calm, connected care for the\npeople you love.',
             style: TextStyle(
-              fontSize: isMobile ? 32 : 40,
+              fontSize: isMobile ? 20 : 40,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
               height: 1.2,
               letterSpacing: -0.5,
             ),
           ),
-          const SizedBox(height: 24),
-          const Text(
+          SizedBox(height: isMobile ? 8 : 24),
+          Text(
             'Real-time vitals, gentle reminders, and peace of mind —\ndesigned for families and caregivers, not hospitals.',
             style: TextStyle(
-              fontSize: 16,
+              fontSize: isMobile ? 13 : 16,
               color: Colors.black54,
               height: 1.5,
             ),
@@ -106,9 +105,14 @@ class PlanSelectionPage extends StatelessWidget {
   Widget _buildRightPanel(BuildContext context) {
     const primaryColor = Color(0xFF3B9784);
 
+    final isMobile = MediaQuery.of(context).size.width <= 800;
+
     return Container(
       color: Colors.white,
-      padding: const EdgeInsets.symmetric(horizontal: 48.0, vertical: 64.0),
+      padding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 16.0 : 48.0, 
+        vertical: isMobile ? 16.0 : 64.0
+      ),
       child: Center(
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 500),
@@ -116,24 +120,24 @@ class PlanSelectionPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              const Text(
+              Text(
                 'Create your account',
                 style: TextStyle(
-                  fontSize: 28,
+                  fontSize: isMobile ? 20 : 28,
                   fontWeight: FontWeight.w600,
                   color: Colors.black87,
                   letterSpacing: -0.5,
                 ),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Choose the plan that fits you. Accounts are created during checkout.',
                 style: TextStyle(
-                  fontSize: 15,
+                  fontSize: isMobile ? 13 : 15,
                   color: Colors.black54,
                 ),
               ),
-              const SizedBox(height: 40),
+              SizedBox(height: isMobile ? 12 : 40),
               
               // Plan Option 1
               _buildPlanCard(
@@ -151,7 +155,7 @@ class PlanSelectionPage extends StatelessWidget {
                   );
                 },
               ),
-              const SizedBox(height: 16),
+              SizedBox(height: isMobile ? 8 : 16),
               
               // Plan Option 2
               _buildPlanCard(
@@ -169,7 +173,7 @@ class PlanSelectionPage extends StatelessWidget {
                   );
                 },
               ),
-              const SizedBox(height: 48),
+              SizedBox(height: isMobile ? 16 : 48),
               
               // Sign in link
               Row(
@@ -223,7 +227,7 @@ class PlanSelectionPage extends StatelessWidget {
           border: Border.all(color: Colors.grey.shade200),
           borderRadius: BorderRadius.circular(16),
         ),
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(12),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -233,9 +237,9 @@ class PlanSelectionPage extends StatelessWidget {
                 color: iconBgColor,
                 shape: BoxShape.circle,
               ),
-              child: Icon(icon, color: iconColor, size: 24),
+              child: Icon(icon, color: iconColor, size: 20),
             ),
-            const SizedBox(width: 20),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -243,7 +247,7 @@ class PlanSelectionPage extends StatelessWidget {
                   Text(
                     title,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
                     ),
@@ -252,15 +256,15 @@ class PlanSelectionPage extends StatelessWidget {
                   Text(
                     subtitle,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       color: Colors.black54,
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(width: 16),
-            const Icon(Icons.arrow_forward, color: Colors.black38, size: 20),
+            const SizedBox(width: 8),
+            const Icon(Icons.arrow_forward, color: Colors.black38, size: 16),
           ],
         ),
       ),
