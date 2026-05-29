@@ -32,41 +32,6 @@ class StepperIndicator extends StatelessWidget {
             _buildStep(3, 'Address', primaryColor, inactiveColor),
           ],
         ),
-        const SizedBox(height: 12),
-        // Progress Bar with Arrows
-        Row(
-          children: [
-            if (currentStep > 0)
-              GestureDetector(
-                onTap: onBack,
-                child: const Icon(Icons.arrow_left, color: Colors.grey),
-              )
-            else
-              const Icon(Icons.arrow_left, color: Colors.transparent),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Container(
-                height: 8,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                alignment: Alignment.centerLeft,
-                child: FractionallySizedBox(
-                  widthFactor: (currentStep + 1) / 4,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade500,
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 8),
-            const Icon(Icons.arrow_right, color: Colors.grey),
-          ],
-        )
       ],
     );
   }
@@ -111,7 +76,7 @@ class StepperIndicator extends StatelessWidget {
               style: TextStyle(
                 color: isActive || isCompleted ? Colors.black87 : Colors.black54,
                 fontWeight: isActive || isCompleted ? FontWeight.w600 : FontWeight.normal,
-                fontSize: 12,
+                fontSize: 11,
               ),
             ),
           ),

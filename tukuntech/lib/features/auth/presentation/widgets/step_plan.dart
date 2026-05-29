@@ -23,10 +23,10 @@ class StepPlan extends StatelessWidget {
         Container(
           decoration: BoxDecoration(
             color: primaryColor.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: primaryColor.withOpacity(0.5), width: 1),
           ),
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -42,7 +42,7 @@ class StepPlan extends StatelessWidget {
                         const Text(
                           'Personal',
                           style: TextStyle(
-                            fontSize: 18,
+                            fontSize: 14,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,
                           ),
@@ -57,7 +57,7 @@ class StepPlan extends StatelessWidget {
                             'RECOMMENDED',
                             style: TextStyle(
                               color: Colors.white,
-                              fontSize: 10,
+                              fontSize: 9,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
@@ -69,33 +69,33 @@ class StepPlan extends StatelessWidget {
                   const Text(
                     '\$29/mo',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 4),
               const Text(
                 '1 TukunTech device · vitals · reminders',
                 style: TextStyle(
                   color: Colors.black54,
-                  fontSize: 16,
+                  fontSize: 12,
                 ),
               ),
             ],
           ),
         ),
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
         // Personal Plus Plan Card
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.grey.shade200, width: 1),
           ),
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -105,7 +105,7 @@ class StepPlan extends StatelessWidget {
                   Text(
                     'Personal Plus',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
                     ),
@@ -113,19 +113,19 @@ class StepPlan extends StatelessWidget {
                   Text(
                     '\$39/mo',
                     style: TextStyle(
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 4),
               const Text(
                 'Adds priority support & extended history',
                 style: TextStyle(
                   color: Colors.black54,
-                  fontSize: 16,
+                  fontSize: 12,
                 ),
               ),
             ],
@@ -136,10 +136,10 @@ class StepPlan extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               color: primaryColor.withOpacity(0.05),
-              borderRadius: BorderRadius.circular(24),
+              borderRadius: BorderRadius.circular(16),
               border: Border.all(color: primaryColor.withOpacity(0.5), width: 1),
             ),
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -156,7 +156,7 @@ class StepPlan extends StatelessWidget {
                           const Text(
                             'Family Pro',
                             style: TextStyle(
-                              fontSize: 18,
+                              fontSize: 14,
                               fontWeight: FontWeight.w600,
                               color: Colors.black87,
                             ),
@@ -168,32 +168,32 @@ class StepPlan extends StatelessWidget {
                     const Text(
                       '\$89/mo',
                       style: TextStyle(
-                        fontSize: 18,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Colors.black87,
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 4),
                 const Text(
                   'Up to 5 TukunTech devices · multi-patient dashboard · 24/7 alerts.',
                   style: TextStyle(
                     color: Colors.black54,
-                    fontSize: 16,
+                    fontSize: 12,
                   ),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 8),
                 _buildCheckItem('5 devices included', primaryColor),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 _buildCheckItem('Caregiver dashboard', primaryColor),
-                const SizedBox(height: 8),
+                const SizedBox(height: 4),
                 _buildCheckItem('Priority support', primaryColor),
               ],
             ),
           ),
         ],
-        const SizedBox(height: 32),
+        const SizedBox(height: 8),
         Align(
           alignment: Alignment.centerRight,
           child: ElevatedButton(
@@ -201,9 +201,9 @@ class StepPlan extends StatelessWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: primaryColor,
               foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(24),
+                borderRadius: BorderRadius.circular(16),
               ),
               elevation: 0,
             ),
@@ -212,10 +212,10 @@ class StepPlan extends StatelessWidget {
               children: const [
                 Text(
                   'Continue',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600),
                 ),
-                SizedBox(width: 8),
-                Icon(Icons.check, size: 18),
+                SizedBox(width: 4),
+                Icon(Icons.check, size: 16),
               ],
             ),
           ),
@@ -227,11 +227,11 @@ class StepPlan extends StatelessWidget {
   Widget _buildCheckItem(String text, Color iconColor) {
     return Row(
       children: [
-        Icon(Icons.check, color: iconColor, size: 18),
-        const SizedBox(width: 8),
+        Icon(Icons.check, color: iconColor, size: 16),
+        const SizedBox(width: 4),
         Text(
           text,
-          style: const TextStyle(color: Colors.black54, fontSize: 14),
+          style: const TextStyle(color: Colors.black54, fontSize: 12),
         ),
       ],
     );

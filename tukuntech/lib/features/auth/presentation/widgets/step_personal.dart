@@ -20,7 +20,7 @@ class StepPersonal extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         border: Border.all(color: Colors.grey.shade200, width: 1),
       ),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(12),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
@@ -31,25 +31,25 @@ class StepPersonal extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildLabel('First name'),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 2),
                     _buildTextField('Eleanor'),
                   ],
                 ),
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: 8),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildLabel('Last name'),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 2),
                     _buildTextField('Marsh'),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 8),
           Row(
             children: [
               Expanded(
@@ -58,7 +58,7 @@ class StepPersonal extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildLabel('Age'),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     _buildTextField('72', keyboardType: TextInputType.number),
                   ],
                 ),
@@ -70,25 +70,25 @@ class StepPersonal extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildLabel('Gender'),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     _buildDropdown('Select gender', ['Select gender', 'Female', 'Male', 'Other']),
                   ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 8),
           _buildLabel('Blood type'),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           _buildDropdown('Select blood type', ['Select blood type', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
-          const SizedBox(height: 20),
-          _buildLabel('Additional notes'),
           const SizedBox(height: 8),
+          _buildLabel('Additional notes'),
+          const SizedBox(height: 4),
           _buildTextField(
             'Allergies, conditions, anything we should know...',
-            maxLines: 3,
+            maxLines: 1,
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -106,9 +106,9 @@ class StepPersonal extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     elevation: 0,
                   ),
@@ -118,7 +118,7 @@ class StepPersonal extends StatelessWidget {
                       Flexible(
                         child: Text(
                           'Continue',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -155,7 +155,7 @@ class StepPersonal extends StatelessWidget {
         hintStyle: const TextStyle(color: Colors.black54),
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -169,7 +169,7 @@ class StepPersonal extends StatelessWidget {
           borderSide: const BorderSide(color: Color(0xFF3B9784), width: 2),
         ),
       ),
-      style: const TextStyle(fontSize: 16),
+      style: const TextStyle(fontSize: 14),
     );
   }
 
@@ -181,7 +181,7 @@ class StepPersonal extends StatelessWidget {
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade300),

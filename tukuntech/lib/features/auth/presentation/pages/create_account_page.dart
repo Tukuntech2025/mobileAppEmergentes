@@ -50,7 +50,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 0.0),
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 500),
               child: Column(
@@ -60,7 +60,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(6),
+                        padding: const EdgeInsets.all(4),
                         decoration: const BoxDecoration(
                           color: primaryColor,
                           shape: BoxShape.circle,
@@ -68,21 +68,21 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         child: const Icon(
                           Icons.monitor_heart_outlined,
                           color: Colors.white,
-                          size: 24,
+                          size: 18,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: 8),
                       const Text(
                         'TukunTech',
                         style: TextStyle(
-                          fontSize: 22,
+                          fontSize: 18,
                           fontWeight: FontWeight.w600,
                           color: Colors.black87,
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 4),
 
                   // Headings
                   Text(
@@ -90,7 +90,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         ? 'Create your patient account'
                         : 'Create your Family Pro account',
                     style: const TextStyle(
-                      fontSize: 24,
+                      fontSize: 18,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
                       letterSpacing: -0.5,
@@ -102,11 +102,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         ? 'Subscribe to activate your TukunTech.'
                         : 'Monitor up to 5 patients under your care.',
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 12,
                       color: Colors.black54,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 4),
 
                   // Stepper Indicator
                   StepperIndicator(
@@ -114,7 +114,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     onBack: _previousStep,
                     stepThreeTitle: widget.planType == PlanType.personal ? 'Personal' : 'Patients',
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 4),
 
                   // Step Content
                   AnimatedSwitcher(
@@ -122,7 +122,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     child: _buildCurrentStep(),
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 4),
                   Center(
                     child: TextButton(
                       onPressed: () {
@@ -133,10 +133,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.black54,
+                        padding: EdgeInsets.zero,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       ),
                       child: const Text(
                         '← Choose a different plan',
-                        style: TextStyle(fontWeight: FontWeight.w400),
+                        style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13),
                       ),
                     ),
                   ),

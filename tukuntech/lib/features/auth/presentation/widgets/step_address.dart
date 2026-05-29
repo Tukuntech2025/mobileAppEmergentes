@@ -33,7 +33,7 @@ class StepAddress extends StatelessWidget {
               prefixIcon: const Icon(Icons.search, color: Colors.grey),
               filled: true,
               fillColor: Colors.white,
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide(color: Colors.grey.shade300),
@@ -49,7 +49,7 @@ class StepAddress extends StatelessWidget {
             ),
             style: const TextStyle(fontSize: 16),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           // Mock Map Area
           Container(
             height: 120,
@@ -118,33 +118,7 @@ class StepAddress extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildLabel('City'),
-                    const SizedBox(height: 8),
-                    _buildTextField('London'),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildLabel('Postal code'),
-                    const SizedBox(height: 8),
-                    _buildTextField('NW1 6XE'),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 8),
           // Info Note
           Container(
             padding: const EdgeInsets.all(12),
@@ -166,7 +140,7 @@ class StepAddress extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -184,9 +158,9 @@ class StepAddress extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(24),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     elevation: 0,
                   ),
@@ -231,7 +205,7 @@ class StepAddress extends StatelessWidget {
         hintStyle: const TextStyle(color: Colors.black87),
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -245,7 +219,7 @@ class StepAddress extends StatelessWidget {
           borderSide: const BorderSide(color: Color(0xFF3B9784), width: 2),
         ),
       ),
-      style: const TextStyle(fontSize: 16),
+      style: const TextStyle(fontSize: 14),
     );
   }
 }

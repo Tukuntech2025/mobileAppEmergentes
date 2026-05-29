@@ -47,27 +47,27 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   
                   // Headings
                   const Text(
                     'Patient sign in',
                     style: TextStyle(
-                      fontSize: 32,
+                      fontSize: 24,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
                       letterSpacing: -0.5,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   const Text(
                     'Enter your credentials to continue.',
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       color: Colors.black54,
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   
                   // Role Badge
                   Align(
@@ -95,7 +95,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
                   
                   // Email Field
                   const Text(
@@ -124,11 +124,11 @@ class LoginScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(color: primaryColor, width: 2),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
-                    style: const TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 14),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   
                   // Password Field
                   Row(
@@ -160,7 +160,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 4),
                   TextField(
                     obscureText: true,
                     controller: TextEditingController(text: '12345678'),
@@ -179,11 +179,11 @@ class LoginScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12),
                         borderSide: const BorderSide(color: primaryColor, width: 2),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     ),
-                    style: const TextStyle(fontSize: 16, letterSpacing: 4),
+                    style: const TextStyle(fontSize: 14, letterSpacing: 4),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 24),
                   
                   // Sign In Button
                   ElevatedButton(
@@ -191,7 +191,7 @@ class LoginScreen extends StatelessWidget {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -200,12 +200,12 @@ class LoginScreen extends StatelessWidget {
                     child: const Text(
                       'Sign in',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 16),
                   
                   // Links
                   Center(
@@ -216,11 +216,11 @@ class LoginScreen extends StatelessWidget {
                       ),
                       child: const Text(
                         'Simulate login error',
-                        style: TextStyle(fontWeight: FontWeight.w500),
+                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -255,7 +255,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 12),
                   Center(
                     child: TextButton(
                       onPressed: () {},
@@ -264,7 +264,7 @@ class LoginScreen extends StatelessWidget {
                       ),
                       child: const Text(
                         '← Choose a different role',
-                        style: TextStyle(fontWeight: FontWeight.w400),
+                        style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
                       ),
                     ),
                   ),
