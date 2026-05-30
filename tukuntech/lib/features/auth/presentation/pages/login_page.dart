@@ -209,19 +209,6 @@ class LoginScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   
                   // Links
-                  Center(
-                    child: TextButton(
-                      onPressed: () {},
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.black54,
-                      ),
-                      child: const Text(
-                        'Simulate login error',
-                        style: TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 8),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
