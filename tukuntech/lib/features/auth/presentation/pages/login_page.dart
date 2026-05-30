@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tukuntech/features/auth/presentation/pages/create_account_page.dart';
+import 'package:tukuntech/features/patient/presentation/pages/vital_signs_page.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
@@ -24,17 +25,10 @@ class LoginScreen extends StatelessWidget {
                   // Logo and App Name
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(6),
-                        decoration: const BoxDecoration(
-                          color: primaryColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.monitor_heart_outlined, 
-                          color: Colors.white, 
-                          size: 24,
-                        ),
+                      Image.asset(
+                        'assets/icon_tukuntech.png',
+                        width: 36,
+                        height: 36,
                       ),
                       const SizedBox(width: 12),
                       const Text(
@@ -187,7 +181,14 @@ class LoginScreen extends StatelessWidget {
                   
                   // Sign In Button
                   ElevatedButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const VitalSignsPage(),
+                        ),
+                      );
+                    },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       foregroundColor: Colors.white,

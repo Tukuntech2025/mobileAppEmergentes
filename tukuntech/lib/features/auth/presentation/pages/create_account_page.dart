@@ -59,17 +59,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   // Logo and App Name
                   Row(
                     children: [
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: primaryColor,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.monitor_heart_outlined,
-                          color: Colors.white,
-                          size: 18,
-                        ),
+                      Image.asset(
+                        'assets/icon_tukuntech.png',
+                        width: 26,
+                        height: 26,
                       ),
                       const SizedBox(width: 8),
                       const Text(
