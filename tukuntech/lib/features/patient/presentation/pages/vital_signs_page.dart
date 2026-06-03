@@ -1,7 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/core/widgets/custom_bottom_nav.dart';
+import 'package:tukuntech/features/patient/presentation/widgets/device_body.dart';
+import 'package:tukuntech/features/patient/presentation/widgets/report_body.dart';
 
-class VitalSignsPage extends StatelessWidget {
+class VitalSignsPage extends StatefulWidget {
   const VitalSignsPage({super.key});
+
+  @override
+  State<VitalSignsPage> createState() => _VitalSignsPageState();
+}
+
+class _VitalSignsPageState extends State<VitalSignsPage> {
+  int _currentIndex = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -38,40 +48,53 @@ class VitalSignsPage extends StatelessWidget {
         ],
       ),
       body: SafeArea(
-        child: Padding(
+        child: IndexedStack(
+          index: _currentIndex,
+          children: [
+            ListView(
           padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Vital Signs',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                ),
+          children: [
+            const Text(
+              'Vital Signs',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
               ),
-              const SizedBox(height: 0),
-              Text(
-                'Detail view of today\'s activity',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey[600],
-                ),
+            ),
+            const SizedBox(height: 0),
+            Text(
+              'Detail view of today\'s activity',
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
               ),
-              const SizedBox(height: 6),
-              Expanded(flex: 4, child: _buildGreetingCard()),
-              const SizedBox(height: 6),
-              Expanded(flex: 3, child: _buildHeartRateCard()),
-              const SizedBox(height: 6),
-              Expanded(flex: 3, child: _buildOxygenCard()),
-              const SizedBox(height: 6),
-              Expanded(flex: 3, child: _buildTemperatureCard()),
-              const SizedBox(height: 6),
-              Expanded(flex: 4, child: _buildLiveEcgCard()),
-            ],
-          ),
+            ),
+            const SizedBox(height: 12),
+            _buildGreetingCard(),
+            const SizedBox(height: 12),
+            _buildHeartRateCard(),
+            const SizedBox(height: 12),
+            _buildOxygenCard(),
+            const SizedBox(height: 12),
+            _buildTemperatureCard(),
+            const SizedBox(height: 12),
+            _buildLiveEcgCard(),
+            const SizedBox(height: 12),
+          ],
         ),
+        const DeviceBody(),
+        const ReportBody(),
+      ],
+    ),
+  ),
+      bottomNavigationBar: CustomBottomNav(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
       ),
     );
   }
@@ -335,12 +358,11 @@ class VitalSignsPage extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           // ECG Mock Graph
-          Expanded(
-            child: SizedBox(
-              width: double.infinity,
-              child: CustomPaint(
-                painter: EcgPainter(),
-              ),
+          SizedBox(
+            width: double.infinity,
+            height: 100,
+            child: CustomPaint(
+              painter: EcgPainter(),
             ),
           )
         ],
