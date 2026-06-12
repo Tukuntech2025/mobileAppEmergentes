@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:tukuntech/features/auth/presentation/pages/patient_create_account_page.dart';
-import 'package:tukuntech/features/patient/presentation/pages/vital_signs_page.dart';
+import 'package:tukuntech/features/auth/presentation/pages/caregiver_create_account_page.dart';
+import 'package:tukuntech/features/caregiver/presentation/pages/caregiver_dashboard_page.dart';
 
-class LoginScreen extends StatelessWidget {
-  const LoginScreen({super.key});
+class CaregiverLoginScreen extends StatelessWidget {
+  const CaregiverLoginScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,30 +22,9 @@ class LoginScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  // Logo and App Name
-                  Row(
-                    children: [
-                      Image.asset(
-                        'assets/icon_tukuntech.png',
-                        width: 36,
-                        height: 36,
-                      ),
-                      const SizedBox(width: 12),
-                      const Text(
-                        'TukunTech',
-                        style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black87,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  
                   // Headings
                   const Text(
-                    'Patient sign in',
+                    'Caregiver sign in',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
@@ -75,12 +54,12 @@ class LoginScreen extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.person_outline, size: 18, color: Colors.blue[600]),
+                          Icon(Icons.favorite_border, size: 18, color: Colors.blue[400]),
                           const SizedBox(width: 8),
                           Text(
-                            'Patient',
+                            'Caregiver',
                             style: TextStyle(
-                              color: Colors.blue[600],
+                              color: Colors.blue[400],
                               fontWeight: FontWeight.w500,
                               fontSize: 14,
                             ),
@@ -102,7 +81,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   TextField(
-                    controller: TextEditingController(text: 'demo.patient@tukuntech.app'),
+                    controller: TextEditingController(text: 'demo.caregiver@tukuntech.app'),
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
@@ -174,6 +153,7 @@ class LoginScreen extends StatelessWidget {
                         borderSide: const BorderSide(color: primaryColor, width: 2),
                       ),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      suffixIcon: const Icon(Icons.visibility_outlined, color: Colors.black45, size: 20),
                     ),
                     style: const TextStyle(fontSize: 14, letterSpacing: 4),
                   ),
@@ -185,7 +165,7 @@ class LoginScreen extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const VitalSignsPage(),
+                          builder: (context) => const CaregiverDashboardPage(),
                         ),
                       );
                     },
@@ -224,7 +204,7 @@ class LoginScreen extends StatelessWidget {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const PatientCreateAccountPage()),
+                            MaterialPageRoute(builder: (context) => const CaregiverCreateAccountPage()),
                           );
                         },
                         style: TextButton.styleFrom(

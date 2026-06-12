@@ -6,6 +6,9 @@ import 'package:tukuntech/features/auth/presentation/widgets/step_account.dart';
 import 'package:tukuntech/features/auth/presentation/widgets/step_personal.dart';
 import 'package:tukuntech/features/auth/presentation/widgets/step_patients.dart';
 import 'package:tukuntech/features/auth/presentation/widgets/step_address.dart';
+import 'package:tukuntech/features/auth/presentation/widgets/step_delivery.dart';
+import 'package:tukuntech/features/auth/presentation/widgets/step_payment.dart';
+import 'package:tukuntech/features/auth/presentation/widgets/step_done.dart';
 
 enum PlanType { personal, familyPro }
 
@@ -20,7 +23,10 @@ class CreateAccountPage extends StatefulWidget {
 
 class _CreateAccountPageState extends State<CreateAccountPage> {
   int _currentStep = 0;
-  final int _totalSteps = 4;
+  int get _totalSteps => widget.planType == PlanType.familyPro ? 7 : 4;
+  List<String> get _stepNames => widget.planType == PlanType.familyPro 
+      ? const ['Plan', 'Account', 'Personal', 'Address', 'Delivery', 'Payment', 'Done']
+      : const ['Plan', 'Account', 'Personal', 'Address'];
 
   void _nextStep() {
     if (_currentStep < _totalSteps - 1) {
@@ -105,9 +111,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   StepperIndicator(
                     currentStep: _currentStep,
                     onBack: _previousStep,
-                    stepThreeTitle: widget.planType == PlanType.personal ? 'Personal' : 'Patients',
+                    steps: _stepNames,
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 16),
 
                   // Step Content
                   AnimatedSwitcher(
@@ -159,7 +165,16 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             ? StepPatients(onContinue: _nextStep, onBack: _previousStep)
             : StepPersonal(onContinue: _nextStep, onBack: _previousStep);
       case 3:
-        return StepAddress(onContinue: () {}, onBack: _previousStep);
+        return StepAddress(
+          onContinue: widget.planType == PlanType.familyPro ? _nextStep : () {}, 
+          onBack: _previousStep
+        );
+      case 4:
+        return StepDelivery(onContinue: _nextStep, onBack: _previousStep);
+      case 5:
+        return StepPayment(onContinue: _nextStep, onBack: _previousStep);
+      case 6:
+        return const StepDone();
       default:
         return const SizedBox.shrink();
     }
