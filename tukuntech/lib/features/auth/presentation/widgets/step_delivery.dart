@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
 class StepDelivery extends StatelessWidget {
-  const StepDelivery({super.key});
+  final VoidCallback onContinue;
+  final VoidCallback onBack;
+
+  const StepDelivery({
+    super.key,
+    required this.onContinue,
+    required this.onBack,
+  });
 
   @override
   Widget build(BuildContext context) {

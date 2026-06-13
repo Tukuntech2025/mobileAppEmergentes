@@ -1,18 +1,29 @@
 import 'package:flutter/material.dart';
 
-// ── Modelos locales ────────────────────────────────────────────────────────────
-class EmergencyContact {
+class EmergencyContactData {
+  String name;
+  String relation;
+  String phone;
+
+  EmergencyContactData({
+    required this.name,
+    required this.relation,
+    required this.phone,
+  });
+}
+
+class EmergencyContactController {
   TextEditingController nameCtrl;
   TextEditingController relationCtrl;
   TextEditingController phoneCtrl;
 
-  EmergencyContact({
+  EmergencyContactController({
     required String name,
     required String relation,
     required String phone,
-  }) : nameCtrl = TextEditingController(text: name),
-       relationCtrl = TextEditingController(text: relation),
-       phoneCtrl = TextEditingController(text: phone);
+  })  : nameCtrl = TextEditingController(text: name),
+        relationCtrl = TextEditingController(text: relation),
+        phoneCtrl = TextEditingController(text: phone);
 
   void dispose() {
     nameCtrl.dispose();
@@ -21,101 +32,156 @@ class EmergencyContact {
   }
 }
 
-// ── Contenido del Perfil (Perspectiva Paciente) ────────────────────────────────
-class ProfileBody extends StatefulWidget {
-  const ProfileBody({super.key});
+class PatientProfileData {
+  String initials;
+  String name;
+  String age;
+  String gender;
+  String address;
+  String bloodType;
+  List<EmergencyContactData> contacts;
 
-  @override
-  State<ProfileBody> createState() => _ProfileBodyState();
+  PatientProfileData({
+    required this.initials,
+    required this.name,
+    required this.age,
+    required this.gender,
+    required this.address,
+    required this.bloodType,
+    required this.contacts,
+  });
 }
 
-class _ProfileBodyState extends State<ProfileBody> {
+class CaregiverProfileBody extends StatefulWidget {
+  const CaregiverProfileBody({super.key});
+
+  @override
+  State<CaregiverProfileBody> createState() => _CaregiverProfileBodyState();
+}
+
+class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
   static const Color _primary = Color(0xFF3B9784);
 
-  // ── Datos del paciente (Perspectiva única) ────────────────────
-  final Map<String, dynamic> _patientData = {
-    'initials': 'EM',
-    'name': 'Eleanor Marsh',
-    'age': '68',
-    'gender': 'Female',
-    'address': 'Av. siempre viva 235',
-    'bloodType': 'A+',
-  };
+  int _selectedPatientIndex = 0;
 
-  // ── Campos de información personal ──────────────────────────
+  final List<PatientProfileData> _patients = [
+    PatientProfileData(
+      initials: 'EM',
+      name: 'Eleanor Marsh',
+      age: '68',
+      gender: 'Female',
+      address: 'Av. siempre viva 235',
+      bloodType: 'A+',
+      contacts: [
+        EmergencyContactData(name: 'Sara Marsh', relation: 'Daughter', phone: '940999345'),
+        EmergencyContactData(name: 'Sara Marsh', relation: 'Daughter', phone: '840989345'),
+      ],
+    ),
+    PatientProfileData(
+      initials: 'CM',
+      name: 'Coco Manlin',
+      age: '45',
+      gender: 'Male',
+      address: '123 Fake Street',
+      bloodType: 'O+',
+      contacts: [],
+    ),
+    PatientProfileData(
+      initials: 'MM',
+      name: 'Miguel Montana',
+      age: '50',
+      gender: 'Male',
+      address: '456 Another St',
+      bloodType: 'B-',
+      contacts: [],
+    ),
+  ];
+
   late TextEditingController _nameCtrl;
   late TextEditingController _ageCtrl;
   late TextEditingController _genderCtrl;
   late TextEditingController _addressCtrl;
   String _bloodType = 'A+';
+  List<EmergencyContactController> _contactControllers = [];
 
-  final List<String> _bloodTypes = [
-    'A+',
-    'A-',
-    'B+',
-    'B-',
-    'O+',
-    'O-',
-    'AB+',
-    'AB-',
-  ];
-
-  // ── Contactos de emergencia ──────────────────────────────────
-  final List<EmergencyContact> _contacts = [
-    EmergencyContact(
-      name: 'Sara Marsh',
-      relation: 'Daughter',
-      phone: '940999345',
-    ),
-    EmergencyContact(
-      name: 'Sara Marsh',
-      relation: 'Daughter',
-      phone: '940999345',
-    ),
-  ];
+  final List<String> _bloodTypes = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
 
   @override
   void initState() {
     super.initState();
-    _nameCtrl = TextEditingController(text: _patientData['name']);
-    _ageCtrl = TextEditingController(text: _patientData['age']);
-    _genderCtrl = TextEditingController(text: _patientData['gender']);
-    _addressCtrl = TextEditingController(text: _patientData['address']);
-    _bloodType = _patientData['bloodType'];
+    _initControllersForSelectedPatient();
   }
 
-  @override
-  void dispose() {
+  void _initControllersForSelectedPatient() {
+    final patient = _patients[_selectedPatientIndex];
+    _nameCtrl = TextEditingController(text: patient.name);
+    _ageCtrl = TextEditingController(text: patient.age);
+    _genderCtrl = TextEditingController(text: patient.gender);
+    _addressCtrl = TextEditingController(text: patient.address);
+    _bloodType = patient.bloodType;
+
+    _contactControllers = patient.contacts
+        .map((c) => EmergencyContactController(
+              name: c.name,
+              relation: c.relation,
+              phone: c.phone,
+            ))
+        .toList();
+  }
+
+  void _disposeControllers() {
     _nameCtrl.dispose();
     _ageCtrl.dispose();
     _genderCtrl.dispose();
     _addressCtrl.dispose();
-    for (var contact in _contacts) {
-      contact.dispose();
+    for (var c in _contactControllers) {
+      c.dispose();
     }
+  }
+
+  @override
+  void dispose() {
+    _disposeControllers();
     super.dispose();
   }
 
-  // ── Guardar información personal ────────────────────────────
-  void _savePersonalInfo() {
-    setState(() {
-      _patientData['name'] = _nameCtrl.text;
-      _patientData['age'] = _ageCtrl.text;
-      _patientData['gender'] = _genderCtrl.text;
-      _patientData['address'] = _addressCtrl.text;
-      _patientData['bloodType'] = _bloodType;
+  void _onPatientSelected(int index) {
+    if (_selectedPatientIndex == index) return;
 
-      // Recalcular iniciales si cambió el nombre
-      List<String> parts = _nameCtrl.text.trim().split(' ');
-      String ini = '';
-      if (parts.isNotEmpty && parts[0].isNotEmpty) {
-        ini += parts[0][0].toUpperCase();
-      }
-      if (parts.length > 1 && parts[1].isNotEmpty) {
-        ini += parts[1][0].toUpperCase();
-      }
-      if (ini.isNotEmpty) _patientData['initials'] = ini;
+    setState(() {
+      _selectedPatientIndex = index;
+      _disposeControllers();
+      _initControllersForSelectedPatient();
     });
+  }
+
+  void _savePersonalInfo() {
+    final patient = _patients[_selectedPatientIndex];
+    patient.name = _nameCtrl.text;
+    patient.age = _ageCtrl.text;
+    patient.gender = _genderCtrl.text;
+    patient.address = _addressCtrl.text;
+    patient.bloodType = _bloodType;
+
+    // Recalcular iniciales si cambió el nombre
+    List<String> parts = _nameCtrl.text.trim().split(' ');
+    String ini = '';
+    if (parts.isNotEmpty && parts[0].isNotEmpty) {
+      ini += parts[0][0].toUpperCase();
+    }
+    if (parts.length > 1 && parts[1].isNotEmpty) {
+      ini += parts[1][0].toUpperCase();
+    }
+    if (ini.isNotEmpty) patient.initials = ini;
+
+    // Guardar contactos
+    patient.contacts = _contactControllers
+        .map((c) => EmergencyContactData(
+              name: c.nameCtrl.text,
+              relation: c.relationCtrl.text,
+              phone: c.phoneCtrl.text,
+            ))
+        .toList();
 
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(
@@ -124,9 +190,9 @@ class _ProfileBodyState extends State<ProfileBody> {
         behavior: SnackBarBehavior.floating,
       ),
     );
+    setState(() {});
   }
 
-  // ── Modal: agregar contacto de emergencia ───────────────────
   void _showAddContactModal() {
     final modalNameCtrl = TextEditingController();
     final modalRelationCtrl = TextEditingController();
@@ -205,8 +271,8 @@ class _ProfileBodyState extends State<ProfileBody> {
                       onPressed: () {
                         if (modalNameCtrl.text.trim().isEmpty) return;
                         setState(() {
-                          _contacts.add(
-                            EmergencyContact(
+                          _contactControllers.add(
+                            EmergencyContactController(
                               name: modalNameCtrl.text.trim(),
                               relation: modalRelationCtrl.text.trim(),
                               phone: modalPhoneCtrl.text.trim(),
@@ -237,15 +303,13 @@ class _ProfileBodyState extends State<ProfileBody> {
     );
   }
 
-  // ── Eliminar contacto ────────────────────────────────────────
   void _deleteContact(int index) {
     setState(() {
-      _contacts[index].dispose();
-      _contacts.removeAt(index);
+      _contactControllers[index].dispose();
+      _contactControllers.removeAt(index);
     });
   }
 
-  // ── Cancelar suscripción ─────────────────────────────────────
   void _cancelSubscription() {
     showDialog(
       context: context,
@@ -253,7 +317,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: const Text('Cancel subscription'),
         content: const Text(
-          'Are you sure you want to cancel your TukunTech Premium subscription?',
+          'Are you sure you want to cancel the TukunTech Premium subscription for this patient?',
         ),
         actions: [
           TextButton(
@@ -291,12 +355,14 @@ class _ProfileBodyState extends State<ProfileBody> {
 
   @override
   Widget build(BuildContext context) {
+    final currentPatient = _patients[_selectedPatientIndex];
+
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       children: [
         // ── Título ──────────────────────────────────────────────
         const Text(
-          'My profile',
+          'Patient profile',
           style: TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
@@ -307,6 +373,64 @@ class _ProfileBodyState extends State<ProfileBody> {
         Text(
           'Personal information, subscription, and emergency contacts.',
           style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+        ),
+        const SizedBox(height: 16),
+
+        // ── Selector de Pacientes ─────────────────────────────────
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(
+            children: List.generate(_patients.length, (index) {
+              final isSelected = index == _selectedPatientIndex;
+              final p = _patients[index];
+              return Padding(
+                padding: const EdgeInsets.only(right: 8.0),
+                child: GestureDetector(
+                  onTap: () => _onPatientSelected(index),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isSelected ? _primary.withOpacity(0.1) : Colors.white,
+                      border: Border.all(
+                        color: isSelected ? _primary : Colors.grey.shade300,
+                      ),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            color: _primary,
+                            shape: BoxShape.circle,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            p.initials,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          p.name,
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                            fontSize: 13,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            }),
+          ),
         ),
         const SizedBox(height: 20),
 
@@ -323,7 +447,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  _patientData['initials']!,
+                  currentPatient.initials,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 22,
@@ -336,7 +460,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    _patientData['name']!,
+                    currentPatient.name,
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -345,7 +469,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${_patientData['age']} years old',
+                    '${currentPatient.age} years old',
                     style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
                   ),
                 ],
@@ -361,7 +485,7 @@ class _ProfileBodyState extends State<ProfileBody> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const Text(
-                'Subsciption',
+                'Subscription',
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
@@ -700,7 +824,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                 ],
               ),
               const SizedBox(height: 20),
-              if (_contacts.isEmpty)
+              if (_contactControllers.isEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   child: Text(
@@ -708,8 +832,8 @@ class _ProfileBodyState extends State<ProfileBody> {
                     style: TextStyle(color: Colors.grey[400], fontSize: 13),
                   ),
                 ),
-              ...List.generate(_contacts.length, (i) {
-                final c = _contacts[i];
+              ...List.generate(_contactControllers.length, (i) {
+                final c = _contactControllers[i];
                 return Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   padding: const EdgeInsets.all(16),
@@ -817,7 +941,7 @@ class _ProfileBodyState extends State<ProfileBody> {
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: const BorderSide(
-                color: Color(0xFF3B9784),
+                color: _primary,
                 width: 1.5,
               ),
             ),

@@ -75,10 +75,10 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                   // Step Content
                   if (_currentStep == 0) _buildPlanCard(primaryColor)
                   else if (_currentStep == 1) _buildAccountForm(primaryColor)
-                  else if (_currentStep == 2) const StepPatients()
-                  else if (_currentStep == 3) const StepAddress()
-                  else if (_currentStep == 4) const StepDelivery()
-                  else if (_currentStep == 5) StepPayment(onContinue: _nextStep)
+                  else if (_currentStep == 2) StepPatients(onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 3) StepAddress(onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 4) StepDelivery(onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 5) StepPayment(onContinue: _nextStep, onBack: _previousStep)
                   else if (_currentStep == 6) StepSuccess(onGoToWebsite: () => Navigator.of(context).popUntil((route) => route.isFirst))
                   else Center(child: Text('Step ${_currentStep + 1} Content', style: const TextStyle(fontSize: 18))),
                   

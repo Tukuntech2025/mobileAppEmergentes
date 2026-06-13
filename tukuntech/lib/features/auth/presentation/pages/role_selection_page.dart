@@ -35,7 +35,7 @@ class RoleSelectionPage extends StatelessWidget {
                   
                   // Headings
                   const Text(
-                    'Bienvenido a TukunTech',
+                    'Welcome to TukunTech',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -44,7 +44,7 @@ class RoleSelectionPage extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   const Text(
-                    'Elige tu rol para continuar.',
+                    'Choose your role to continue.',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.black54,
@@ -55,8 +55,8 @@ class RoleSelectionPage extends StatelessWidget {
                   // Role Options
                   _buildRoleCard(
                     context,
-                    title: 'Soy Paciente',
-                    subtitle: 'Accede a tus signos vitales, dispositivo y suscripción.',
+                    title: 'I\'m a Patient',
+                    subtitle: 'Access your vital signs, device, and subscription.',
                     icon: Icons.person_outline,
                     iconColor: Colors.blue[300]!,
                     iconBgColor: Colors.blue.withOpacity(0.1),
@@ -65,8 +65,8 @@ class RoleSelectionPage extends StatelessWidget {
                   const SizedBox(height: 12),
                   _buildRoleCard(
                     context,
-                    title: 'Soy Cuidador / Familiar',
-                    subtitle: 'Monitorea hasta 5 personas bajo tu cuidado.',
+                    title: 'I\'m a Caregiver / Family',
+                    subtitle: 'Monitor up to 5 people under your care.',
                     icon: Icons.favorite_border,
                     iconColor: primaryColor,
                     iconBgColor: primaryColor.withOpacity(0.15),
@@ -75,8 +75,8 @@ class RoleSelectionPage extends StatelessWidget {
                   const SizedBox(height: 12),
                   _buildRoleCard(
                     context,
-                    title: 'Soy Administrador',
-                    subtitle: 'Consola operativa — solo inicio de sesión.',
+                    title: 'I\'m an Administrator',
+                    subtitle: 'Operational console — login only.',
                     icon: Icons.shield_outlined,
                     iconColor: primaryColor,
                     iconBgColor: primaryColor.withOpacity(0.15),
@@ -103,8 +103,8 @@ class RoleSelectionPage extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          _buildLangButton('EN', false, primaryColor),
-                          _buildLangButton('ES', true, primaryColor),
+                          _buildLangButton('EN', true, primaryColor),
+                          _buildLangButton('ES', false, primaryColor),
                           const SizedBox(width: 8),
                           Icon(Icons.translate, size: 18, color: primaryColor),
                           const SizedBox(width: 12),

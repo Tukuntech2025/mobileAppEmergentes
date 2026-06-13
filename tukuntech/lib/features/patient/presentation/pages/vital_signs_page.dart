@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/features/auth/presentation/pages/role_selection_page.dart';
 import 'package:tukuntech/core/widgets/custom_bottom_nav.dart';
 import 'package:tukuntech/features/patient/presentation/widgets/device_body.dart';
 import 'package:tukuntech/features/patient/presentation/widgets/report_body.dart';
@@ -33,6 +34,18 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
         backgroundColor: Colors.white,
         elevation: 0,
         automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const RoleSelectionPage(),
+              ),
+              (route) => false,
+            );
+          },
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

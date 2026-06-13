@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
 class StepAddress extends StatelessWidget {
-  const StepAddress({super.key});
+  final VoidCallback onContinue;
+  final VoidCallback onBack;
+
+  const StepAddress({
+    super.key,
+    required this.onContinue,
+    required this.onBack,
+  });
 
   @override
   Widget build(BuildContext context) {

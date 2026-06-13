@@ -15,7 +15,14 @@ class PatientData {
 }
 
 class StepPatients extends StatefulWidget {
-  const StepPatients({super.key});
+  final VoidCallback onContinue;
+  final VoidCallback onBack;
+
+  const StepPatients({
+    super.key,
+    required this.onContinue,
+    required this.onBack,
+  });
 
   @override
   State<StepPatients> createState() => _StepPatientsState();
@@ -179,11 +186,11 @@ class _StepPatientsState extends State<StepPatients> {
                 children: [
                   Expanded(
                     child: ElevatedButton.icon(
-                      onPressed: _currentPatientIndex > 0 ? _previousPatient : null,
-                      icon: Icon(Icons.arrow_back, size: 16, color: _currentPatientIndex > 0 ? primaryColor : Colors.grey),
-                      label: Text('Previous', style: TextStyle(color: _currentPatientIndex > 0 ? primaryColor : Colors.grey, fontSize: 13)),
+                      onPressed: _currentPatientIndex > 0 ? _previousPatient : widget.onBack,
+                      icon: const Icon(Icons.arrow_back, size: 16, color: Color(0xFF3B9784)),
+                      label: const Text('Previous', style: TextStyle(color: Color(0xFF3B9784), fontSize: 13)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor.withOpacity(0.05),
+                        backgroundColor: const Color(0xFF3B9784).withOpacity(0.05),
                         elevation: 0,
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
@@ -193,7 +200,7 @@ class _StepPatientsState extends State<StepPatients> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: _currentPatientIndex < 4 ? _nextPatient : null,
+                      onPressed: _currentPatientIndex < 4 ? _nextPatient : widget.onContinue,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: primaryColor,
                         foregroundColor: Colors.white,

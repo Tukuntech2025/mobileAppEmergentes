@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/features/auth/presentation/pages/role_selection_page.dart';
 import 'package:tukuntech/core/widgets/custom_bottom_nav.dart';
 import 'package:tukuntech/features/caregiver/presentation/widgets/patient_vital_card.dart';
 import 'package:tukuntech/features/caregiver/presentation/widgets/device_status_card.dart';
 import 'package:tukuntech/features/caregiver/presentation/widgets/patient_history_view.dart';
+import 'package:tukuntech/features/caregiver/presentation/widgets/caregiver_profile_body.dart';
+import 'package:tukuntech/features/patient/presentation/widgets/settings_body.dart';
+import 'package:tukuntech/features/patient/presentation/widgets/support_body.dart';
 
 class CaregiverDashboardPage extends StatefulWidget {
   const CaregiverDashboardPage({super.key});
@@ -13,6 +17,7 @@ class CaregiverDashboardPage extends StatefulWidget {
 
 class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
   int _currentIndex = 0;
+  String? _drawerSection;
 
   final List<PatientVitalData> mockPatients = [
     PatientVitalData(
@@ -69,6 +74,19 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const RoleSelectionPage(),
+              ),
+              (route) => false,
+            );
+          },
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -90,16 +108,81 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings_outlined, color: Colors.black54),
-            onPressed: () {},
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.black54, size: 28),
+              onPressed: () {
+                Scaffold.of(context).openEndDrawer();
+              },
+            ),
           ),
         ],
       ),
+      endDrawer: Drawer(
+        width: MediaQuery.of(context).size.width * 0.7,
+        backgroundColor: Colors.white,
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.all(16),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.close,
+                    color: Colors.black54,
+                    size: 24,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Text(
+                  'Menu',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+              ),
+              const Divider(),
+              ListTile(
+                leading: const Icon(Icons.settings_outlined, color: Color(0xFF3B9784)),
+                title: const Text(
+                  'Settings',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                ),
+                onTap: () {
+                  setState(() => _drawerSection = 'settings');
+                  Navigator.pop(context);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.support_agent_outlined, color: Color(0xFF3B9784)),
+                title: const Text(
+                  'Support',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                ),
+                onTap: () {
+                  setState(() => _drawerSection = 'support');
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
       body: SafeArea(
-        child: IndexedStack(
-          index: _currentIndex,
-          children: [
+        child: _drawerSection == 'settings'
+            ? const SettingsBody()
+            : _drawerSection == 'support'
+                ? const SupportBody()
+                : IndexedStack(
+                    index: _currentIndex,
+                    children: [
             ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
               children: [
@@ -175,7 +258,7 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
               ],
             ),
             PatientHistoryView(patients: mockPatients),
-            const Center(child: Text('Profile')),
+            const CaregiverProfileBody(),
             const Center(child: Text('Reports')),
           ],
         ),
@@ -185,6 +268,7 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
         onTap: (index) {
           setState(() {
             _currentIndex = index;
+            _drawerSection = null;
           });
         },
       ),
