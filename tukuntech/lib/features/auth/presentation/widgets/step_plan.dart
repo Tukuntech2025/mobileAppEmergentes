@@ -166,7 +166,7 @@ class StepPlan extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     const Text(
-                      '\$89/mo',
+                      '\$200/mo',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -177,18 +177,12 @@ class StepPlan extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Up to 5 TukunTech devices · multi-patient dashboard · 24/7 alerts.',
+                  'Up to 5 TukunTech devices · family dashboard · vitals tracking · Mobile app and web access',
                   style: TextStyle(
                     color: Colors.black54,
                     fontSize: 12,
                   ),
                 ),
-                const SizedBox(height: 8),
-                _buildCheckItem('5 devices included', primaryColor),
-                const SizedBox(height: 4),
-                _buildCheckItem('Caregiver dashboard', primaryColor),
-                const SizedBox(height: 4),
-                _buildCheckItem('Priority support', primaryColor),
               ],
             ),
           ),

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/features/auth/presentation/pages/role_selection_page.dart';
 import 'package:tukuntech/core/widgets/custom_bottom_nav.dart';
 import 'package:tukuntech/features/patient/presentation/widgets/device_body.dart';
 import 'package:tukuntech/features/patient/presentation/widgets/report_body.dart';
+import 'package:tukuntech/features/patient/presentation/widgets/patient_profile_body.dart';
+import 'package:tukuntech/features/patient/presentation/widgets/settings_body.dart';
+import 'package:tukuntech/features/patient/presentation/widgets/support_body.dart';
 
 class VitalSignsPage extends StatefulWidget {
   const VitalSignsPage({super.key});
@@ -11,15 +15,37 @@ class VitalSignsPage extends StatefulWidget {
 }
 
 class _VitalSignsPageState extends State<VitalSignsPage> {
+  static const Color _primary = Color(0xFF3B9784);
+  static const Color _primaryLight = Color(0xFFE0F2F1);
+
   int _currentIndex = 0;
+
+  // ── Drawer: sección activa ───────────────────────────────────
+  // null = muestra los tabs del BottomNav, 'settings' = Settings, 'support' = Support
+  String? _drawerSection;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F9F8),
+
+      // ── AppBar ───────────────────────────────────────────────
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+          onPressed: () {
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                builder: (context) => const RoleSelectionPage(),
+              ),
+              (route) => false,
+            );
+          },
+        ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -32,82 +58,184 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
               ),
             ),
             Text(
-              'Patient',
-              style: TextStyle(
-                color: Colors.grey[500],
-                fontSize: 12,
-              ),
+              'patient', // O 'Patient' según la vista que uses
+              style: TextStyle(color: Colors.grey[500], fontSize: 11),
             ),
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.menu, color: Colors.black54),
-            onPressed: () {},
+          // ── Botón de las 3 rayitas que abre el Side Bar ───────
+          Builder(
+            builder: (ctx) => IconButton(
+              icon: const Icon(Icons.menu, color: Colors.black54, size: 28),
+              onPressed: () {
+                Scaffold.of(ctx).openEndDrawer();
+              },
+            ),
           ),
+          const SizedBox(width: 8),
         ],
       ),
-      body: SafeArea(
-        child: IndexedStack(
-          index: _currentIndex,
-          children: [
-            ListView(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-          children: [
-            const Text(
-              'Vital Signs',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
+
+      // ── Toggle Side Bar (End Drawer) ─────────────────────────
+      endDrawer: Drawer(
+        width: MediaQuery.of(context).size.width * 0.7,
+        backgroundColor: Colors.white,
+        child: SafeArea(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Botón para cerrar el Drawer
+              Container(
+                alignment: Alignment.centerRight,
+                padding: const EdgeInsets.all(16),
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.close,
+                    color: Colors.black54,
+                    size: 24,
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                ),
               ),
-            ),
-            const SizedBox(height: 0),
-            Text(
-              'Detail view of today\'s activity',
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.grey[600],
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Text(
+                  'Menu',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
               ),
-            ),
-            const SizedBox(height: 12),
-            _buildGreetingCard(),
-            const SizedBox(height: 12),
-            _buildHeartRateCard(),
-            const SizedBox(height: 12),
-            _buildOxygenCard(),
-            const SizedBox(height: 12),
-            _buildTemperatureCard(),
-            const SizedBox(height: 12),
-            _buildLiveEcgCard(),
-            const SizedBox(height: 12),
-          ],
+              const Divider(),
+              // Opción Settings
+              ListTile(
+                leading: const Icon(Icons.settings_outlined, color: _primary),
+                title: const Text(
+                  'Settings',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                ),
+                onTap: () {
+                  setState(() => _drawerSection = 'settings');
+                  Navigator.pop(context); // Cierra el sidebar
+                },
+              ),
+              // Opción Support
+              ListTile(
+                leading: const Icon(
+                  Icons.support_agent_outlined,
+                  color: _primary,
+                ),
+                title: const Text(
+                  'Support',
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                ),
+                onTap: () {
+                  setState(() => _drawerSection = 'support');
+                  Navigator.pop(context); // Cierra el sidebar
+                },
+              ),
+            ],
+          ),
         ),
-        const DeviceBody(),
-        const ReportBody(),
-      ],
-    ),
-  ),
+      ),
+
+      // ── Body principal ───────────────────────────────────────
+      body: SafeArea(
+        child: _drawerSection == 'settings'
+            ? const SettingsBody()
+            : _drawerSection == 'support'
+            ? const SupportBody()
+            : IndexedStack(
+                index: _currentIndex,
+                children: [
+                  // 0: Vital Signs
+                  _buildVitalSignsTab(),
+                  // 1: Device
+                  const DeviceBody(),
+                  // 2: Report
+                  const ReportBody(),
+                  // 3: Profile (Tu archivo modificado anteriormente)
+                  const ProfileBody(),
+                ],
+              ),
+      ),
+
+      // ── Bottom Nav ────────────────────────────────────────────
       bottomNavigationBar: CustomBottomNav(
         currentIndex: _currentIndex,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
+            _drawerSection =
+                null; // Al tocar abajo, salimos de settings/support y volvemos a los tabs
           });
         },
       ),
     );
   }
 
+  // ── Vital Signs tab ──────────────────────────────────────────
+  Widget _buildVitalSignsTab() {
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+      children: [
+        const Text(
+          'Vital Signs',
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        Text(
+          'Detail view of today\'s activity',
+          style: TextStyle(fontSize: 12, color: Colors.grey[600]),
+        ),
+        const SizedBox(height: 12),
+        _buildGreetingCard(),
+        const SizedBox(height: 12),
+        _buildMetricCard(
+          label: 'Heart rate',
+          value: '74 bpm',
+          sub: 'Resting - normal',
+          color: _primaryLight,
+          icon: Icons.favorite_border,
+          iconColor: _primary,
+        ),
+        const SizedBox(height: 12),
+        _buildMetricCard(
+          label: 'Oxygen',
+          value: '98%',
+          sub: 'SpO2',
+          color: const Color(0xFFE8F4F8),
+          icon: Icons.air,
+          iconColor: const Color(0xFF4FC3F7),
+        ),
+        const SizedBox(height: 12),
+        _buildMetricCard(
+          label: 'Temperature',
+          value: '36.7 °C',
+          sub: 'Normal',
+          color: const Color(0xFFF9F5E8),
+          icon: Icons.thermostat,
+          iconColor: const Color(0xFFFFCA28),
+        ),
+        const SizedBox(height: 12),
+        _buildLiveEcgCard(),
+        const SizedBox(height: 12),
+      ],
+    );
+  }
+
   Widget _buildGreetingCard() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [
-            const Color(0xFFE0F2F1), // Light teal
-            const Color(0xFFB2DFDB).withOpacity(0.5),
-          ],
+          colors: [_primaryLight, _primaryLight.withOpacity(0.5)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -115,16 +243,14 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Container(
                 width: 44,
                 height: 44,
                 decoration: const BoxDecoration(
-                  color: Color(0xFF3B9784), // Primary teal
+                  color: _primary,
                   shape: BoxShape.circle,
                 ),
                 alignment: Alignment.center,
@@ -141,7 +267,6 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       'Hello',
@@ -165,13 +290,13 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
               ),
             ],
           ),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: const Color(0xFF3B9784).withOpacity(0.2),
+              color: _primary.withOpacity(0.2),
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFF3B9784).withOpacity(0.5)),
+              border: Border.all(color: _primary.withOpacity(0.5)),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -180,7 +305,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
                   width: 6,
                   height: 6,
                   decoration: const BoxDecoration(
-                    color: Color(0xFF3B9784),
+                    color: _primary,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -195,124 +320,49 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
                 ),
               ],
             ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHeartRateCard() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFE0F2F1), // Light teal
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Heart rate',
-                style: TextStyle(color: Colors.grey[600], fontSize: 12),
-              ),
-              const Icon(Icons.favorite_border, color: Color(0xFF3B9784), size: 18),
-            ],
-          ),
-          const SizedBox(height: 2),
-          const Text(
-            '74 bpm',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          Text(
-            'Resting - normal',
-            style: TextStyle(color: Colors.grey[600], fontSize: 11),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildOxygenCard() {
+  Widget _buildMetricCard({
+    required String label,
+    required String value,
+    required String sub,
+    required Color color,
+    required IconData icon,
+    required Color iconColor,
+  }) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFFE8F4F8), // Light blue
+        color: color,
         borderRadius: BorderRadius.circular(20),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Oxygen',
+                label,
                 style: TextStyle(color: Colors.grey[600], fontSize: 12),
               ),
-              const Icon(Icons.air, color: Color(0xFF4FC3F7), size: 18),
+              Icon(icon, color: iconColor, size: 18),
             ],
           ),
           const SizedBox(height: 2),
-          const Text(
-            '98%',
-            style: TextStyle(
+          Text(
+            value,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
             ),
           ),
-          Text(
-            'SpO2',
-            style: TextStyle(color: Colors.grey[600], fontSize: 11),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTemperatureCard() {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF9F5E8), // Light yellow/beige
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Temperature',
-                style: TextStyle(color: Colors.grey[600], fontSize: 12),
-              ),
-              const Icon(Icons.thermostat, color: Color(0xFFFFCA28), size: 18),
-            ],
-          ),
-          const SizedBox(height: 2),
-          const Text(
-            '36.7 °C',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-          ),
-          Text(
-            'Normal',
-            style: TextStyle(color: Colors.grey[600], fontSize: 11),
-          ),
+          Text(sub, style: TextStyle(color: Colors.grey[600], fontSize: 11)),
         ],
       ),
     );
@@ -320,7 +370,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
 
   Widget _buildLiveEcgCard() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -335,11 +385,10 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Row(
             children: [
-              const Icon(Icons.favorite_border, color: Color(0xFF3B9784), size: 16),
+              const Icon(Icons.favorite_border, color: _primary, size: 16),
               const SizedBox(width: 6),
               const Text(
                 'Heart rate - live',
@@ -357,28 +406,23 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
             style: TextStyle(color: Colors.grey[500], fontSize: 10),
           ),
           const SizedBox(height: 8),
-          // ECG Mock Graph
           SizedBox(
             width: double.infinity,
             height: 100,
-            child: CustomPaint(
-              painter: EcgPainter(),
-            ),
-          )
+            child: CustomPaint(painter: _EcgPainter()),
+          ),
         ],
       ),
     );
   }
 }
 
-class EcgPainter extends CustomPainter {
+class _EcgPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    // Draw grid
     final gridPaint = Paint()
       ..color = const Color(0xFFE0F2F1).withOpacity(0.5)
       ..strokeWidth = 1.0;
-
     for (double i = 0; i < size.width; i += 10) {
       canvas.drawLine(Offset(i, 0), Offset(i, size.height), gridPaint);
     }
@@ -386,7 +430,6 @@ class EcgPainter extends CustomPainter {
       canvas.drawLine(Offset(0, i), Offset(size.width, i), gridPaint);
     }
 
-    // Draw ECG line
     final linePaint = Paint()
       ..color = const Color(0xFF3B9784)
       ..strokeWidth = 1.5
@@ -394,59 +437,38 @@ class EcgPainter extends CustomPainter {
       ..strokeJoin = StrokeJoin.round;
 
     final path = Path();
-    double currentX = 0;
-    final middleY = size.height / 2;
-
-    path.moveTo(0, middleY);
-
-    // Create a repeating ECG pattern
-    while (currentX < size.width) {
-      // Flat segment
-      path.lineTo(currentX + 10, middleY);
-      currentX += 10;
-      if (currentX >= size.width) break;
-
-      // P wave (small bump)
-      path.quadraticBezierTo(currentX + 2.5, middleY - 5, currentX + 5, middleY);
-      currentX += 5;
-      if (currentX >= size.width) break;
-
-      // Flat segment
-      path.lineTo(currentX + 5, middleY);
-      currentX += 5;
-      if (currentX >= size.width) break;
-
-      // Q wave (small dip)
-      path.lineTo(currentX + 2, middleY + 5);
-      currentX += 2;
-      if (currentX >= size.width) break;
-
-      // R wave (tall peak)
-      path.lineTo(currentX + 4, middleY - 20); // reduced peak height slightly
-      currentX += 4;
-      if (currentX >= size.width) break;
-
-      // S wave (deep dip)
-      path.lineTo(currentX + 4, middleY + 12); // reduced dip height slightly
-      currentX += 4;
-      if (currentX >= size.width) break;
-
-      // Back to baseline
-      path.lineTo(currentX + 2, middleY);
-      currentX += 2;
-      if (currentX >= size.width) break;
-
-      // Flat segment
-      path.lineTo(currentX + 8, middleY);
-      currentX += 8;
-      if (currentX >= size.width) break;
-
-      // T wave (medium bump)
-      path.quadraticBezierTo(currentX + 5, middleY - 8, currentX + 10, middleY);
-      currentX += 10;
-      if (currentX >= size.width) break;
+    double x = 0;
+    final mid = size.height / 2;
+    path.moveTo(0, mid);
+    while (x < size.width) {
+      path.lineTo(x + 10, mid);
+      x += 10;
+      if (x >= size.width) break;
+      path.quadraticBezierTo(x + 2.5, mid - 5, x + 5, mid);
+      x += 5;
+      if (x >= size.width) break;
+      path.lineTo(x + 5, mid);
+      x += 5;
+      if (x >= size.width) break;
+      path.lineTo(x + 2, mid + 5);
+      x += 2;
+      if (x >= size.width) break;
+      path.lineTo(x + 4, mid - 20);
+      x += 4;
+      if (x >= size.width) break;
+      path.lineTo(x + 4, mid + 12);
+      x += 4;
+      if (x >= size.width) break;
+      path.lineTo(x + 2, mid);
+      x += 2;
+      if (x >= size.width) break;
+      path.lineTo(x + 8, mid);
+      x += 8;
+      if (x >= size.width) break;
+      path.quadraticBezierTo(x + 5, mid - 8, x + 10, mid);
+      x += 10;
+      if (x >= size.width) break;
     }
-
     canvas.drawPath(path, linePaint);
   }
 

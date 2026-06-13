@@ -44,6 +44,11 @@ class CustomBottomNav extends StatelessWidget {
                 activeIcon: Icons.assignment,
                 index: 2,
               ),
+              _buildNavItem(
+                icon: Icons.person_outline,
+                activeIcon: Icons.person,
+                index: 3,
+              ),
             ],
           ),
         ),

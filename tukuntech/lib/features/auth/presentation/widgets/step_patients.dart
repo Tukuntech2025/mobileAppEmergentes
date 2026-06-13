@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 
 class PatientData {
-  final TextEditingController firstNameCtrl = TextEditingController();
-  final TextEditingController lastNameCtrl = TextEditingController();
+  final TextEditingController fullNameCtrl = TextEditingController();
   final TextEditingController ageCtrl = TextEditingController();
   final TextEditingController notesCtrl = TextEditingController();
   String? gender;
   String? bloodType;
 
   void dispose() {
-    firstNameCtrl.dispose();
-    lastNameCtrl.dispose();
+    fullNameCtrl.dispose();
     ageCtrl.dispose();
     notesCtrl.dispose();
   }
@@ -45,8 +43,6 @@ class _StepPatientsState extends State<StepPatients> {
   void _nextPatient() {
     if (_currentPatientIndex < 4) {
       setState(() => _currentPatientIndex++);
-    } else {
-      widget.onContinue();
     }
   }
 
@@ -66,20 +62,20 @@ class _StepPatientsState extends State<StepPatients> {
       children: [
         // Info Banner
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
-            color: primaryColor.withOpacity(0.05),
-            borderRadius: BorderRadius.circular(16),
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(12),
             border: Border.all(color: Colors.grey.shade200),
           ),
           child: Row(
             children: [
-              Icon(Icons.people_outline, color: primaryColor, size: 20),
-              const SizedBox(width: 12),
+              Icon(Icons.people_outline, color: primaryColor, size: 16),
+              const SizedBox(width: 8),
               const Expanded(
                 child: Text(
                   'Register all 5 patients under your care.',
-                  style: TextStyle(color: Colors.black87, fontSize: 14),
+                  style: TextStyle(color: Colors.black54, fontSize: 12),
                 ),
               ),
             ],
@@ -94,7 +90,7 @@ class _StepPatientsState extends State<StepPatients> {
             children: List.generate(5, (index) {
               final isSelected = index == _currentPatientIndex;
               return Padding(
-                padding: const EdgeInsets.only(right: 4.0),
+                padding: const EdgeInsets.only(right: 8.0),
                 child: ChoiceChip(
                   label: Text('Patient ${index + 1}', style: const TextStyle(fontSize: 12)),
                   selected: isSelected,
@@ -107,7 +103,6 @@ class _StepPatientsState extends State<StepPatients> {
                   backgroundColor: Colors.white,
                   labelStyle: TextStyle(
                     color: isSelected ? Colors.white : Colors.black87,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
@@ -116,6 +111,7 @@ class _StepPatientsState extends State<StepPatients> {
                     ),
                   ),
                   showCheckmark: false,
+                  padding: const EdgeInsets.all(0),
                 ),
               );
             }),
@@ -127,60 +123,36 @@ class _StepPatientsState extends State<StepPatients> {
         Container(
           decoration: BoxDecoration(
             color: Colors.white,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             border: Border.all(color: Colors.grey.shade200, width: 1),
           ),
-          padding: const EdgeInsets.all(12),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
+              _buildLabel('Full name'),
+              const SizedBox(height: 4),
+              _buildTextField('Enter your full name', controller: currentPatient.fullNameCtrl),
+              const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildLabel('First name'),
-                        const SizedBox(height: 2),
-                        _buildTextField('First name', controller: currentPatient.firstNameCtrl),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildLabel('Last name'),
-                        const SizedBox(height: 2),
-                        _buildTextField('Last name', controller: currentPatient.lastNameCtrl),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Row(
-                children: [
-                  Expanded(
-                    flex: 2,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildLabel('Age'),
-                        const SizedBox(height: 2),
-                        _buildTextField('e.g. 68', keyboardType: TextInputType.number, controller: currentPatient.ageCtrl),
+                        const SizedBox(height: 4),
+                        _buildTextField('Enter your age', keyboardType: TextInputType.number, controller: currentPatient.ageCtrl),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 16),
+                  const SizedBox(width: 12),
                   Expanded(
-                    flex: 3,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         _buildLabel('Gender'),
-                        const SizedBox(height: 2),
+                        const SizedBox(height: 4),
                         _buildDropdown(
                           'Select gender', 
                           ['Female', 'Male', 'Other'],
@@ -192,7 +164,7 @@ class _StepPatientsState extends State<StepPatients> {
                   ),
                 ],
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 12),
               _buildLabel('Blood type'),
               const SizedBox(height: 4),
               _buildDropdown(
@@ -201,85 +173,54 @@ class _StepPatientsState extends State<StepPatients> {
                 currentPatient.bloodType,
                 (val) => setState(() => currentPatient.bloodType = val),
               ),
-              const SizedBox(height: 2),
+              const SizedBox(height: 12),
               _buildLabel('Additional notes'),
               const SizedBox(height: 4),
               _buildTextField(
-                'Allergies, conditions, medications...',
-                maxLines: 1,
+                'Allergies, conditions...',
+                maxLines: 2,
                 controller: currentPatient.notesCtrl,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
               Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  if (_currentPatientIndex > 0)
-                    Expanded(
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: TextButton.icon(
-                          onPressed: _previousPatient,
-                          icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 18),
-                          label: const Flexible(
-                            child: Text(
-                              'Previous patient',
-                              style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 15),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                        ),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: _currentPatientIndex > 0 ? _previousPatient : widget.onBack,
+                      icon: const Icon(Icons.arrow_back, size: 16, color: Color(0xFF3B9784)),
+                      label: const Text('Previous', style: TextStyle(color: Color(0xFF3B9784), fontSize: 13)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF3B9784).withOpacity(0.05),
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       ),
-                    )
-                  else
-                    const Spacer(),
+                    ),
+                  ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: Align(
-                      alignment: Alignment.centerRight,
-                      child: ElevatedButton(
-                        onPressed: _nextPatient,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          elevation: 0,
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Flexible(
-                              child: Text(
-                                _currentPatientIndex == 4 ? 'Continue' : 'Next patient',
-                                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            const SizedBox(width: 4),
-                            Icon(_currentPatientIndex == 4 ? Icons.check : Icons.arrow_forward, size: 18),
-                          ],
-                        ),
+                    child: ElevatedButton(
+                      onPressed: _currentPatientIndex < 4 ? _nextPatient : widget.onContinue,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: const [
+                          Flexible(child: Text('Next', style: TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis)),
+                          SizedBox(width: 4),
+                          Icon(Icons.arrow_forward, size: 16),
+                        ],
                       ),
                     ),
                   ),
                 ],
               ),
             ],
-          ),
-        ),
-        
-        const SizedBox(height: 8),
-        Align(
-          alignment: Alignment.centerLeft,
-          child: TextButton.icon(
-            onPressed: widget.onBack,
-            icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 16),
-            label: const Text(
-              'Back to account',
-              style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w500, fontSize: 14),
-            ),
           ),
         ),
       ],
@@ -291,7 +232,7 @@ class _StepPatientsState extends State<StepPatients> {
       text,
       style: const TextStyle(
         fontWeight: FontWeight.w600,
-        fontSize: 14,
+        fontSize: 13,
         color: Colors.black87,
       ),
     );
@@ -304,10 +245,10 @@ class _StepPatientsState extends State<StepPatients> {
       keyboardType: keyboardType,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Colors.black54, fontSize: 14),
+        hintStyle: const TextStyle(color: Colors.black45, fontWeight: FontWeight.normal),
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -321,7 +262,7 @@ class _StepPatientsState extends State<StepPatients> {
           borderSide: const BorderSide(color: Color(0xFF3B9784), width: 2),
         ),
       ),
-      style: const TextStyle(fontSize: 14),
+      style: const TextStyle(fontSize: 13),
     );
   }
 
@@ -329,12 +270,12 @@ class _StepPatientsState extends State<StepPatients> {
     return DropdownButtonFormField<String>(
       value: value,
       isExpanded: true,
-      hint: Text(hint, style: const TextStyle(color: Colors.black54)),
+      hint: Text(hint, style: const TextStyle(color: Colors.black45, fontWeight: FontWeight.normal)),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
       decoration: InputDecoration(
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -354,7 +295,7 @@ class _StepPatientsState extends State<StepPatients> {
           child: Text(
             item,
             style: const TextStyle(
-              fontSize: 16,
+              fontSize: 13,
               color: Colors.black87,
             ),
           ),
