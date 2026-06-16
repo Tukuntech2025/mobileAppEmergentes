@@ -4,6 +4,7 @@ import 'package:tukuntech/features/auth/presentation/widgets/step_address.dart';
 import 'package:tukuntech/features/auth/presentation/widgets/step_delivery.dart';
 import 'package:tukuntech/features/auth/presentation/widgets/step_payment.dart';
 import 'package:tukuntech/features/auth/presentation/widgets/step_success.dart';
+import 'package:tukuntech/features/auth/presentation/pages/plan_selection_page.dart';
 
 class CaregiverCreateAccountPage extends StatefulWidget {
   const CaregiverCreateAccountPage({super.key});
@@ -29,7 +30,10 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
     if (_currentStep > 0) {
       setState(() => _currentStep--);
     } else {
-      Navigator.pop(context); // Go back to PlanSelectionPage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PlanSelectionPage()),
+      ); // Go back to PlanSelectionPage
     }
   }
 
@@ -113,7 +117,12 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                     const SizedBox(height: 16),
                     Center(
                       child: TextButton(
-                        onPressed: () => Navigator.pop(context),
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const PlanSelectionPage()),
+                          );
+                        },
                         style: TextButton.styleFrom(foregroundColor: Colors.black54),
                         child: const Text('← Choose a different plan', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13)),
                       ),

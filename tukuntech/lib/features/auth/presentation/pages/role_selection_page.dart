@@ -72,18 +72,7 @@ class RoleSelectionPage extends StatelessWidget {
                     iconBgColor: primaryColor.withOpacity(0.15),
                     destination: const CaregiverLoginScreen(),
                   ),
-                  const SizedBox(height: 12),
-                  _buildRoleCard(
-                    context,
-                    title: 'I\'m an Administrator',
-                    subtitle: 'Operational console — login only.',
-                    icon: Icons.shield_outlined,
-                    iconColor: primaryColor,
-                    iconBgColor: primaryColor.withOpacity(0.15),
-                    destination: const LoginScreen(),
-                  ),
                   const SizedBox(height: 24),
-
                   // Language pill
                   Center(
                     child: Container(
