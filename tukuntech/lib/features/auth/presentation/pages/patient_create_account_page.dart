@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/features/auth/presentation/pages/plan_selection_page.dart';
 
 class PatientCreateAccountPage extends StatefulWidget {
   const PatientCreateAccountPage({super.key});
@@ -26,7 +27,10 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
     if (_currentStep > 0) {
       setState(() => _currentStep--);
     } else {
-      Navigator.pop(context); // Go back to Patient Login
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const PlanSelectionPage()),
+      ); // Go back to PlanSelectionPage
     }
   }
 
@@ -150,7 +154,10 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                   Center(
                     child: TextButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => const PlanSelectionPage()),
+                        );
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.black54,

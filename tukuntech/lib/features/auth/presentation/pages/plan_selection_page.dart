@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tukuntech/features/auth/presentation/pages/create_account_page.dart';
+import 'package:tukuntech/features/auth/presentation/pages/patient_create_account_page.dart';
 import 'package:tukuntech/features/auth/presentation/pages/caregiver_create_account_page.dart';
 import 'package:tukuntech/features/auth/presentation/pages/role_selection_page.dart';
 
@@ -76,7 +76,7 @@ class PlanSelectionPage extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => const CreateAccountPage(planType: PlanType.personal),
+                          builder: (context) => const PatientCreateAccountPage(),
                         ),
                       );
                     },

@@ -125,10 +125,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                   Center(
                     child: TextButton(
                       onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => const PlanSelectionPage()),
-                        );
+                        Navigator.pop(context);
                       },
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.black54,
