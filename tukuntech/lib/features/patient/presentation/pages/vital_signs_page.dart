@@ -232,96 +232,115 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
 
   Widget _buildGreetingCard() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        // Aquí el degradado de esquina a esquina con un color más intenso
         gradient: LinearGradient(
-          colors: [_primaryLight, _primaryLight.withOpacity(0.5)],
+          colors: [
+            const Color(0xFFC0E5DF), // Tu color original pero más fuerte
+            Colors.white.withOpacity(
+              0.1,
+            ), // Difuminado hacia la esquina inferior derecha
+          ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
+          stops: const [0.0, 1.0],
         ),
-        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade200),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: const BoxDecoration(
-                  color: _primary,
-                  shape: BoxShape.circle,
-                ),
-                alignment: Alignment.center,
-                child: const Text(
-                  'EM',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Hello',
-                      style: TextStyle(color: Colors.grey[600], fontSize: 11),
-                    ),
-                    const Text(
-                      'Eleanor Marsh',
-                      style: TextStyle(
-                        color: Colors.black87,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      'all good! You are feeling calm.',
-                      style: TextStyle(color: Colors.grey[700], fontSize: 11),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: _primary.withOpacity(0.2),
-              borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: _primary.withOpacity(0.5)),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+      clipBehavior: Clip.antiAlias,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
                 Container(
-                  width: 6,
-                  height: 6,
+                  width: 50,
+                  height: 50,
                   decoration: const BoxDecoration(
                     color: _primary,
                     shape: BoxShape.circle,
                   ),
+                  alignment: Alignment.center,
+                  child: const Text(
+                    'EM',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 6),
-                const Text(
-                  'Calm and stable',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 11,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Hello',
+                        style: TextStyle(color: Colors.grey[600], fontSize: 11),
+                      ),
+                      const Text(
+                        'Eleanor Marsh',
+                        style: TextStyle(
+                          color: Colors.black87,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        'all good! You are feeling calm.',
+                        style: TextStyle(color: Colors.grey[700], fontSize: 12),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+              decoration: BoxDecoration(
+                // Etiqueta con el mismo tono translúcido
+                color: const Color(0xFFC0E5DF).withOpacity(0.6),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(color: _primary.withOpacity(0.3)),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: _primary, // Punto con tu color principal
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  const Text(
+                    'Calm and stable',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
