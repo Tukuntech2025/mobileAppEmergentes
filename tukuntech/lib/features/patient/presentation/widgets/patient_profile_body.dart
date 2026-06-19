@@ -140,98 +140,98 @@ class _ProfileBodyState extends State<ProfileBody> {
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Add emergency contact',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          'Enter the contact information for\nemergency situations.',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
-                        ),
-                      ],
-                    ),
-                  ),
-                  GestureDetector(
-                    onTap: () => Navigator.pop(ctx),
-                    child: const Icon(Icons.close, color: _primary),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-              _field('Name', modalNameCtrl),
-              const SizedBox(height: 12),
-              _field('Relation', modalRelationCtrl),
-              const SizedBox(height: 12),
-              _field(
-                'Phone',
-                modalPhoneCtrl,
-                keyboardType: TextInputType.phone,
-              ),
-              const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.grey.shade300),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(color: Colors.black54),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        if (modalNameCtrl.text.trim().isEmpty) return;
-                        setState(() {
-                          _contacts.add(
-                            EmergencyContact(
-                              name: modalNameCtrl.text.trim(),
-                              relation: modalRelationCtrl.text.trim(),
-                              phone: modalPhoneCtrl.text.trim(),
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Add emergency contact',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
                             ),
-                          );
-                        });
-                        Navigator.pop(ctx);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        elevation: 0,
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'Enter the contact information for\nemergency situations.',
+                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                          ),
+                        ],
                       ),
-                      child: const Text('Save changes'),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                    GestureDetector(
+                      onTap: () => Navigator.pop(ctx),
+                      child: const Icon(Icons.close, color: _primary),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                _field('Name', modalNameCtrl),
+                const SizedBox(height: 12),
+                _field('Relation', modalRelationCtrl),
+                const SizedBox(height: 12),
+                _field(
+                  'Phone',
+                  modalPhoneCtrl,
+                  keyboardType: TextInputType.phone,
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: Colors.grey.shade300),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        child: const Text(
+                          'Cancel',
+                          style: TextStyle(color: Colors.black54),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          if (modalNameCtrl.text.trim().isEmpty) return;
+                          setState(() {
+                            _contacts.add(
+                              EmergencyContact(
+                                name: modalNameCtrl.text.trim(),
+                                relation: modalRelationCtrl.text.trim(),
+                                phone: modalPhoneCtrl.text.trim(),
+                              ),
+                            );
+                          });
+                          Navigator.pop(ctx);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          elevation: 0,
+                        ),
+                        child: const Text('Save changes'),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
         ),
       ),
     );
@@ -368,7 +368,21 @@ class _ProfileBodyState extends State<ProfileBody> {
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5F1), // Fondo verde clarito
+                  // 1. Aquí aplicamos el degradado diagonal
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Color(
+                        0xFFD8F2EB,
+                      ), // Verde claro (Esquina superior izquierda)
+                      Color(0xFFF4FAF8), // Casi blanco (Centro)
+                      Color(
+                        0xFFE2F5F0,
+                      ), // Verde claro (Esquina inferior derecha)
+                    ],
+                    stops: [0.0, 0.5, 1.0],
+                  ),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -480,18 +494,25 @@ class _ProfileBodyState extends State<ProfileBody> {
                               );
                             },
                             icon: const Icon(Icons.refresh, size: 18),
-                            label: const Text(
-                              'Renew subscription',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
+                            // 2. FittedBox para evitar que el texto se salga
+                            label: const FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'Renew subscription',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: _primary,
                               foregroundColor: Colors.white,
                               elevation: 0,
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 8,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
@@ -503,18 +524,25 @@ class _ProfileBodyState extends State<ProfileBody> {
                           child: ElevatedButton.icon(
                             onPressed: _cancelSubscription,
                             icon: const Icon(Icons.cancel_outlined, size: 18),
-                            label: const Text(
-                              'Cancel subscription',
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
+                            // 2. FittedBox para evitar que el texto se salga
+                            label: const FittedBox(
+                              fit: BoxFit.scaleDown,
+                              child: Text(
+                                'Cancel subscription',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFFF6B6B),
                               foregroundColor: Colors.white,
                               elevation: 0,
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 8,
+                              ),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
