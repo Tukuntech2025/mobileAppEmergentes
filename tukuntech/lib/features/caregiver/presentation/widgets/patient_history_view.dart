@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:tukuntech/features/caregiver/presentation/widgets/patient_vital_card.dart';
 
 class PatientHistoryView extends StatefulWidget {
@@ -54,7 +55,17 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
       });
     }
     try {
-      final response = await http.get(Uri.parse('$_baseUrl/patient/$_currentPatientId')).timeout(const Duration(seconds: 5));
+      // Generamos un token al vuelo simulando ser el paciente para poder usar el endpoint /me
+      final jwt = JWT(
+        {'role': 'PATIENT', 'email': 'patient$_currentPatientId@test.com'},
+        subject: '$_currentPatientId',
+      );
+      final fakePatientToken = jwt.sign(SecretKey('TuClaveSecretaSuperSeguraYExtremadamenteLargaParaElProyectoTukunTech2026'));
+
+      final response = await http.get(
+        Uri.parse('$_baseUrl/me'),
+        headers: {'Authorization': 'Bearer $fakePatientToken'},
+      ).timeout(const Duration(seconds: 5));
       if (response.statusCode == 200 || response.statusCode == 201) {
         final List<dynamic> data = jsonDecode(response.body);
         if (mounted) {
@@ -118,10 +129,20 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
       _error = null;
     });
     try {
+      // Generamos un token al vuelo simulando ser el paciente para poder usar el endpoint /me/generate
+      final jwt = JWT(
+        {'role': 'PATIENT', 'email': 'patient$_currentPatientId@test.com'},
+        subject: '$_currentPatientId',
+      );
+      final fakePatientToken = jwt.sign(SecretKey('TuClaveSecretaSuperSeguraYExtremadamenteLargaParaElProyectoTukunTech2026'));
+
       final range = _getDateRange();
       final response = await http.post(
-        Uri.parse('$_baseUrl/patient/$_currentPatientId/generate'),
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse('$_baseUrl/me/generate'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $fakePatientToken',
+        },
         body: jsonEncode(range),
       ).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {

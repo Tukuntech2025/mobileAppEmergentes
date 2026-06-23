@@ -225,25 +225,14 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                   
                   const SizedBox(height: 24),
                   
-                  // Step Content
                   if (_currentStep == 0) ...[
                     _buildPlanCard(
-                      title: 'Personal',
-                      price: '\$29/mo',
-                      description: '1 TukunTech device · vitals · reminders',
+                      title: 'Individual',
+                      price: '\$15/mo',
+                      description: '\$90 one-time setup fee + 1 TukunTech device · vitals · reminders',
                       isRecommended: true,
                       isSelected: _selectedPlanIndex == 0,
                       onTap: () => setState(() => _selectedPlanIndex = 0),
-                      primaryColor: primaryColor,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildPlanCard(
-                      title: 'Personal Plus',
-                      price: '\$39/mo',
-                      description: 'Adds priority support & extended history',
-                      isRecommended: false,
-                      isSelected: _selectedPlanIndex == 1,
-                      onTap: () => setState(() => _selectedPlanIndex = 1),
                       primaryColor: primaryColor,
                     ),
                   ] 

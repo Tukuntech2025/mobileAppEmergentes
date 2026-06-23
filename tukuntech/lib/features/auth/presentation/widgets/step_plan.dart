@@ -40,7 +40,7 @@ class StepPlan extends StatelessWidget {
                       runSpacing: 4,
                       children: [
                         const Text(
-                          'Personal',
+                          'Individual',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
@@ -67,7 +67,7 @@ class StepPlan extends StatelessWidget {
                   ),
                   const SizedBox(width: 8),
                   const Text(
-                    '\$29/mo',
+                    '\$15/mo',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
@@ -78,51 +78,7 @@ class StepPlan extends StatelessWidget {
               ),
               const SizedBox(height: 4),
               const Text(
-                '1 TukunTech device · vitals · reminders',
-                style: TextStyle(
-                  color: Colors.black54,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        // Personal Plus Plan Card
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: Colors.grey.shade200, width: 1),
-          ),
-          padding: const EdgeInsets.all(12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    'Personal Plus',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  Text(
-                    '\$39/mo',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 4),
-              const Text(
-                'Adds priority support & extended history',
+                '\$90 one-time setup fee + 1 TukunTech device · vitals · reminders',
                 style: TextStyle(
                   color: Colors.black54,
                   fontSize: 12,
@@ -166,7 +122,7 @@ class StepPlan extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     const Text(
-                      '\$200/mo',
+                      '\$25/mo',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -177,7 +133,7 @@ class StepPlan extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 const Text(
-                  'Up to 5 TukunTech devices · family dashboard · vitals tracking · Mobile app and web access',
+                  '\$170 one-time setup fee + up to 5 TukunTech devices · family dashboard · vitals tracking · Mobile app and web access',
                   style: TextStyle(
                     color: Colors.black54,
                     fontSize: 12,

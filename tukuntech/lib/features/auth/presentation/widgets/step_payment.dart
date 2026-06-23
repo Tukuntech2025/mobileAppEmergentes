@@ -73,12 +73,34 @@ class StepPayment extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    const Text(
+                      'One-time payment',
+                      style: TextStyle(fontWeight: FontWeight.w400, fontSize: 14, color: Colors.black54),
+                    ),
+                    Text(
+                      planType == PlanType.personal ? '\$90' : '\$170',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey.shade200),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
                     Text(
                       planType == PlanType.personal ? 'Individual plan' : 'Family Pro plan',
                       style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 14, color: Colors.black54),
                     ),
                     Text(
-                      planType == PlanType.personal ? '\$50/mo' : '\$200/mo',
+                      planType == PlanType.personal ? '\$15/mo' : '\$25/mo',
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
                     ),
                   ],

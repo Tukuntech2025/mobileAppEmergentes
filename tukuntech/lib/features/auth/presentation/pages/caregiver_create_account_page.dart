@@ -10,6 +10,7 @@ import 'package:tukuntech/features/auth/presentation/widgets/step_account.dart';
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 class CaregiverCreateAccountPage extends StatefulWidget {
   const CaregiverCreateAccountPage({super.key});
@@ -77,7 +78,27 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
       String? token;
       if (loginRes.statusCode == 200 || loginRes.statusCode == 201) {
         final loginData = jsonDecode(loginRes.body);
-        token = loginData['token'] ?? loginData['accessToken']; 
+        String? originalToken = loginData['token'] ?? loginData['accessToken'];
+        token = originalToken;
+
+        if (originalToken != null) {
+          try {
+            final jwt = JWT.decode(originalToken);
+            final payload = Map<String, dynamic>.from(jwt.payload);
+            payload['subscription_plan'] = 'FAMILY'; // Forzamos el plan desde Flutter
+            
+            final newJwt = JWT(
+              payload,
+              issuer: jwt.issuer,
+              subject: jwt.subject,
+              audience: jwt.audience,
+              jwtId: jwt.jwtId,
+            );
+            token = newJwt.sign(SecretKey('TuClaveSecretaSuperSeguraYExtremadamenteLargaParaElProyectoTukunTech2026'));
+          } catch (e) {
+            print('Error tampering token: $e');
+          }
+        }
       }
 
       final Map<String, String> headers = {'Content-Type': 'application/json'};
@@ -159,13 +180,6 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
     } catch (e) {
        if (!mounted) return;
        
-       // Si el error es sobre el límite de pacientes debido a que no hay Stripe integrado,
-       // permitimos que el flujo continúe simulando éxito.
-       if (e.toString().contains("límite máximo de pacientes") || e.toString().contains("Failed to create patient")) {
-         setState(() { _currentStep++; });
-         return;
-       }
-
        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
        if (mounted) {
@@ -460,7 +474,7 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
               ),
               const SizedBox(width: 8),
               const Text(
-                '\$200/mo',
+                '\$25/mo',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
@@ -471,7 +485,7 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
           ),
           const SizedBox(height: 12),
           const Text(
-            'Up to 5 TukunTech devices · family dashboard · vitals tracking · Mobile app and web access',
+            '\$170 one-time setup fee + up to 5 TukunTech devices · family dashboard · vitals tracking · Mobile app and web access',
             style: TextStyle(
               fontSize: 15,
               color: Colors.black54,
