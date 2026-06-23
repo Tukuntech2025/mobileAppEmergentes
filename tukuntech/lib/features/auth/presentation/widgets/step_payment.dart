@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/features/auth/presentation/pages/create_account_page.dart';
 
 class StepPayment extends StatelessWidget {
+  final PlanType planType;
   final VoidCallback onContinue;
   final VoidCallback onBack;
 
   const StepPayment({
     super.key,
+    required this.planType,
     required this.onContinue,
     required this.onBack,
   });
@@ -14,103 +17,99 @@ class StepPayment extends StatelessWidget {
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF3B9784);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.grey.shade200, width: 1),
-      ),
-      padding: const EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Center(
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.blue.shade50,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.credit_card,
-                color: Colors.blue,
-                size: 28,
-              ),
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.grey.shade200, width: 1),
           ),
-          const SizedBox(height: 16),
-          const Text(
-            'Payment',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF112A24),
-            ),
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            'This is a mock payment step. The real payment gateway will be connected later.',
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 13, color: Colors.black54),
-          ),
-          const SizedBox(height: 24),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.grey.shade200),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: const [
-                Text(
-                  'Family Pro plan',
-                  style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13, color: Colors.black54),
-                ),
-                Text(
-                  '\$200/mo',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 24),
-          Row(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Expanded(
-                flex: 1,
-                child: OutlinedButton(
-                  onPressed: onBack,
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: primaryColor,
-                    side: const BorderSide(color: primaryColor),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    shape: BoxShape.circle,
                   ),
-                  child: const Text('Back', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  child: const Icon(
+                    Icons.credit_card,
+                    color: Colors.blue,
+                    size: 32,
+                  ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                flex: 2,
-                child: ElevatedButton(
-                  onPressed: onContinue,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    elevation: 0,
-                  ),
-                  child: const Text('Simulate payment', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 16),
+              const Text(
+                'Payment',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
                 ),
+              ),
+              const SizedBox(height: 12),
+              const Text(
+                'This is a mock payment step. The real payment gateway will be\nconnected later.',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Colors.black54),
+              ),
+              const SizedBox(height: 32),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey.shade200),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      planType == PlanType.personal ? 'Individual plan' : 'Family Pro plan',
+                      style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 14, color: Colors.black54),
+                    ),
+                    Text(
+                      planType == PlanType.personal ? '\$50/mo' : '\$200/mo',
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: onContinue,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color(0xFF3B9784),
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 0,
+                ),
+                child: const Text('Simulate payment and continue', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 24),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: onBack,
+            icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 18),
+            label: const Text(
+              'Back',
+              style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 16),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

@@ -5,6 +5,8 @@ import 'package:tukuntech/features/auth/presentation/widgets/step_delivery.dart'
 import 'package:tukuntech/features/auth/presentation/widgets/step_payment.dart';
 import 'package:tukuntech/features/auth/presentation/widgets/step_success.dart';
 import 'package:tukuntech/features/auth/presentation/pages/plan_selection_page.dart';
+import 'package:tukuntech/features/auth/presentation/pages/create_account_page.dart';
+import 'package:tukuntech/features/auth/presentation/widgets/step_account.dart';
 
 class CaregiverCreateAccountPage extends StatefulWidget {
   const CaregiverCreateAccountPage({super.key});
@@ -78,19 +80,18 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                   
                   // Step Content
                   if (_currentStep == 0) _buildPlanCard(primaryColor)
-                  else if (_currentStep == 1) _buildAccountForm(primaryColor)
+                  else if (_currentStep == 1) StepAccount(onContinue: _nextStep, onBack: _previousStep)
                   else if (_currentStep == 2) StepPatients(onContinue: _nextStep, onBack: _previousStep)
                   else if (_currentStep == 3) StepAddress(onContinue: _nextStep, onBack: _previousStep)
                   else if (_currentStep == 4) StepDelivery(onContinue: _nextStep, onBack: _previousStep)
-                  else if (_currentStep == 5) StepPayment(onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 5) StepPayment(planType: PlanType.familyPro, onContinue: _nextStep, onBack: _previousStep)
                   else if (_currentStep == 6) StepSuccess(onGoToWebsite: () => Navigator.of(context).popUntil((route) => route.isFirst))
                   else Center(child: Text('Step ${_currentStep + 1} Content', style: const TextStyle(fontSize: 18))),
                   
                   const SizedBox(height: 16),
                   
                   // Bottom Actions
-                  if (_currentStep == 6) const SizedBox.shrink()
-                  else if (_currentStep == 0) ...[
+                  if (_currentStep == 0) ...[
                     Align(
                       alignment: Alignment.centerLeft,
                       child: ElevatedButton(
@@ -126,38 +127,6 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                         style: TextButton.styleFrom(foregroundColor: Colors.black54),
                         child: const Text('← Choose a different plan', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13)),
                       ),
-                    ),
-                  ] else ...[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        TextButton.icon(
-                          onPressed: _previousStep,
-                          icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 16),
-                          label: const Text('Back', style: TextStyle(color: Colors.black87, fontSize: 14, fontWeight: FontWeight.w600)),
-                        ),
-                        if (_currentStep != 5)
-                          ElevatedButton(
-                            onPressed: _nextStep,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: primaryColor,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              elevation: 0,
-                            ),
-                            child: const Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text('Continue', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                                SizedBox(width: 6),
-                                Icon(Icons.check, size: 18),
-                              ],
-                            ),
-                          ),
-                      ],
                     ),
                   ],
                 ],
@@ -266,64 +235,6 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
               color: isCompleted || isActive ? Colors.black87 : Colors.black54,
               fontWeight: isCompleted || isActive ? FontWeight.bold : FontWeight.normal,
               fontSize: 16,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAccountForm(Color primaryColor) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text('Email', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87)),
-          const SizedBox(height: 4),
-          TextField(
-            decoration: InputDecoration(
-              hintText: 'you@example.com',
-              hintStyle: const TextStyle(color: Colors.black54),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: primaryColor, width: 2)),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Text('Password', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87)),
-          const SizedBox(height: 4),
-          TextField(
-            obscureText: true,
-            decoration: InputDecoration(
-              hintText: '••••••••',
-              hintStyle: const TextStyle(color: Colors.black54),
-              suffixIcon: const Icon(Icons.visibility_outlined, color: Colors.black54),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: primaryColor, width: 2)),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Text('Confirm password', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87)),
-          const SizedBox(height: 4),
-          TextField(
-            obscureText: true,
-            decoration: InputDecoration(
-              hintText: '••••••••',
-              hintStyle: const TextStyle(color: Colors.black54),
-              suffixIcon: const Icon(Icons.visibility_outlined, color: Colors.black54),
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-              enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
-              focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: primaryColor, width: 2)),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
             ),
           ),
         ],

@@ -114,6 +114,9 @@ class StepAccount extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0xFF3B9784), width: 2),
         ),
+        suffixIcon: obscureText
+            ? const Icon(Icons.remove_red_eye_outlined, color: Colors.black45)
+            : null,
       ),
       style: TextStyle(
         fontSize: 16,

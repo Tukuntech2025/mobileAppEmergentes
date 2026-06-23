@@ -19,6 +19,28 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
   int _currentIndex = 0;
   String? _drawerSection;
 
+  void _addNewPatient(String name, String initials) {
+    setState(() {
+      mockPatients.add(
+        PatientVitalData(
+          initials: initials,
+          titlePrefix: 'Hello',
+          name: name,
+          subtitle: 'Waiting for device connection...',
+          badgeText: 'Pending',
+          badgeColor: Colors.grey.withOpacity(0.2),
+          badgeDotColor: Colors.grey,
+          heartRate: '-- bmp',
+          heartRateSubtitle: 'No data',
+          oxygen: '--%',
+          oxygenSubtitle: 'SpO2',
+          temperature: '-- °C',
+          temperatureSubtitle: 'No data',
+        ),
+      );
+    });
+  }
+
   final List<PatientVitalData> mockPatients = [
     PatientVitalData(
       initials: 'EM',
@@ -258,7 +280,7 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
               ],
             ),
             PatientHistoryView(patients: mockPatients),
-            const CaregiverProfileBody(),
+            CaregiverProfileBody(onPatientAdded: _addNewPatient),
             const Center(child: Text('Reports')),
           ],
         ),

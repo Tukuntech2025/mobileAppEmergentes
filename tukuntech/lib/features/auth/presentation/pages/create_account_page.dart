@@ -23,10 +23,8 @@ class CreateAccountPage extends StatefulWidget {
 
 class _CreateAccountPageState extends State<CreateAccountPage> {
   int _currentStep = 0;
-  int get _totalSteps => widget.planType == PlanType.familyPro ? 7 : 4;
-  List<String> get _stepNames => widget.planType == PlanType.familyPro 
-      ? const ['Plan', 'Account', 'Personal', 'Address', 'Delivery', 'Payment', 'Done']
-      : const ['Plan', 'Account', 'Personal', 'Address'];
+  int get _totalSteps => 7;
+  List<String> get _stepNames => const ['Plan', 'Account', 'Personal', 'Address', 'Delivery', 'Payment', 'Done'];
 
   void _nextStep() {
     if (_currentStep < _totalSteps - 1) {
@@ -163,15 +161,19 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
             : StepPersonal(onContinue: _nextStep, onBack: _previousStep);
       case 3:
         return StepAddress(
-          onContinue: widget.planType == PlanType.familyPro ? _nextStep : () {}, 
+          onContinue: _nextStep, 
           onBack: _previousStep
         );
       case 4:
         return StepDelivery(onContinue: _nextStep, onBack: _previousStep);
       case 5:
-        return StepPayment(onContinue: _nextStep, onBack: _previousStep);
+        return StepPayment(
+          planType: widget.planType,
+          onContinue: _nextStep, 
+          onBack: _previousStep
+        );
       case 6:
-        return const StepDone();
+        return StepDone(planType: widget.planType);
       default:
         return const SizedBox.shrink();
     }

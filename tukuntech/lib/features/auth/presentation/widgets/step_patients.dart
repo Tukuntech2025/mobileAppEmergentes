@@ -4,6 +4,14 @@ class PatientData {
   final TextEditingController fullNameCtrl = TextEditingController();
   final TextEditingController ageCtrl = TextEditingController();
   final TextEditingController notesCtrl = TextEditingController();
+  
+  final TextEditingController minHrCtrl = TextEditingController();
+  final TextEditingController maxHrCtrl = TextEditingController();
+  final TextEditingController minO2Ctrl = TextEditingController();
+  final TextEditingController maxO2Ctrl = TextEditingController();
+  final TextEditingController minTempCtrl = TextEditingController();
+  final TextEditingController maxTempCtrl = TextEditingController();
+
   String? gender;
   String? bloodType;
 
@@ -11,6 +19,12 @@ class PatientData {
     fullNameCtrl.dispose();
     ageCtrl.dispose();
     notesCtrl.dispose();
+    minHrCtrl.dispose();
+    maxHrCtrl.dispose();
+    minO2Ctrl.dispose();
+    maxO2Ctrl.dispose();
+    minTempCtrl.dispose();
+    maxTempCtrl.dispose();
   }
 }
 
@@ -182,6 +196,142 @@ class _StepPatientsState extends State<StepPatients> {
                 controller: currentPatient.notesCtrl,
               ),
               const SizedBox(height: 16),
+              
+              const Divider(color: Color(0xFFEEEEEE)),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.monitor_heart_outlined, color: primaryColor, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Medical parameters',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Set the personalized monitoring ranges for this patient.',
+                          style: TextStyle(fontSize: 12, color: Colors.black54),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel('Minimum heart rate'),
+                        const SizedBox(height: 4),
+                        _buildSuffixTextField('bpm', keyboardType: TextInputType.number, controller: currentPatient.minHrCtrl),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel('Maximum heart rate'),
+                        const SizedBox(height: 4),
+                        _buildSuffixTextField('bpm', keyboardType: TextInputType.number, controller: currentPatient.maxHrCtrl),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel('Minimum oxygen saturation'),
+                        const SizedBox(height: 4),
+                        _buildSuffixTextField('%', keyboardType: TextInputType.number, controller: currentPatient.minO2Ctrl),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel('Maximum oxygen saturation'),
+                        const SizedBox(height: 4),
+                        _buildSuffixTextField('%', keyboardType: TextInputType.number, controller: currentPatient.maxO2Ctrl),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel('Minimum temperature'),
+                        const SizedBox(height: 4),
+                        _buildSuffixTextField('°C', keyboardType: TextInputType.number, controller: currentPatient.minTempCtrl),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel('Maximum temperature'),
+                        const SizedBox(height: 4),
+                        _buildSuffixTextField('°C', keyboardType: TextInputType.number, controller: currentPatient.maxTempCtrl),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: primaryColor.withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.info_outline, size: 16, color: Colors.black54),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'These values belong to the patient and will be used to evaluate readings and alerts. Patients and caregivers cannot edit them.',
+                        style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 24),
               Row(
                 children: [
                   Expanded(
@@ -246,6 +396,33 @@ class _StepPatientsState extends State<StepPatients> {
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.black45, fontWeight: FontWeight.normal),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF3B9784), width: 2),
+        ),
+      ),
+      style: const TextStyle(fontSize: 13),
+    );
+  }
+
+  Widget _buildSuffixTextField(String suffix, {TextInputType? keyboardType, TextEditingController? controller}) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        suffixText: suffix,
+        suffixStyle: const TextStyle(color: Colors.black54, fontSize: 13),
         filled: true,
         fillColor: Colors.white,
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

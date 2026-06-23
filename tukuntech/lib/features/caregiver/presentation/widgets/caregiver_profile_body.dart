@@ -53,7 +53,9 @@ class PatientProfileData {
 }
 
 class CaregiverProfileBody extends StatefulWidget {
-  const CaregiverProfileBody({super.key});
+  final void Function(String name, String initials)? onPatientAdded;
+
+  const CaregiverProfileBody({super.key, this.onPatientAdded});
 
   @override
   State<CaregiverProfileBody> createState() => _CaregiverProfileBodyState();
@@ -191,6 +193,200 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
       ),
     );
     setState(() {});
+  }
+
+  void _showAddPatientModal() {
+    final modalNameCtrl = TextEditingController();
+    final modalAgeCtrl = TextEditingController();
+    final modalGenderCtrl = TextEditingController();
+    final modalAddressCtrl = TextEditingController();
+    String modalBloodType = 'A+';
+
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setModalState) {
+          return Dialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Add new patient',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 2),
+                              Text(
+                                'Enter the new patient information.',
+                                style: TextStyle(fontSize: 12, color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pop(ctx),
+                          child: const Icon(Icons.close, color: _primary),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    _field('Full name', modalNameCtrl),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _field(
+                            'Age',
+                            modalAgeCtrl,
+                            keyboardType: TextInputType.number,
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(child: _field('Gender', modalGenderCtrl)),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    _field('Address', modalAddressCtrl),
+                    const SizedBox(height: 12),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Blood type',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        DropdownButtonFormField<String>(
+                          value: modalBloodType,
+                          icon: const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.black54,
+                          ),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 12,
+                            ),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(
+                                color: _primary,
+                                width: 1.5,
+                              ),
+                            ),
+                            filled: true,
+                            fillColor: const Color(0xFFFAFAFA),
+                          ),
+                          items: _bloodTypes
+                              .map(
+                                (bt) => DropdownMenuItem(value: bt, child: Text(bt)),
+                              )
+                              .toList(),
+                          onChanged: (v) => setModalState(() => modalBloodType = v!),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.pop(ctx),
+                            style: OutlinedButton.styleFrom(
+                              side: BorderSide(color: Colors.grey.shade300),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                            ),
+                            child: const Text(
+                              'Cancel',
+                              style: TextStyle(color: Colors.black54),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            onPressed: () {
+                              if (modalNameCtrl.text.trim().isEmpty) return;
+                              List<String> parts = modalNameCtrl.text.trim().split(' ');
+                              String ini = '';
+                              if (parts.isNotEmpty && parts[0].isNotEmpty) {
+                                ini += parts[0][0].toUpperCase();
+                              }
+                              if (parts.length > 1 && parts[1].isNotEmpty) {
+                                ini += parts[1][0].toUpperCase();
+                              }
+                              if (ini.isEmpty) ini = '?';
+
+                              setState(() {
+                                _patients.add(
+                                  PatientProfileData(
+                                    initials: ini,
+                                    name: modalNameCtrl.text.trim(),
+                                    age: modalAgeCtrl.text.trim(),
+                                    gender: modalGenderCtrl.text.trim(),
+                                    address: modalAddressCtrl.text.trim(),
+                                    bloodType: modalBloodType,
+                                    contacts: [],
+                                  ),
+                                );
+                                _selectedPatientIndex = _patients.length - 1;
+                                _disposeControllers();
+                                _initControllersForSelectedPatient();
+                              });
+                              widget.onPatientAdded?.call(modalNameCtrl.text.trim(), ini);
+                              Navigator.pop(ctx);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: _primary,
+                              foregroundColor: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30),
+                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              elevation: 0,
+                            ),
+                            child: const Text('Add patient'),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
   }
 
   void _showAddContactModal() {
@@ -361,18 +557,57 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       children: [
         // ── Título ──────────────────────────────────────────────
-        const Text(
-          'Patient profile',
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          'Personal information, subscription, and emergency contacts.',
-          style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Patient profile',
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    'Personal information, subscription, and emergency contacts.',
+                    style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+                  ),
+                ],
+              ),
+            ),
+            GestureDetector(
+              onTap: () {
+                if (_patients.length >= 5) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('You can only have up to 5 patients.'),
+                      backgroundColor: Colors.redAccent,
+                      behavior: SnackBarBehavior.floating,
+                    ),
+                  );
+                  return;
+                }
+                _showAddPatientModal();
+              },
+              child: Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: _primary.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.add,
+                  color: _primary,
+                  size: 24,
+                ),
+              ),
+            ),
+          ],
         ),
         const SizedBox(height: 16),
 

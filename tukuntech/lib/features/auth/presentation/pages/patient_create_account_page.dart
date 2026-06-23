@@ -1,5 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:tukuntech/features/auth/presentation/pages/plan_selection_page.dart';
+import 'package:tukuntech/features/auth/presentation/widgets/step_account.dart';
+import 'package:tukuntech/features/auth/presentation/widgets/step_personal.dart';
+import 'package:tukuntech/features/auth/presentation/widgets/step_address.dart';
+import 'package:tukuntech/features/auth/presentation/widgets/step_delivery.dart';
+import 'package:tukuntech/features/auth/presentation/widgets/step_payment.dart';
+import 'package:tukuntech/features/auth/presentation/widgets/step_done.dart';
+import 'package:tukuntech/features/auth/presentation/pages/create_account_page.dart';
 
 class PatientCreateAccountPage extends StatefulWidget {
   const PatientCreateAccountPage({super.key});
@@ -10,9 +17,9 @@ class PatientCreateAccountPage extends StatefulWidget {
 
 class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
   int _currentStep = 0;
-  final int _totalSteps = 4;
-  final List<String> _stepNames = const [
-    'Plan', 'Account', 'Personal', 'Address'
+  int get _totalSteps => 7;
+  List<String> get _stepNames => const [
+    'Plan', 'Account', 'Personal', 'Address', 'Delivery', 'Payment', 'Done'
   ];
 
   int _selectedPlanIndex = 0; // 0 for Personal, 1 for Personal Plus
@@ -113,61 +120,69 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                       onTap: () => setState(() => _selectedPlanIndex = 1),
                       primaryColor: primaryColor,
                     ),
-                  ] else Center(child: Text('Step ${_currentStep + 1} Content', style: const TextStyle(fontSize: 16))),
+                  ] 
+                  else if (_currentStep == 1) StepAccount(onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 2) StepPersonal(onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 3) StepAddress(onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 4) StepDelivery(onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 5) StepPayment(planType: PlanType.personal, onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 6) StepDone(planType: PlanType.personal, onFinish: () => Navigator.of(context).popUntil((route) => route.isFirst)),
                   
                   const SizedBox(height: 24),
                   
-                  // Continue Button
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: ElevatedButton(
-                      onPressed: _nextStep,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        elevation: 0,
-                      ),
-                      child: const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'Continue',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
+                  if (_currentStep == 0) ...[
+                    // Continue Button
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton(
+                        onPressed: _nextStep,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
                           ),
-                          SizedBox(width: 6),
-                          Icon(Icons.check, size: 18),
-                        ],
+                          elevation: 0,
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              'Continue',
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            SizedBox(width: 6),
+                            Icon(Icons.check, size: 18),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  
-                  const SizedBox(height: 32),
-                  
-                  // Choose a different plan link
-                  Center(
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) => const PlanSelectionPage()),
-                        );
-                      },
-                      style: TextButton.styleFrom(
-                        foregroundColor: Colors.black54,
-                      ),
-                      child: const Text(
-                        '← Choose a different plan',
-                        style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13),
+                    
+                    const SizedBox(height: 32),
+                    
+                    // Choose a different plan link
+                    Center(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(builder: (context) => const PlanSelectionPage()),
+                          );
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.black54,
+                        ),
+                        child: const Text(
+                          '← Choose a different plan',
+                          style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13),
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             ),

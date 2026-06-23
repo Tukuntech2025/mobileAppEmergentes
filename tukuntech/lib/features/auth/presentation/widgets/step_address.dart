@@ -136,6 +136,48 @@ class StepAddress extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              TextButton.icon(
+                onPressed: onBack,
+                icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 18),
+                label: const Text(
+                  'Back',
+                  style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 14),
+                ),
+              ),
+              Flexible(
+                child: ElevatedButton(
+                  onPressed: onContinue,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF3B9784),
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Flexible(
+                        child: Text(
+                          'Continue',
+                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      SizedBox(width: 8),
+                      Icon(Icons.check, size: 18),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
