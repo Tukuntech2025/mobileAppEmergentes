@@ -32,6 +32,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   final _dummyAge = TextEditingController();
   final _dummyNotes = TextEditingController();
   final _dummyAddress = TextEditingController();
+  final List<PatientData> _dummyPatients = List.generate(5, (_) => PatientData());
 
   @override
   void dispose() {
@@ -41,6 +42,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     _dummyAge.dispose();
     _dummyNotes.dispose();
     _dummyAddress.dispose();
+    for (var p in _dummyPatients) {
+      p.dispose();
+    }
     super.dispose();
   }
 
@@ -180,7 +184,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         );
       case 2:
         return widget.planType == PlanType.familyPro
-            ? StepPatients(onContinue: _nextStep, onBack: _previousStep)
+            ? StepPatients(onContinue: _nextStep, onBack: _previousStep, patients: _dummyPatients)
             : StepPersonal(
                 onContinue: _nextStep, 
                 onBack: _previousStep,

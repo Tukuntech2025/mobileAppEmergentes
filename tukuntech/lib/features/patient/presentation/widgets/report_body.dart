@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/auth_store.dart';
 
 class ReportBody extends StatefulWidget {
   const ReportBody({super.key});
@@ -47,7 +48,14 @@ class _ReportBodyState extends State<ReportBody> {
       });
     }
     try {
-      final response = await http.get(Uri.parse('$_baseUrl/patient/1')).timeout(const Duration(seconds: 5));
+      final Map<String, String> headers = {};
+      if (AuthStore.token != null) {
+        headers['Authorization'] = 'Bearer ${AuthStore.token}';
+      }
+      final response = await http.get(
+        Uri.parse('$_baseUrl/me'),
+        headers: headers,
+      ).timeout(const Duration(seconds: 5));
       if (response.statusCode == 200 || response.statusCode == 201) {
         final List<dynamic> data = jsonDecode(response.body);
         if (mounted) {
@@ -112,9 +120,13 @@ class _ReportBodyState extends State<ReportBody> {
     });
     try {
       final range = _getDateRange();
+      final Map<String, String> headers = {'Content-Type': 'application/json'};
+      if (AuthStore.token != null) {
+        headers['Authorization'] = 'Bearer ${AuthStore.token}';
+      }
       final response = await http.post(
-        Uri.parse('$_baseUrl/patient/1/generate'),
-        headers: {'Content-Type': 'application/json'},
+        Uri.parse('$_baseUrl/me/generate'),
+        headers: headers,
         body: jsonEncode(range),
       ).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {

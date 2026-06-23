@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class StepAccount extends StatelessWidget {
+class StepAccount extends StatefulWidget {
   final VoidCallback onContinue;
   final VoidCallback onBack;
   final TextEditingController emailController;
@@ -13,6 +13,14 @@ class StepAccount extends StatelessWidget {
     required this.emailController,
     required this.passwordController,
   });
+
+  @override
+  State<StepAccount> createState() => _StepAccountState();
+}
+
+class _StepAccountState extends State<StepAccount> {
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -30,21 +38,21 @@ class StepAccount extends StatelessWidget {
         children: [
           _buildLabel('Email'),
           const SizedBox(height: 2),
-          _buildTextField('you@example.com', controller: emailController),
+          _buildTextField('you@example.com', controller: widget.emailController),
           const SizedBox(height: 20),
           _buildLabel('Password'),
           const SizedBox(height: 2),
-          _buildTextField('••••••••', obscureText: true, controller: passwordController),
+          _buildPasswordField('••••••••', obscureText: _obscurePassword, controller: widget.passwordController, onToggle: () => setState(() => _obscurePassword = !_obscurePassword)),
           const SizedBox(height: 20),
           _buildLabel('Confirm password'),
           const SizedBox(height: 2),
-          _buildTextField('••••••••', obscureText: true), // mock confirm
+          _buildPasswordField('••••••••', obscureText: _obscureConfirmPassword, onToggle: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword)), // mock confirm
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               TextButton.icon(
-                onPressed: onBack,
+                onPressed: widget.onBack,
                 icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 18),
                 label: const Text(
                   'Back',
@@ -53,7 +61,7 @@ class StepAccount extends StatelessWidget {
               ),
               Flexible(
                 child: ElevatedButton(
-                  onPressed: onContinue,
+                  onPressed: widget.onContinue,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
@@ -119,9 +127,43 @@ class StepAccount extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0xFF3B9784), width: 2),
         ),
-        suffixIcon: obscureText
-            ? const Icon(Icons.remove_red_eye_outlined, color: Colors.black45)
-            : null,
+      ),
+      style: TextStyle(
+        fontSize: 16,
+        letterSpacing: obscureText ? 4 : 0,
+      ),
+    );
+  }
+
+  Widget _buildPasswordField(String hint, {required bool obscureText, TextEditingController? controller, required VoidCallback onToggle}) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.black38),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF3B9784), width: 2),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+            color: Colors.black45,
+          ),
+          onPressed: onToggle,
+        ),
       ),
       style: TextStyle(
         fontSize: 16,
