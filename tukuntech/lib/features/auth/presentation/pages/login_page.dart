@@ -4,6 +4,7 @@ import 'package:tukuntech/features/patient/presentation/pages/vital_signs_page.d
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/auth_store.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -40,6 +41,13 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        try {
+          final Map<String, dynamic> responseData = jsonDecode(response.body);
+          AuthStore.token = responseData['token'] ?? responseData['accessToken'];
+        } catch (_) {
+          // Si la respuesta no es JSON (ej. si es un String quemado por backend por error), no crashear
+        }
+        
         // Success, navigate to dashboard
         Navigator.push(
           context,

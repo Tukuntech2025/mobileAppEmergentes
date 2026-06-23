@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 class PatientData {
   final TextEditingController fullNameCtrl = TextEditingController();
+  final TextEditingController emailCtrl = TextEditingController();
   final TextEditingController ageCtrl = TextEditingController();
   final TextEditingController notesCtrl = TextEditingController();
   
@@ -17,6 +18,7 @@ class PatientData {
 
   void dispose() {
     fullNameCtrl.dispose();
+    emailCtrl.dispose();
     ageCtrl.dispose();
     notesCtrl.dispose();
     minHrCtrl.dispose();
@@ -31,11 +33,13 @@ class PatientData {
 class StepPatients extends StatefulWidget {
   final VoidCallback onContinue;
   final VoidCallback onBack;
+  final List<PatientData> patients;
 
   const StepPatients({
     super.key,
     required this.onContinue,
     required this.onBack,
+    required this.patients,
   });
 
   @override
@@ -44,13 +48,9 @@ class StepPatients extends StatefulWidget {
 
 class _StepPatientsState extends State<StepPatients> {
   int _currentPatientIndex = 0; // 0 to 4
-  final List<PatientData> _patients = List.generate(5, (_) => PatientData());
 
   @override
   void dispose() {
-    for (var p in _patients) {
-      p.dispose();
-    }
     super.dispose();
   }
 
@@ -69,7 +69,7 @@ class _StepPatientsState extends State<StepPatients> {
   @override
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF3B9784);
-    final currentPatient = _patients[_currentPatientIndex];
+    final currentPatient = widget.patients[_currentPatientIndex];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -146,7 +146,11 @@ class _StepPatientsState extends State<StepPatients> {
             children: [
               _buildLabel('Full name'),
               const SizedBox(height: 4),
-              _buildTextField('Enter your full name', controller: currentPatient.fullNameCtrl),
+              _buildTextField('Enter full name', controller: currentPatient.fullNameCtrl),
+              const SizedBox(height: 12),
+              _buildLabel('Email'),
+              const SizedBox(height: 4),
+              _buildTextField('Enter patient email', keyboardType: TextInputType.emailAddress, controller: currentPatient.emailCtrl),
               const SizedBox(height: 12),
               Row(
                 children: [
