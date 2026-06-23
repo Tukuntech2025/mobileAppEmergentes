@@ -13,8 +13,8 @@ class CaregiverLoginScreen extends StatefulWidget {
 }
 
 class _CaregiverLoginScreenState extends State<CaregiverLoginScreen> {
-  final TextEditingController _emailController = TextEditingController(text: 'demo.caregiver@tukuntech.app');
-  final TextEditingController _passwordController = TextEditingController(text: '12345678');
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
 
