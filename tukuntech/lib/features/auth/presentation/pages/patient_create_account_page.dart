@@ -7,6 +7,9 @@ import 'package:tukuntech/features/auth/presentation/widgets/step_delivery.dart'
 import 'package:tukuntech/features/auth/presentation/widgets/step_payment.dart';
 import 'package:tukuntech/features/auth/presentation/widgets/step_done.dart';
 import 'package:tukuntech/features/auth/presentation/pages/create_account_page.dart';
+import 'dart:convert';
+import 'dart:io' show Platform;
+import 'package:http/http.dart' as http;
 
 class PatientCreateAccountPage extends StatefulWidget {
   const PatientCreateAccountPage({super.key});
@@ -24,8 +27,131 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
 
   int _selectedPlanIndex = 0; // 0 for Personal, 1 for Personal Plus
 
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _fullNameController = TextEditingController();
+  final _ageController = TextEditingController();
+  final _notesController = TextEditingController();
+  final _addressController = TextEditingController();
+  
+  String _gender = 'Select gender';
+  String _bloodType = 'Select blood type';
+
+  bool _isRegistering = false;
+
+  final String _baseUrl = Platform.isAndroid 
+      ? 'http://10.0.2.2:8080/api/v1' 
+      : 'http://localhost:8080/api/v1';
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _fullNameController.dispose();
+    _ageController.dispose();
+    _notesController.dispose();
+    _addressController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _processRegistration() async {
+    setState(() { _isRegistering = true; });
+
+    try {
+      // 1. Register Auth
+      final registerRes = await http.post(
+        Uri.parse('$_baseUrl/auth/register'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': _emailController.text.trim(),
+          'password': _passwordController.text,
+          'role': 'PATIENT'
+        }),
+      ).timeout(const Duration(seconds: 10));
+
+      if (registerRes.statusCode != 200 && registerRes.statusCode != 201) {
+        throw Exception('Failed to register auth: ${registerRes.body}');
+      }
+
+      final loginRes = await http.post(
+        Uri.parse('$_baseUrl/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': _emailController.text.trim(),
+          'password': _passwordController.text,
+        }),
+      ).timeout(const Duration(seconds: 10));
+
+      String? token;
+      if (loginRes.statusCode == 200 || loginRes.statusCode == 201) {
+        final loginData = jsonDecode(loginRes.body);
+        token = loginData['token'] ?? loginData['accessToken']; 
+      }
+
+      final Map<String, String> headers = {'Content-Type': 'application/json'};
+      if (token != null) {
+        headers['Authorization'] = 'Bearer $token';
+      }
+
+      String apiGender = 'OTHER';
+      if (_gender == 'Male') apiGender = 'MALE';
+      if (_gender == 'Female') apiGender = 'FEMALE';
+
+      String apiBloodType = 'A_POSITIVE';
+      final bloodMap = {
+        'A+': 'A_POSITIVE', 'A-': 'A_NEGATIVE',
+        'B+': 'B_POSITIVE', 'B-': 'B_NEGATIVE',
+        'AB+': 'AB_POSITIVE', 'AB-': 'AB_NEGATIVE',
+        'O+': 'O_POSITIVE', 'O-': 'O_NEGATIVE',
+      };
+      if (bloodMap.containsKey(_bloodType)) {
+        apiBloodType = bloodMap[_bloodType]!;
+      }
+
+      int birthYear = DateTime.now().year - (int.tryParse(_ageController.text) ?? 30);
+      String birthDate = '$birthYear-01-01';
+
+      // 2. Create Profile
+      final profileRes = await http.post(
+        Uri.parse('$_baseUrl/profiles/me'),
+        headers: headers,
+        body: jsonEncode({
+          'fullName': _fullNameController.text,
+          'birthDate': birthDate,
+          'address': _addressController.text,
+          'bloodType': apiBloodType,
+          'gender': apiGender,
+          'notes': _notesController.text,
+          'emergencyContacts': [
+             {
+               "name": "Emergency Contact",
+               "relationship": "FAMILY",
+               "phoneNumber": "123456789"
+             }
+          ]
+        }),
+      ).timeout(const Duration(seconds: 10));
+
+      if (profileRes.statusCode != 200 && profileRes.statusCode != 201) {
+         throw Exception('Failed to create profile: ${profileRes.body}');
+      }
+
+      if (!mounted) return;
+      setState(() { _currentStep++; });
+    } catch (e) {
+       if (!mounted) return;
+       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+    } finally {
+       if (mounted) {
+         setState(() { _isRegistering = false; });
+       }
+    }
+  }
+
   void _nextStep() {
-    if (_currentStep < _totalSteps - 1) {
+    if (_currentStep == 5) {
+      _processRegistration();
+    } else if (_currentStep < _totalSteps - 1) {
       setState(() => _currentStep++);
     }
   }
@@ -121,11 +247,35 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                       primaryColor: primaryColor,
                     ),
                   ] 
-                  else if (_currentStep == 1) StepAccount(onContinue: _nextStep, onBack: _previousStep)
-                  else if (_currentStep == 2) StepPersonal(onContinue: _nextStep, onBack: _previousStep)
-                  else if (_currentStep == 3) StepAddress(onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 1) StepAccount(
+                    onContinue: _nextStep, 
+                    onBack: _previousStep,
+                    emailController: _emailController,
+                    passwordController: _passwordController,
+                  )
+                  else if (_currentStep == 2) StepPersonal(
+                    onContinue: _nextStep, 
+                    onBack: _previousStep,
+                    fullNameController: _fullNameController,
+                    ageController: _ageController,
+                    notesController: _notesController,
+                    gender: _gender,
+                    onGenderChanged: (val) => setState(() => _gender = val ?? _gender),
+                    bloodType: _bloodType,
+                    onBloodTypeChanged: (val) => setState(() => _bloodType = val ?? _bloodType),
+                  )
+                  else if (_currentStep == 3) StepAddress(
+                    onContinue: _nextStep, 
+                    onBack: _previousStep,
+                    addressController: _addressController,
+                  )
                   else if (_currentStep == 4) StepDelivery(onContinue: _nextStep, onBack: _previousStep)
-                  else if (_currentStep == 5) StepPayment(planType: PlanType.personal, onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 5) StepPayment(
+                    planType: PlanType.personal, 
+                    onContinue: _nextStep, 
+                    onBack: _previousStep,
+                    isRegistering: _isRegistering,
+                  )
                   else if (_currentStep == 6) StepDone(planType: PlanType.personal, onFinish: () => Navigator.of(context).popUntil((route) => route.isFirst)),
                   
                   const SizedBox(height: 24),

@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 class StepAccount extends StatelessWidget {
   final VoidCallback onContinue;
   final VoidCallback onBack;
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
 
   const StepAccount({
     super.key,
     required this.onContinue,
     required this.onBack,
+    required this.emailController,
+    required this.passwordController,
   });
 
   @override
@@ -26,15 +30,15 @@ class StepAccount extends StatelessWidget {
         children: [
           _buildLabel('Email'),
           const SizedBox(height: 2),
-          _buildTextField('you@example.com'),
+          _buildTextField('you@example.com', controller: emailController),
           const SizedBox(height: 20),
           _buildLabel('Password'),
           const SizedBox(height: 2),
-          _buildTextField('••••••••', obscureText: true),
+          _buildTextField('••••••••', obscureText: true, controller: passwordController),
           const SizedBox(height: 20),
           _buildLabel('Confirm password'),
           const SizedBox(height: 2),
-          _buildTextField('••••••••', obscureText: true),
+          _buildTextField('••••••••', obscureText: true), // mock confirm
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -93,8 +97,9 @@ class StepAccount extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String hint, {bool obscureText = false}) {
+  Widget _buildTextField(String hint, {bool obscureText = false, TextEditingController? controller}) {
     return TextField(
+      controller: controller,
       obscureText: obscureText,
       decoration: InputDecoration(
         hintText: hint,
