@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 class StepAddress extends StatelessWidget {
   final VoidCallback onContinue;
   final VoidCallback onBack;
+  final TextEditingController addressController;
 
   const StepAddress({
     super.key,
     required this.onContinue,
     required this.onBack,
+    required this.addressController,
   });
 
   @override
@@ -34,6 +36,7 @@ class StepAddress extends StatelessWidget {
           ),
           const SizedBox(height: 4),
           TextField(
+            controller: addressController,
             decoration: InputDecoration(
               hintText: 'Enter your address',
               hintStyle: const TextStyle(color: Colors.black45, fontWeight: FontWeight.normal),

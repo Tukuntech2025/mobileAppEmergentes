@@ -3,11 +3,25 @@ import 'package:flutter/material.dart';
 class StepPersonal extends StatelessWidget {
   final VoidCallback onContinue;
   final VoidCallback onBack;
+  final TextEditingController fullNameController;
+  final TextEditingController ageController;
+  final TextEditingController notesController;
+  final String gender;
+  final ValueChanged<String?> onGenderChanged;
+  final String bloodType;
+  final ValueChanged<String?> onBloodTypeChanged;
 
   const StepPersonal({
     super.key,
     required this.onContinue,
     required this.onBack,
+    required this.fullNameController,
+    required this.ageController,
+    required this.notesController,
+    required this.gender,
+    required this.onGenderChanged,
+    required this.bloodType,
+    required this.onBloodTypeChanged,
   });
 
   @override
@@ -26,7 +40,7 @@ class StepPersonal extends StatelessWidget {
         children: [
           _buildLabel('Full name'),
           const SizedBox(height: 2),
-          _buildTextField('Enter your full name'),
+          _buildTextField('Enter your full name', controller: fullNameController),
           const SizedBox(height: 8),
           Row(
             children: [
@@ -37,7 +51,7 @@ class StepPersonal extends StatelessWidget {
                   children: [
                     _buildLabel('Age'),
                     const SizedBox(height: 4),
-                    _buildTextField('Enter your age', keyboardType: TextInputType.number),
+                    _buildTextField('Enter your age', keyboardType: TextInputType.number, controller: ageController),
                   ],
                 ),
               ),
@@ -49,7 +63,7 @@ class StepPersonal extends StatelessWidget {
                   children: [
                     _buildLabel('Gender'),
                     const SizedBox(height: 4),
-                    _buildDropdown('Select gender', ['Select gender', 'Female', 'Male', 'Other']),
+                    _buildDropdown(gender, ['Select gender', 'Female', 'Male', 'Other'], onGenderChanged),
                   ],
                 ),
               ),
@@ -58,13 +72,14 @@ class StepPersonal extends StatelessWidget {
           const SizedBox(height: 8),
           _buildLabel('Blood type'),
           const SizedBox(height: 4),
-          _buildDropdown('Select blood type', ['Select blood type', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-']),
+          _buildDropdown(bloodType, ['Select blood type', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], onBloodTypeChanged),
           const SizedBox(height: 8),
           _buildLabel('Additional notes'),
           const SizedBox(height: 4),
           _buildTextField(
             'Allergies, conditions, anything we should know...',
             maxLines: 3,
+            controller: notesController,
           ),
           const SizedBox(height: 16),
           const Divider(color: Color(0xFFEEEEEE), thickness: 1),
@@ -270,8 +285,9 @@ class StepPersonal extends StatelessWidget {
     );
   }
 
-  Widget _buildTextField(String hint, {int maxLines = 1, TextInputType? keyboardType}) {
+  Widget _buildTextField(String hint, {int maxLines = 1, TextInputType? keyboardType, TextEditingController? controller}) {
     return TextField(
+      controller: controller,
       maxLines: maxLines,
       keyboardType: keyboardType,
       decoration: InputDecoration(
@@ -297,7 +313,7 @@ class StepPersonal extends StatelessWidget {
     );
   }
 
-  Widget _buildDropdown(String value, List<String> items) {
+  Widget _buildDropdown(String value, List<String> items, ValueChanged<String?> onChanged) {
     return DropdownButtonFormField<String>(
       value: value,
       isExpanded: true,
@@ -331,7 +347,7 @@ class StepPersonal extends StatelessWidget {
           ),
         );
       }).toList(),
-      onChanged: (val) {},
+      onChanged: onChanged,
     );
   }
 

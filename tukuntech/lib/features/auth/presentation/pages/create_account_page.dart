@@ -26,6 +26,24 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   int get _totalSteps => 7;
   List<String> get _stepNames => const ['Plan', 'Account', 'Personal', 'Address', 'Delivery', 'Payment', 'Done'];
 
+  final _dummyEmail = TextEditingController();
+  final _dummyPassword = TextEditingController();
+  final _dummyFullName = TextEditingController();
+  final _dummyAge = TextEditingController();
+  final _dummyNotes = TextEditingController();
+  final _dummyAddress = TextEditingController();
+
+  @override
+  void dispose() {
+    _dummyEmail.dispose();
+    _dummyPassword.dispose();
+    _dummyFullName.dispose();
+    _dummyAge.dispose();
+    _dummyNotes.dispose();
+    _dummyAddress.dispose();
+    super.dispose();
+  }
+
   void _nextStep() {
     if (_currentStep < _totalSteps - 1) {
       setState(() {
@@ -154,15 +172,31 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           onContinue: _nextStep,
         );
       case 1:
-        return StepAccount(onContinue: _nextStep, onBack: _previousStep);
+        return StepAccount(
+          onContinue: _nextStep, 
+          onBack: _previousStep,
+          emailController: _dummyEmail,
+          passwordController: _dummyPassword,
+        );
       case 2:
         return widget.planType == PlanType.familyPro
             ? StepPatients(onContinue: _nextStep, onBack: _previousStep)
-            : StepPersonal(onContinue: _nextStep, onBack: _previousStep);
+            : StepPersonal(
+                onContinue: _nextStep, 
+                onBack: _previousStep,
+                fullNameController: _dummyFullName,
+                ageController: _dummyAge,
+                notesController: _dummyNotes,
+                gender: 'Select gender',
+                onGenderChanged: (v) {},
+                bloodType: 'Select blood type',
+                onBloodTypeChanged: (v) {},
+              );
       case 3:
         return StepAddress(
           onContinue: _nextStep, 
-          onBack: _previousStep
+          onBack: _previousStep,
+          addressController: _dummyAddress,
         );
       case 4:
         return StepDelivery(onContinue: _nextStep, onBack: _previousStep);
@@ -170,7 +204,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         return StepPayment(
           planType: widget.planType,
           onContinue: _nextStep, 
-          onBack: _previousStep
+          onBack: _previousStep,
+          isRegistering: false,
         );
       case 6:
         return StepDone(planType: widget.planType);

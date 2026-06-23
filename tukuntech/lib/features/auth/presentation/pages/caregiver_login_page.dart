@@ -1,9 +1,77 @@
 import 'package:flutter/material.dart';
 import 'package:tukuntech/features/auth/presentation/pages/caregiver_create_account_page.dart';
 import 'package:tukuntech/features/caregiver/presentation/pages/caregiver_dashboard_page.dart';
+import 'dart:convert';
+import 'dart:io' show Platform;
+import 'package:http/http.dart' as http;
 
-class CaregiverLoginScreen extends StatelessWidget {
+class CaregiverLoginScreen extends StatefulWidget {
   const CaregiverLoginScreen({super.key});
+
+  @override
+  State<CaregiverLoginScreen> createState() => _CaregiverLoginScreenState();
+}
+
+class _CaregiverLoginScreenState extends State<CaregiverLoginScreen> {
+  final TextEditingController _emailController = TextEditingController(text: 'demo.caregiver@tukuntech.app');
+  final TextEditingController _passwordController = TextEditingController(text: '12345678');
+  bool _isLoading = false;
+
+  final String _loginUrl = Platform.isAndroid 
+      ? 'http://10.0.2.2:8080/api/v1/auth/login' 
+      : 'http://localhost:8080/api/v1/auth/login';
+
+  Future<void> _login() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse(_loginUrl),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({
+          'email': _emailController.text,
+          'password': _passwordController.text,
+        }),
+      ).timeout(const Duration(seconds: 10));
+
+      if (!mounted) return;
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        // Success, navigate to dashboard
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CaregiverDashboardPage(),
+          ),
+        );
+      } else {
+        // Show error
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: ${response.statusCode}')),
+        );
+      }
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +149,7 @@ class CaregiverLoginScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   TextField(
-                    controller: TextEditingController(text: 'demo.caregiver@tukuntech.app'),
+                    controller: _emailController,
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
@@ -136,7 +204,7 @@ class CaregiverLoginScreen extends StatelessWidget {
                   const SizedBox(height: 4),
                   TextField(
                     obscureText: true,
-                    controller: TextEditingController(text: '12345678'),
+                    controller: _passwordController,
                     decoration: InputDecoration(
                       filled: true,
                       fillColor: Colors.white,
@@ -161,14 +229,7 @@ class CaregiverLoginScreen extends StatelessWidget {
                   
                   // Sign In Button
                   ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const CaregiverDashboardPage(),
-                        ),
-                      );
-                    },
+                    onPressed: _isLoading ? null : _login,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primaryColor,
                       foregroundColor: Colors.white,
@@ -178,13 +239,22 @@ class CaregiverLoginScreen extends StatelessWidget {
                       ),
                       elevation: 0,
                     ),
-                    child: const Text(
-                      'Sign in',
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'Sign in',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                   ),
                   const SizedBox(height: 16),
                   

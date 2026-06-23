@@ -22,6 +22,18 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
     'Plan', 'Account', 'Personal', 'Address', 'Delivery', 'Payment', 'Done'
   ];
 
+  final _dummyEmail = TextEditingController();
+  final _dummyPassword = TextEditingController();
+  final _dummyAddress = TextEditingController();
+
+  @override
+  void dispose() {
+    _dummyEmail.dispose();
+    _dummyPassword.dispose();
+    _dummyAddress.dispose();
+    super.dispose();
+  }
+
   void _nextStep() {
     if (_currentStep < _totalSteps - 1) {
       setState(() => _currentStep++);
@@ -80,11 +92,25 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                   
                   // Step Content
                   if (_currentStep == 0) _buildPlanCard(primaryColor)
-                  else if (_currentStep == 1) StepAccount(onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 1) StepAccount(
+                    onContinue: _nextStep, 
+                    onBack: _previousStep,
+                    emailController: _dummyEmail,
+                    passwordController: _dummyPassword,
+                  )
                   else if (_currentStep == 2) StepPatients(onContinue: _nextStep, onBack: _previousStep)
-                  else if (_currentStep == 3) StepAddress(onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 3) StepAddress(
+                    onContinue: _nextStep, 
+                    onBack: _previousStep,
+                    addressController: _dummyAddress,
+                  )
                   else if (_currentStep == 4) StepDelivery(onContinue: _nextStep, onBack: _previousStep)
-                  else if (_currentStep == 5) StepPayment(planType: PlanType.familyPro, onContinue: _nextStep, onBack: _previousStep)
+                  else if (_currentStep == 5) StepPayment(
+                    planType: PlanType.familyPro, 
+                    onContinue: _nextStep, 
+                    onBack: _previousStep,
+                    isRegistering: false,
+                  )
                   else if (_currentStep == 6) StepSuccess(onGoToWebsite: () => Navigator.of(context).popUntil((route) => route.isFirst))
                   else Center(child: Text('Step ${_currentStep + 1} Content', style: const TextStyle(fontSize: 18))),
                   

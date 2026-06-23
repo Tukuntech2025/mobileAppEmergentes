@@ -5,12 +5,14 @@ class StepPayment extends StatelessWidget {
   final PlanType planType;
   final VoidCallback onContinue;
   final VoidCallback onBack;
+  final bool isRegistering;
 
   const StepPayment({
     super.key,
     required this.planType,
     required this.onContinue,
     required this.onBack,
+    required this.isRegistering,
   });
 
   @override
@@ -84,7 +86,7 @@ class StepPayment extends StatelessWidget {
               ),
               const SizedBox(height: 24),
               ElevatedButton(
-                onPressed: onContinue,
+                onPressed: isRegistering ? null : onContinue,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF3B9784),
                   foregroundColor: Colors.white,
@@ -92,7 +94,16 @@ class StepPayment extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: const Text('Simulate payment and continue', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                child: isRegistering
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      )
+                    : const Text('Simulate payment and continue', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
               ),
             ],
           ),
