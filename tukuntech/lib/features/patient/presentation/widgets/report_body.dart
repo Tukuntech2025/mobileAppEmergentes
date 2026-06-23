@@ -81,14 +81,43 @@ class _ReportBodyState extends State<ReportBody> {
     }
   }
 
+  Map<String, String> _getDateRange() {
+    final now = DateTime.now();
+    DateTime start;
+    switch (_selectedPeriod) {
+      case 'Daily':
+        start = now; // Or subtract 1 day depending on preference
+        break;
+      case 'Monthly':
+        start = now.subtract(const Duration(days: 30));
+        break;
+      case 'Yearly':
+        start = now.subtract(const Duration(days: 365));
+        break;
+      case 'Weekly':
+      default:
+        start = now.subtract(const Duration(days: 7));
+        break;
+    }
+    return {
+      'startDate': start.toIso8601String().split('T')[0],
+      'endDate': now.toIso8601String().split('T')[0],
+    };
+  }
+
   Future<void> _generateReport() async {
     setState(() {
       _isLoading = true;
       _error = null;
     });
     try {
-      final response = await http.get(Uri.parse('$_baseUrl/patient/1/generate')).timeout(const Duration(seconds: 5));
-      if (response.statusCode == 200 || response.statusCode == 201) {
+      final range = _getDateRange();
+      final response = await http.post(
+        Uri.parse('$_baseUrl/patient/1/generate'),
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode(range),
+      ).timeout(const Duration(seconds: 10));
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
         await _fetchReports();
       } else {
         if (mounted) {
@@ -275,7 +304,40 @@ class _ReportBodyState extends State<ReportBody> {
     );
   }
 
+  List<dynamic> get _filteredReports {
+    final now = DateTime.now();
+    return _reports.where((r) {
+      final dateStr = r['generatedAt'] ?? r['startDate'] ?? r['endDate'];
+      if (dateStr == null) return true;
+      
+      final date = DateTime.tryParse(dateStr);
+      if (date == null) return true;
+
+      switch (_selectedPeriod) {
+        case 'Daily':
+          return date.year == now.year && date.month == now.month && date.day == now.day;
+        case 'Weekly':
+          // Current week (assuming week starts on Monday, or just last 7 days as an approximation)
+          // To be precise with "this week":
+          final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+          final endOfWeek = startOfWeek.add(const Duration(days: 6));
+          final dateOnly = DateTime(date.year, date.month, date.day);
+          final startOnly = DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day);
+          final endOnly = DateTime(endOfWeek.year, endOfWeek.month, endOfWeek.day);
+          return dateOnly.isAfter(startOnly.subtract(const Duration(days: 1))) && 
+                 dateOnly.isBefore(endOnly.add(const Duration(days: 1)));
+        case 'Monthly':
+          return date.year == now.year && date.month == now.month;
+        case 'Yearly':
+          return date.year == now.year;
+        default:
+          return true;
+      }
+    }).toList();
+  }
+
   Widget _buildHistoryCard() {
+    final filteredReports = _filteredReports;
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -312,32 +374,32 @@ class _ReportBodyState extends State<ReportBody> {
             ],
           ),
           const SizedBox(height: 16),
-          if (_isLoading && _reports.isEmpty)
+          if (_isLoading && filteredReports.isEmpty)
             const Center(
               child: Padding(
                 padding: EdgeInsets.all(16.0),
                 child: CircularProgressIndicator(color: Color(0xFF3B9784)),
               ),
             )
-          else if (_error != null && _reports.isEmpty)
+          else if (_error != null && filteredReports.isEmpty)
             Center(
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(_error!, style: const TextStyle(color: Colors.red)),
               ),
             )
-          else if (_reports.isEmpty)
+          else if (filteredReports.isEmpty)
             const Center(
               child: Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Text('No reports available.', style: TextStyle(color: Colors.grey)),
+                child: Text('No reports available for this period.', style: TextStyle(color: Colors.grey)),
               ),
             )
           else
-            ..._reports.reversed.toList().asMap().entries.map((entry) {
+            ...filteredReports.reversed.toList().asMap().entries.map((entry) {
               final int index = entry.key;
               final report = entry.value;
-              final isLast = index == _reports.length - 1;
+              final isLast = index == filteredReports.length - 1;
               
               // Map API fields (assuming camelCase)
               final String date = _formatDate(report['generatedAt'] ?? report['startDate'] ?? report['endDate']);
@@ -345,8 +407,8 @@ class _ReportBodyState extends State<ReportBody> {
               final num hrMin = report['minHeartRate'] ?? 0;
               final num hrMax = report['maxHeartRate'] ?? 0;
               
-              final num spo2Avg = report['avgSpo2'] ?? 0;
-              final num spo2Min = report['minSpo2'] ?? 0;
+              final num spo2Avg = report['avgSpO2'] ?? 0;
+              final num spo2Min = report['minSpO2'] ?? 0;
               
               final num tempAvg = report['avgTemperature'] ?? 0;
               final String tempStatus = (tempAvg >= 36.0 && tempAvg <= 37.5) ? 'normal' : 'abnormal';
