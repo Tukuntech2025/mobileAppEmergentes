@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/auth_store.dart';
 
 // ── Modelos locales ────────────────────────────────────────────────────────────
 class EmergencyContact {
@@ -74,14 +78,96 @@ class _ProfileBodyState extends State<ProfileBody> {
     ),
   ];
 
+  bool _isLoading = true;
+
   @override
   void initState() {
     super.initState();
-    _nameCtrl = TextEditingController(text: _patientData['name']);
-    _ageCtrl = TextEditingController(text: _patientData['age']);
-    _genderCtrl = TextEditingController(text: _patientData['gender']);
-    _addressCtrl = TextEditingController(text: _patientData['address']);
-    _bloodType = _patientData['bloodType'];
+    _nameCtrl = TextEditingController(text: '');
+    _ageCtrl = TextEditingController(text: '');
+    _genderCtrl = TextEditingController(text: '');
+    _addressCtrl = TextEditingController(text: '');
+    _fetchProfile();
+  }
+
+  Future<void> _fetchProfile() async {
+    try {
+      final token = AuthStore.token;
+      if (token == null) throw Exception("No token");
+
+      final String baseUrl = Platform.isAndroid 
+          ? 'http://10.0.2.2:8080/api/v1' 
+          : 'http://localhost:8080/api/v1';
+
+      final res = await http.get(
+        Uri.parse('$baseUrl/profiles/me'),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(const Duration(seconds: 5));
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final data = jsonDecode(utf8.decode(res.bodyBytes));
+        if (mounted) {
+          setState(() {
+            _patientData['name'] = data['fullName'] ?? '';
+            if (data['birthDate'] != null) {
+              final birthDate = DateTime.tryParse(data['birthDate']);
+              if (birthDate != null) {
+                _patientData['age'] = (DateTime.now().year - birthDate.year).toString();
+              }
+            }
+            
+            String rawGender = data['gender'] ?? 'OTHER';
+            if (rawGender == 'MALE') _patientData['gender'] = 'Male';
+            else if (rawGender == 'FEMALE') _patientData['gender'] = 'Female';
+            else _patientData['gender'] = 'Other';
+
+            _patientData['address'] = data['address'] ?? '';
+
+            String rawBlood = data['bloodType'] ?? 'A_POSITIVE';
+            final bloodMap = {
+              'A_POSITIVE': 'A+', 'A_NEGATIVE': 'A-',
+              'B_POSITIVE': 'B+', 'B_NEGATIVE': 'B-',
+              'AB_POSITIVE': 'AB+', 'AB_NEGATIVE': 'AB-',
+              'O_POSITIVE': 'O+', 'O_NEGATIVE': 'O-',
+            };
+            _bloodType = bloodMap[rawBlood] ?? 'A+';
+            _patientData['bloodType'] = _bloodType;
+
+            List<String> parts = _patientData['name']!.trim().split(' ');
+            String ini = '';
+            if (parts.isNotEmpty && parts[0].isNotEmpty) ini += parts[0][0].toUpperCase();
+            if (parts.length > 1 && parts[1].isNotEmpty) ini += parts[1][0].toUpperCase();
+            if (ini.isNotEmpty) _patientData['initials'] = ini;
+
+            _nameCtrl.text = _patientData['name']!;
+            _ageCtrl.text = _patientData['age']!;
+            _genderCtrl.text = _patientData['gender']!;
+            _addressCtrl.text = _patientData['address']!;
+
+            _contacts.clear();
+            if (data['emergencyContacts'] != null) {
+              for (var c in data['emergencyContacts']) {
+                _contacts.add(EmergencyContact(
+                  name: c['name'] ?? '',
+                  relation: c['relationship'] ?? '',
+                  phone: c['phoneNumber'] ?? '',
+                ));
+              }
+            }
+            _isLoading = false;
+          });
+        }
+      } else {
+        throw Exception("Failed to fetch profile");
+      }
+    } catch (e) {
+      print("Error fetching profile: $e");
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -291,6 +377,7 @@ class _ProfileBodyState extends State<ProfileBody> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) return const Center(child: CircularProgressIndicator());
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       children: [

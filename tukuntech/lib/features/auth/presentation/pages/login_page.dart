@@ -43,18 +43,55 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response.statusCode == 200 || response.statusCode == 201) {
         try {
           final Map<String, dynamic> responseData = jsonDecode(response.body);
-          AuthStore.token = responseData['token'] ?? responseData['accessToken'];
-        } catch (_) {
-          // Si la respuesta no es JSON (ej. si es un String quemado por backend por error), no crashear
+          final String token = responseData['token'] ?? responseData['accessToken'] ?? '';
+          
+          if (token.isEmpty) {
+            throw Exception('No token received');
+          }
+
+          final String profileUrl = Platform.isAndroid 
+              ? 'http://10.0.2.2:8080/api/v1/profiles/me' 
+              : 'http://localhost:8080/api/v1/profiles/me';
+
+          final profileResponse = await http.get(
+            Uri.parse(profileUrl),
+            headers: {'Authorization': 'Bearer $token'},
+          ).timeout(const Duration(seconds: 10));
+
+          if (profileResponse.statusCode == 200 || profileResponse.statusCode == 201) {
+            final profileData = jsonDecode(utf8.decode(profileResponse.bodyBytes));
+            if (profileData['role'] != 'PATIENT') {
+              if (mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Access denied: You are not a Patient'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+              return;
+            }
+            
+            // Success, save token and navigate to dashboard
+            AuthStore.token = token;
+            if (mounted) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const VitalSignsPage(),
+                ),
+              );
+            }
+          } else {
+            throw Exception('Failed to fetch profile info');
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Error: $e')),
+            );
+          }
         }
-        
-        // Success, navigate to dashboard
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => const VitalSignsPage(),
-          ),
-        );
       } else {
         // Show error
         ScaffoldMessenger.of(context).showSnackBar(

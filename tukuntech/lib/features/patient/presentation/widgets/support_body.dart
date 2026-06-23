@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:io' show Platform;
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/auth_store.dart';
 
 class SupportTicket {
   final String subject;
@@ -24,18 +28,74 @@ class _SupportBodyState extends State<SupportBody> {
   final TextEditingController _subjectCtrl = TextEditingController();
   final TextEditingController _descCtrl = TextEditingController();
 
-  List<SupportTicket> _tickets = [
-    SupportTicket(
-      subject: 'Problem with device',
-      date: '2026-09-03',
-      status: 'Done',
-    ),
-    SupportTicket(
-      subject: 'Problem with device',
-      date: '2026-09-03',
-      status: 'Outstanding',
-    ),
-  ];
+  List<SupportTicket> _tickets = [];
+  bool _isLoadingTickets = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTickets();
+  }
+
+  Future<void> _fetchTickets() async {
+    try {
+      final token = AuthStore.token;
+      if (token == null) return;
+      
+      final String baseUrl = Platform.isAndroid 
+          ? 'http://10.0.2.2:8080/api/v1' 
+          : 'http://localhost:8080/api/v1';
+
+      // 1. Fetch profile to get ID
+      final profileRes = await http.get(
+        Uri.parse('$baseUrl/profiles/me'),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(const Duration(seconds: 5));
+
+      if (profileRes.statusCode != 200 && profileRes.statusCode != 201) {
+        throw Exception("Failed to fetch profile");
+      }
+      final profileData = jsonDecode(utf8.decode(profileRes.bodyBytes));
+      final String myId = profileData['id']?.toString() ?? '';
+
+      // 2. Fetch tickets
+      final res = await http.get(
+        Uri.parse('$baseUrl/tickets/me'),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(const Duration(seconds: 5));
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final List<dynamic> data = jsonDecode(utf8.decode(res.bodyBytes));
+        
+        final loadedTickets = data
+          .where((json) => json['reporterId']?.toString() == myId)
+          .map((json) {
+            final createdAt = json['createdAt'] as String? ?? '';
+            final dateStr = createdAt.length >= 10 ? createdAt.substring(0, 10) : '';
+            
+            return SupportTicket(
+              subject: json['subject'] ?? 'No subject',
+              date: dateStr,
+              status: json['status'] ?? 'Pending',
+            );
+          }).toList();
+
+        if (mounted) {
+          setState(() {
+            _tickets = loadedTickets;
+            _isLoadingTickets = false;
+          });
+        }
+      } else {
+        if (mounted) setState(() => _isLoadingTickets = false);
+      }
+    } catch (e) {
+      print('Error fetching tickets: $e');
+      if (mounted) {
+        setState(() => _isLoadingTickets = false);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -49,40 +109,108 @@ class _SupportBodyState extends State<SupportBody> {
     return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
   }
 
-  void _sendTicket() {
+  Future<void> _sendTicket() async {
     final subject = _subjectCtrl.text.trim();
-    if (subject.isEmpty) {
+    final description = _descCtrl.text.trim();
+    if (subject.isEmpty || description.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Please enter a subject'),
+          content: Text('Please enter a subject and description'),
           behavior: SnackBarBehavior.floating,
         ),
       );
       return;
     }
-    setState(() {
-      _tickets.insert(
-        0,
-        SupportTicket(subject: subject, date: _today(), status: 'Outstanding'),
-      );
-      _subjectCtrl.clear();
-      _descCtrl.clear();
-    });
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Ticket sent successfully'),
-        backgroundColor: _primary,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+
+    try {
+      final token = AuthStore.token;
+      if (token == null) throw Exception("No token");
+
+      final String baseUrl = Platform.isAndroid 
+          ? 'http://10.0.2.2:8080/api/v1' 
+          : 'http://localhost:8080/api/v1';
+
+      // 1. Fetch profile to get email
+      final profileRes = await http.get(
+        Uri.parse('$baseUrl/profiles/me'),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(const Duration(seconds: 5));
+
+      if (profileRes.statusCode != 200 && profileRes.statusCode != 201) {
+        throw Exception("Failed to fetch profile to get email");
+      }
+      
+      final profileData = jsonDecode(utf8.decode(profileRes.bodyBytes));
+      final String contactEmail = profileData['email'] ?? "unknown@example.com";
+
+      if (contactEmail == "unknown@example.com") {
+        print("Warning: email was not found in profile response: $profileData");
+      }
+
+      // 2. Post ticket
+      final body = jsonEncode({
+        "contactEmail": contactEmail,
+        "subject": subject,
+        "description": description
+      });
+
+      final res = await http.post(
+        Uri.parse('$baseUrl/tickets'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      ).timeout(const Duration(seconds: 5));
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        if (mounted) {
+          setState(() {
+            _tickets.insert(
+              0,
+              SupportTicket(subject: subject, date: _today(), status: 'PENDING'),
+            );
+            _subjectCtrl.clear();
+            _descCtrl.clear();
+          });
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Ticket sent successfully'),
+              backgroundColor: _primary,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } else {
+        throw Exception("Failed to send ticket");
+      }
+    } catch (e) {
+      print('Error sending ticket: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error sending ticket: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   Color _statusColor(String status) {
-    switch (status) {
-      case 'Done':
+    final s = status.toUpperCase();
+    switch (s) {
+      case 'DONE':
+      case 'RESOLVED':
+      case 'CLOSED':
         return _primary;
-      case 'Outstanding':
+      case 'OUTSTANDING':
+      case 'IN_PROGRESS':
         return const Color(0xFFF9A825);
+      case 'PENDING':
+      case 'OPEN':
+        return Colors.grey.shade600;
       default:
         return Colors.grey;
     }
@@ -225,15 +353,23 @@ class _SupportBodyState extends State<SupportBody> {
                 style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 14),
-              if (_tickets.isEmpty)
+              if (_isLoadingTickets)
+                const Center(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(vertical: 20),
+                    child: CircularProgressIndicator(),
+                  ),
+                )
+              else if (_tickets.isEmpty)
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Text(
                     'No tickets submitted yet.',
                     style: TextStyle(color: Colors.grey[400], fontSize: 13),
                   ),
-                ),
-              ..._tickets.map(
+                )
+              else
+                ..._tickets.map(
                 (t) => Container(
                   margin: const EdgeInsets.only(bottom: 14),
                   child: Column(

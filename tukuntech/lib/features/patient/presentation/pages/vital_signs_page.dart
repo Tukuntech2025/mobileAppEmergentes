@@ -6,6 +6,10 @@ import 'package:tukuntech/features/patient/presentation/widgets/report_body.dart
 import 'package:tukuntech/features/patient/presentation/widgets/patient_profile_body.dart';
 import 'package:tukuntech/features/patient/presentation/widgets/settings_body.dart';
 import 'package:tukuntech/features/patient/presentation/widgets/support_body.dart';
+import 'dart:io' show Platform;
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/auth_store.dart';
 
 class VitalSignsPage extends StatefulWidget {
   const VitalSignsPage({super.key});
@@ -23,6 +27,49 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
   // ── Drawer: sección activa ───────────────────────────────────
   // null = muestra los tabs del BottomNav, 'settings' = Settings, 'support' = Support
   String? _drawerSection;
+
+  final String _baseUrl = Platform.isAndroid 
+      ? 'http://10.0.2.2:8080/api/v1' 
+      : 'http://localhost:8080/api/v1';
+
+  Map<String, dynamic>? _profileData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfile();
+  }
+
+  Future<void> _fetchProfile() async {
+    try {
+      final token = AuthStore.token;
+      if (token == null) throw Exception("No token");
+
+      final res = await http.get(
+        Uri.parse('$_baseUrl/profiles/me'),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(const Duration(seconds: 5));
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        if (mounted) {
+          setState(() {
+            _profileData = jsonDecode(utf8.decode(res.bodyBytes));
+            _isLoading = false;
+          });
+        }
+      } else {
+        throw Exception("Failed to fetch profile");
+      }
+    } catch (e) {
+      print("Error fetching profile: $e");
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -231,6 +278,18 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
   }
 
   Widget _buildGreetingCard() {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    String fullName = _profileData?['fullName'] ?? 'Eleanor Marsh';
+    String initials = 'EM';
+    if (_profileData != null && fullName.isNotEmpty) {
+      List<String> parts = fullName.trim().split(' ');
+      initials = '';
+      if (parts.isNotEmpty && parts[0].isNotEmpty) initials += parts[0][0].toUpperCase();
+      if (parts.length > 1 && parts[1].isNotEmpty) initials += parts[1][0].toUpperCase();
+    }
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(24),
@@ -271,9 +330,9 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
-                  child: const Text(
-                    'EM',
-                    style: TextStyle(
+                  child: Text(
+                    initials,
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
@@ -289,9 +348,9 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
                         'Hello',
                         style: TextStyle(color: Colors.grey[600], fontSize: 11),
                       ),
-                      const Text(
-                        'Eleanor Marsh',
-                        style: TextStyle(
+                      Text(
+                        fullName,
+                        style: const TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
