@@ -16,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _emailController = TextEditingController(text: 'demo.patient@tukuntech.app');
   final TextEditingController _passwordController = TextEditingController(text: '12345678');
   bool _isLoading = false;
+  bool _obscurePassword = true;
 
   final String _loginUrl = Platform.isAndroid 
       ? 'http://10.0.2.2:8080/api/v1/auth/login' 
@@ -224,7 +225,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 4),
                   TextField(
-                    obscureText: true,
+                    obscureText: _obscurePassword,
                     controller: _passwordController,
                     decoration: InputDecoration(
                       filled: true,
@@ -242,8 +243,20 @@ class _LoginScreenState extends State<LoginScreen> {
                         borderSide: const BorderSide(color: primaryColor, width: 2),
                       ),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                          color: Colors.black45,
+                          size: 20,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
                     ),
-                    style: const TextStyle(fontSize: 14, letterSpacing: 4),
+                    style: TextStyle(fontSize: 14, letterSpacing: _obscurePassword ? 4 : 0),
                   ),
                   const SizedBox(height: 24),
                   
