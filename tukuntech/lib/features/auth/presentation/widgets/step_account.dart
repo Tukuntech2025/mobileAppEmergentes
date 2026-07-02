@@ -36,15 +36,15 @@ class _StepAccountState extends State<StepAccount> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildLabel('Email'),
+          _buildLabel('Caregiver email'),
           const SizedBox(height: 2),
           _buildTextField('you@example.com', controller: widget.emailController),
           const SizedBox(height: 20),
-          _buildLabel('Password'),
+          _buildLabel('Caregiver password'),
           const SizedBox(height: 2),
           _buildPasswordField('••••••••', obscureText: _obscurePassword, controller: widget.passwordController, onToggle: () => setState(() => _obscurePassword = !_obscurePassword)),
           const SizedBox(height: 20),
-          _buildLabel('Confirm password'),
+          _buildLabel('Confirm caregiver password'),
           const SizedBox(height: 2),
           _buildPasswordField('••••••••', obscureText: _obscureConfirmPassword, onToggle: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword)), // mock confirm
           const SizedBox(height: 8),

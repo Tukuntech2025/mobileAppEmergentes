@@ -42,8 +42,16 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
   final _dummyEmail = TextEditingController();
   final _dummyPassword = TextEditingController();
   final _dummyAddress = TextEditingController();
-  final List<PatientData> _patients = List.generate(5, (_) => PatientData());
+  late final List<PatientData> _patients;
   bool _isRegistering = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final match = RegExp(r'\d+').firstMatch(widget.planTitle);
+    final count = match != null ? int.parse(match.group(0)!) : 5;
+    _patients = List.generate(count, (_) => PatientData());
+  }
 
   final String _baseUrl = Platform.isAndroid 
       ? 'http://10.0.2.2:8080/api/v1' 
@@ -294,7 +302,9 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                   )
                   else if (_currentStep == 4) StepDelivery(onContinue: _nextStep, onBack: _previousStep)
                   else if (_currentStep == 5) StepPayment(
-                    planType: PlanType.familyPro, 
+                    planTitle: widget.planTitle,
+                    initialPayment: widget.initialPayment,
+                    monthlyPayment: widget.monthlyPayment,
                     onContinue: _nextStep, 
                     onBack: _previousStep,
                     isRegistering: _isRegistering,

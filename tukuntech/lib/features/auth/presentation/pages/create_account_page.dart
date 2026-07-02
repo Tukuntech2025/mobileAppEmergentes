@@ -29,6 +29,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   final _dummyEmail = TextEditingController();
   final _dummyPassword = TextEditingController();
   final _dummyFullName = TextEditingController();
+  final _dummyDni = TextEditingController();
   final _dummyAge = TextEditingController();
   final _dummyNotes = TextEditingController();
   final _dummyAddress = TextEditingController();
@@ -39,6 +40,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     _dummyEmail.dispose();
     _dummyPassword.dispose();
     _dummyFullName.dispose();
+    _dummyDni.dispose();
     _dummyAge.dispose();
     _dummyNotes.dispose();
     _dummyAddress.dispose();
@@ -189,12 +191,22 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                 onContinue: _nextStep, 
                 onBack: _previousStep,
                 fullNameController: _dummyFullName,
+                dniController: _dummyDni,
                 ageController: _dummyAge,
                 notesController: _dummyNotes,
                 gender: 'Select gender',
                 onGenderChanged: (v) {},
                 bloodType: 'Select blood type',
                 onBloodTypeChanged: (v) {},
+                patientEmailController: _dummyPatients[0].emailCtrl,
+                patientPasswordController: _dummyPatients[0].passwordCtrl,
+                patientConfirmPasswordController: _dummyPatients[0].confirmPasswordCtrl,
+                minHrController: _dummyPatients[0].minHrCtrl,
+                maxHrController: _dummyPatients[0].maxHrCtrl,
+                minO2Controller: _dummyPatients[0].minO2Ctrl,
+                maxO2Controller: _dummyPatients[0].maxO2Ctrl,
+                minTempController: _dummyPatients[0].minTempCtrl,
+                maxTempController: _dummyPatients[0].maxTempCtrl,
               );
       case 3:
         return StepAddress(
@@ -206,7 +218,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         return StepDelivery(onContinue: _nextStep, onBack: _previousStep);
       case 5:
         return StepPayment(
-          planType: widget.planType,
+          planTitle: widget.planType == PlanType.personal ? 'Individual plan' : 'Family Pro plan',
+          initialPayment: widget.planType == PlanType.personal ? '\$50' : '\$170',
+          monthlyPayment: widget.planType == PlanType.personal ? '\$15/mo' : '\$25/mo',
           onContinue: _nextStep, 
           onBack: _previousStep,
           isRegistering: false,

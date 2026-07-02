@@ -41,9 +41,21 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _fullNameController = TextEditingController();
+  final _dniController = TextEditingController();
   final _ageController = TextEditingController();
   final _notesController = TextEditingController();
   final _addressController = TextEditingController();
+
+  // Patient sub-account & parameters controllers
+  final _patientEmailController = TextEditingController();
+  final _patientPasswordController = TextEditingController();
+  final _patientConfirmPasswordController = TextEditingController();
+  final _minHrController = TextEditingController();
+  final _maxHrController = TextEditingController();
+  final _minO2Controller = TextEditingController();
+  final _maxO2Controller = TextEditingController();
+  final _minTempController = TextEditingController();
+  final _maxTempController = TextEditingController();
   
   String _gender = 'Select gender';
   String _bloodType = 'Select blood type';
@@ -59,9 +71,19 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
     _emailController.dispose();
     _passwordController.dispose();
     _fullNameController.dispose();
+    _dniController.dispose();
     _ageController.dispose();
     _notesController.dispose();
     _addressController.dispose();
+    _patientEmailController.dispose();
+    _patientPasswordController.dispose();
+    _patientConfirmPasswordController.dispose();
+    _minHrController.dispose();
+    _maxHrController.dispose();
+    _minO2Controller.dispose();
+    _maxO2Controller.dispose();
+    _minTempController.dispose();
+    _maxTempController.dispose();
     super.dispose();
   }
 
@@ -249,12 +271,22 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                     onContinue: _nextStep, 
                     onBack: _previousStep,
                     fullNameController: _fullNameController,
+                    dniController: _dniController,
                     ageController: _ageController,
                     notesController: _notesController,
                     gender: _gender,
                     onGenderChanged: (val) => setState(() => _gender = val ?? _gender),
                     bloodType: _bloodType,
                     onBloodTypeChanged: (val) => setState(() => _bloodType = val ?? _bloodType),
+                    patientEmailController: _patientEmailController,
+                    patientPasswordController: _patientPasswordController,
+                    patientConfirmPasswordController: _patientConfirmPasswordController,
+                    minHrController: _minHrController,
+                    maxHrController: _maxHrController,
+                    minO2Controller: _minO2Controller,
+                    maxO2Controller: _maxO2Controller,
+                    minTempController: _minTempController,
+                    maxTempController: _maxTempController,
                   )
                   else if (_currentStep == 3) StepAddress(
                     onContinue: _nextStep, 
@@ -263,7 +295,9 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                   )
                   else if (_currentStep == 4) StepDelivery(onContinue: _nextStep, onBack: _previousStep)
                   else if (_currentStep == 5) StepPayment(
-                    planType: PlanType.personal, 
+                    planTitle: widget.planTitle,
+                    initialPayment: widget.initialPayment,
+                    monthlyPayment: widget.monthlyPayment,
                     onContinue: _nextStep, 
                     onBack: _previousStep,
                     isRegistering: _isRegistering,

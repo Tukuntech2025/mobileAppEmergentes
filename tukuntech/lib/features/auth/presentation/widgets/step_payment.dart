@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import 'package:tukuntech/features/auth/presentation/pages/create_account_page.dart';
 
 class StepPayment extends StatelessWidget {
-  final PlanType planType;
+  final String planTitle;
+  final String initialPayment;
+  final String monthlyPayment;
   final VoidCallback onContinue;
   final VoidCallback onBack;
   final bool isRegistering;
 
   const StepPayment({
     super.key,
-    required this.planType,
+    required this.planTitle,
+    required this.initialPayment,
+    required this.monthlyPayment,
     required this.onContinue,
     required this.onBack,
     required this.isRegistering,
@@ -78,7 +81,7 @@ class StepPayment extends StatelessWidget {
                       style: TextStyle(fontWeight: FontWeight.w400, fontSize: 14, color: Colors.black54),
                     ),
                     Text(
-                      planType == PlanType.personal ? '\$90' : '\$170',
+                      initialPayment,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
                     ),
                   ],
@@ -96,11 +99,11 @@ class StepPayment extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      planType == PlanType.personal ? 'Individual plan' : 'Family Pro plan',
+                      planTitle,
                       style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 14, color: Colors.black54),
                     ),
                     Text(
-                      planType == PlanType.personal ? '\$15/mo' : '\$25/mo',
+                      monthlyPayment,
                       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
                     ),
                   ],
@@ -110,7 +113,7 @@ class StepPayment extends StatelessWidget {
               ElevatedButton(
                 onPressed: isRegistering ? null : onContinue,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF3B9784),
+                  backgroundColor: primaryColor,
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),

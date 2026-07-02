@@ -13,6 +13,10 @@ class PatientData {
   final TextEditingController minTempCtrl = TextEditingController();
   final TextEditingController maxTempCtrl = TextEditingController();
 
+  final TextEditingController passwordCtrl = TextEditingController();
+  final TextEditingController confirmPasswordCtrl = TextEditingController();
+  final TextEditingController dniCtrl = TextEditingController();
+
   String? gender;
   String? bloodType;
 
@@ -27,6 +31,9 @@ class PatientData {
     maxO2Ctrl.dispose();
     minTempCtrl.dispose();
     maxTempCtrl.dispose();
+    passwordCtrl.dispose();
+    confirmPasswordCtrl.dispose();
+    dniCtrl.dispose();
   }
 }
 
@@ -47,7 +54,9 @@ class StepPatients extends StatefulWidget {
 }
 
 class _StepPatientsState extends State<StepPatients> {
-  int _currentPatientIndex = 0; // 0 to 4
+  int _currentPatientIndex = 0;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
 
   @override
   void dispose() {
@@ -55,14 +64,22 @@ class _StepPatientsState extends State<StepPatients> {
   }
 
   void _nextPatient() {
-    if (_currentPatientIndex < 4) {
-      setState(() => _currentPatientIndex++);
+    if (_currentPatientIndex < widget.patients.length - 1) {
+      setState(() {
+        _currentPatientIndex++;
+        _obscurePassword = true;
+        _obscureConfirmPassword = true;
+      });
     }
   }
 
   void _previousPatient() {
     if (_currentPatientIndex > 0) {
-      setState(() => _currentPatientIndex--);
+      setState(() {
+        _currentPatientIndex--;
+        _obscurePassword = true;
+        _obscureConfirmPassword = true;
+      });
     }
   }
 
@@ -84,12 +101,12 @@ class _StepPatientsState extends State<StepPatients> {
           ),
           child: Row(
             children: [
-              Icon(Icons.people_outline, color: primaryColor, size: 16),
+              const Icon(Icons.people_outline, color: primaryColor, size: 16),
               const SizedBox(width: 8),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Register all 5 patients under your care.',
-                  style: TextStyle(color: Colors.black54, fontSize: 12),
+                  'Register the ${widget.patients.length} ${widget.patients.length == 1 ? 'patient' : 'patients'} included in this plan.',
+                  style: const TextStyle(color: Colors.black54, fontSize: 12),
                 ),
               ),
             ],
@@ -101,7 +118,7 @@ class _StepPatientsState extends State<StepPatients> {
         SingleChildScrollView(
           scrollDirection: Axis.horizontal,
           child: Row(
-            children: List.generate(5, (index) {
+            children: List.generate(widget.patients.length, (index) {
               final isSelected = index == _currentPatientIndex;
               return Padding(
                 padding: const EdgeInsets.only(right: 8.0),
@@ -110,7 +127,11 @@ class _StepPatientsState extends State<StepPatients> {
                   selected: isSelected,
                   onSelected: (selected) {
                     if (selected) {
-                      setState(() => _currentPatientIndex = index);
+                      setState(() {
+                        _currentPatientIndex = index;
+                        _obscurePassword = true;
+                        _obscureConfirmPassword = true;
+                      });
                     }
                   },
                   selectedColor: primaryColor,
@@ -144,14 +165,87 @@ class _StepPatientsState extends State<StepPatients> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              _buildLabel('Full name'),
-              const SizedBox(height: 4),
-              _buildTextField('Enter full name', controller: currentPatient.fullNameCtrl),
-              const SizedBox(height: 12),
-              _buildLabel('Email'),
+              // Patient account header block
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.assignment_ind_outlined, color: Colors.blue, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Patient account',
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Each patient will have their own independent access.',
+                          style: TextStyle(fontSize: 12, color: Colors.black54),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              _buildLabel('Patient email'),
               const SizedBox(height: 4),
               _buildTextField('Enter patient email', keyboardType: TextInputType.emailAddress, controller: currentPatient.emailCtrl),
               const SizedBox(height: 12),
+
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel('Patient password'),
+                        const SizedBox(height: 4),
+                        _buildPasswordField('••••••••', obscureText: _obscurePassword, controller: currentPatient.passwordCtrl, onToggle: () => setState(() => _obscurePassword = !_obscurePassword)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildLabel('Confirm patient password'),
+                        const SizedBox(height: 4),
+                        _buildPasswordField('••••••••', obscureText: _obscureConfirmPassword, controller: currentPatient.confirmPasswordCtrl, onToggle: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword)),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+
+              _buildLabel('DNI'),
+              const SizedBox(height: 4),
+              _buildTextField('8 digits', keyboardType: TextInputType.number, controller: currentPatient.dniCtrl, maxLength: 8),
+              const SizedBox(height: 16),
+
+              const Divider(color: Color(0xFFEEEEEE)),
+              const SizedBox(height: 16),
+
+              _buildLabel('Full name'),
+              const SizedBox(height: 4),
+              _buildTextField('Enter your full name', controller: currentPatient.fullNameCtrl),
+              const SizedBox(height: 12),
+
               Row(
                 children: [
                   Expanded(
@@ -183,6 +277,7 @@ class _StepPatientsState extends State<StepPatients> {
                 ],
               ),
               const SizedBox(height: 12),
+
               _buildLabel('Blood type'),
               const SizedBox(height: 4),
               _buildDropdown(
@@ -192,17 +287,19 @@ class _StepPatientsState extends State<StepPatients> {
                 (val) => setState(() => currentPatient.bloodType = val),
               ),
               const SizedBox(height: 12),
+
               _buildLabel('Additional notes'),
               const SizedBox(height: 4),
               _buildTextField(
-                'Allergies, conditions...',
-                maxLines: 2,
+                'Allergies, conditions, anything we should know...',
+                maxLines: 3,
                 controller: currentPatient.notesCtrl,
               ),
               const SizedBox(height: 16),
               
               const Divider(color: Color(0xFFEEEEEE)),
-              const SizedBox(height: 8),
+              const SizedBox(height: 16),
+
               Row(
                 children: [
                   Container(
@@ -237,6 +334,7 @@ class _StepPatientsState extends State<StepPatients> {
                 ],
               ),
               const SizedBox(height: 16),
+
               Row(
                 children: [
                   Expanded(
@@ -263,6 +361,7 @@ class _StepPatientsState extends State<StepPatients> {
                 ],
               ),
               const SizedBox(height: 12),
+
               Row(
                 children: [
                   Expanded(
@@ -289,6 +388,7 @@ class _StepPatientsState extends State<StepPatients> {
                 ],
               ),
               const SizedBox(height: 12),
+
               Row(
                 children: [
                   Expanded(
@@ -315,6 +415,7 @@ class _StepPatientsState extends State<StepPatients> {
                 ],
               ),
               const SizedBox(height: 16),
+
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                 decoration: BoxDecoration(
@@ -336,38 +437,62 @@ class _StepPatientsState extends State<StepPatients> {
                 ),
               ),
               const SizedBox(height: 24),
+
               Row(
                 children: [
                   Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: _currentPatientIndex > 0 ? _previousPatient : widget.onBack,
-                      icon: const Icon(Icons.arrow_back, size: 16, color: Color(0xFF3B9784)),
-                      label: const Text('Previous', style: TextStyle(color: Color(0xFF3B9784), fontSize: 13)),
+                    child: ElevatedButton(
+                      onPressed: _currentPatientIndex > 0 ? _previousPatient : null,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF3B9784).withOpacity(0.05),
+                        disabledBackgroundColor: Colors.grey.shade100,
+                        disabledForegroundColor: Colors.black26,
                         elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: const [
+                          Icon(Icons.arrow_back, size: 16, color: Color(0xFF3B9784)),
+                          SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              'Previous patient',
+                              style: TextStyle(color: Color(0xFF3B9784), fontSize: 12),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
                     child: ElevatedButton(
-                      onPressed: _currentPatientIndex < 4 ? _nextPatient : widget.onContinue,
+                      onPressed: _currentPatientIndex < widget.patients.length - 1 ? _nextPatient : null,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: Colors.white,
+                        backgroundColor: const Color(0xFF3B9784),
+                        disabledBackgroundColor: Colors.grey.shade100,
+                        disabledForegroundColor: Colors.black26,
                         elevation: 0,
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
                         children: const [
-                          Flexible(child: Text('Next', style: TextStyle(fontSize: 13), overflow: TextOverflow.ellipsis)),
+                          Flexible(
+                            child: Text(
+                              'Next patient',
+                              style: TextStyle(fontSize: 12, color: Colors.white),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
                           SizedBox(width: 4),
-                          Icon(Icons.arrow_forward, size: 16),
+                          Icon(Icons.arrow_forward, size: 16, color: Colors.white),
                         ],
                       ),
                     ),
@@ -377,7 +502,76 @@ class _StepPatientsState extends State<StepPatients> {
             ],
           ),
         ),
+        const SizedBox(height: 16),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            TextButton.icon(
+              onPressed: widget.onBack,
+              icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 18),
+              label: const Text(
+                'Back',
+                style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 14),
+              ),
+            ),
+            ElevatedButton(
+              onPressed: widget.onContinue,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: primaryColor,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                elevation: 0,
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: const [
+                  Text('Continue', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  SizedBox(width: 6),
+                  Icon(Icons.check, size: 18),
+                ],
+              ),
+            ),
+          ],
+        ),
       ],
+    );
+  }
+
+  Widget _buildPasswordField(String hint, {required bool obscureText, TextEditingController? controller, required VoidCallback onToggle}) {
+    return TextField(
+      controller: controller,
+      obscureText: obscureText,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(color: Colors.black45, fontWeight: FontWeight.normal),
+        filled: true,
+        fillColor: Colors.white,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: Color(0xFF3B9784), width: 2),
+        ),
+        suffixIcon: IconButton(
+          icon: Icon(
+            obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
+            color: Colors.black45,
+            size: 20,
+          ),
+          onPressed: onToggle,
+        ),
+      ),
+      style: const TextStyle(fontSize: 13),
     );
   }
 
@@ -392,16 +586,18 @@ class _StepPatientsState extends State<StepPatients> {
     );
   }
 
-  Widget _buildTextField(String hint, {int maxLines = 1, TextInputType? keyboardType, TextEditingController? controller}) {
+  Widget _buildTextField(String hint, {int maxLines = 1, TextInputType? keyboardType, TextEditingController? controller, int? maxLength}) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
       keyboardType: keyboardType,
+      maxLength: maxLength,
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.black45, fontWeight: FontWeight.normal),
         filled: true,
         fillColor: Colors.white,
+        counterText: "",
         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
