@@ -13,7 +13,20 @@ import 'package:http/http.dart' as http;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 
 class CaregiverCreateAccountPage extends StatefulWidget {
-  const CaregiverCreateAccountPage({super.key});
+  final String planTitle;
+  final String planSubtitle;
+  final String initialPayment;
+  final String monthlyPayment;
+  final bool isRecommended;
+
+  const CaregiverCreateAccountPage({
+    super.key,
+    this.planTitle = 'Family plan 2',
+    this.planSubtitle = '2 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+    this.initialPayment = '\$95',
+    this.monthlyPayment = '\$28/mo',
+    this.isRecommended = false,
+  });
 
   @override
   State<CaregiverCreateAccountPage> createState() => _CaregiverCreateAccountPageState();
@@ -224,22 +237,22 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const Text(
-                    'Create your Family Pro account',
+                    'Create your TukunTech account',
                     style: TextStyle(
-                      fontSize: 22,
+                      fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF112A24),
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: 8),
                   const Text(
-                    'Monitor up to 5 patients under your care.',
+                    'Register the caregiver first, then the patients included in your plan.',
                     style: TextStyle(
-                      fontSize: 13,
+                      fontSize: 14,
                       color: Colors.black54,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 24),
                   
                   // Steps Indicator with Arrows and Progress Bar
                   _buildStepper(primaryColor),
@@ -426,71 +439,86 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
 
   Widget _buildPlanCard(Color primaryColor) {
     return Container(
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: primaryColor.withOpacity(0.05),
-        border: Border.all(color: primaryColor),
+        border: Border.all(color: primaryColor.withOpacity(0.5), width: 1.5),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Wrap(
-                  spacing: 12,
-                  runSpacing: 8,
-                  crossAxisAlignment: WrapCrossAlignment.center,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      'Family Pro',
-                      style: TextStyle(
-                        fontSize: 20,
+                    Text(
+                      widget.planTitle,
+                      style: const TextStyle(
+                        fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: Color(0xFF112A24),
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: primaryColor,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Text(
-                        'RECOMMENDED',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
+                    if (widget.isRecommended) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: primaryColor,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: const Text(
+                          'RECOMMENDED',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 0.5,
+                          ),
                         ),
                       ),
-                    ),
+                    ],
                   ],
                 ),
+                const SizedBox(height: 6),
+                Text(
+                  widget.planSubtitle,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: Colors.black54,
+                    height: 1.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Initial payment: ${widget.initialPayment}',
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: Colors.black54,
+                ),
               ),
-              const SizedBox(width: 8),
-              const Text(
-                '\$25/mo',
-                style: TextStyle(
-                  fontSize: 20,
+              const SizedBox(height: 2),
+              Text(
+                'Monthly: ${widget.monthlyPayment}',
+                style: const TextStyle(
+                  fontSize: 14,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
               ),
             ],
-          ),
-          const SizedBox(height: 12),
-          const Text(
-            '\$170 one-time setup fee + up to 5 TukunTech devices · family dashboard · vitals tracking · Mobile app and web access',
-            style: TextStyle(
-              fontSize: 15,
-              color: Colors.black54,
-              height: 1.5,
-            ),
           ),
         ],
       ),

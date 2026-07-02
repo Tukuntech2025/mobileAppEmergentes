@@ -78,7 +78,12 @@ class PlanSelectionPage extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const CaregiverCreateAccountPage(),
+                            builder: (context) => const CaregiverCreateAccountPage(
+                              planTitle: 'Family plan 2',
+                              planSubtitle: '2 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+                              initialPayment: '\$95',
+                              monthlyPayment: '\$28/mo',
+                            ),
                           ),
                         );
                       },
@@ -99,7 +104,13 @@ class PlanSelectionPage extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const CaregiverCreateAccountPage(),
+                            builder: (context) => const CaregiverCreateAccountPage(
+                              planTitle: 'Family plan 3',
+                              planSubtitle: '3 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+                              initialPayment: '\$140',
+                              monthlyPayment: '\$40/mo',
+                              isRecommended: true,
+                            ),
                           ),
                         );
                       },
@@ -120,7 +131,12 @@ class PlanSelectionPage extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const CaregiverCreateAccountPage(),
+                            builder: (context) => const CaregiverCreateAccountPage(
+                              planTitle: 'Family plan 4',
+                              planSubtitle: '4 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+                              initialPayment: '\$180',
+                              monthlyPayment: '\$52/mo',
+                            ),
                           ),
                         );
                       },
@@ -141,7 +157,12 @@ class PlanSelectionPage extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const CaregiverCreateAccountPage(),
+                            builder: (context) => const CaregiverCreateAccountPage(
+                              planTitle: 'Family plan 5',
+                              planSubtitle: '5 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+                              initialPayment: '\$215',
+                              monthlyPayment: '\$62/mo',
+                            ),
                           ),
                         );
                       },

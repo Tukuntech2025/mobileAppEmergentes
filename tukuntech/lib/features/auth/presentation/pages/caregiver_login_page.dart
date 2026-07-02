@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:tukuntech/features/auth/presentation/pages/caregiver_create_account_page.dart';
+import 'package:tukuntech/features/auth/presentation/pages/plan_selection_page.dart';
 import 'package:tukuntech/core/auth_store.dart';
 import 'package:tukuntech/features/caregiver/presentation/pages/caregiver_dashboard_page.dart';
 import 'dart:convert';
@@ -331,7 +331,7 @@ class _CaregiverLoginScreenState extends State<CaregiverLoginScreen> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const CaregiverCreateAccountPage()),
+                            MaterialPageRoute(builder: (context) => const PlanSelectionPage()),
                           );
                         },
                         style: TextButton.styleFrom(

@@ -12,7 +12,20 @@ import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 
 class PatientCreateAccountPage extends StatefulWidget {
-  const PatientCreateAccountPage({super.key});
+  final String planTitle;
+  final String planSubtitle;
+  final String initialPayment;
+  final String monthlyPayment;
+  final bool isRecommended;
+
+  const PatientCreateAccountPage({
+    super.key,
+    this.planTitle = 'Individual plan',
+    this.planSubtitle = '1 patient + 1 caregiver · vital signs monitoring · web and mobile access',
+    this.initialPayment = '\$50',
+    this.monthlyPayment = '\$15/mo',
+    this.isRecommended = false,
+  });
 
   @override
   State<PatientCreateAccountPage> createState() => _PatientCreateAccountPageState();
@@ -24,8 +37,6 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
   List<String> get _stepNames => const [
     'Plan', 'Account', 'Personal', 'Address', 'Delivery', 'Payment', 'Done'
   ];
-
-  int _selectedPlanIndex = 0; // 0 for Personal, 1 for Personal Plus
 
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -203,7 +214,7 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                   ),
                   const SizedBox(height: 24),
                   const Text(
-                    'Create your patient account',
+                    'Create your TukunTech account',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -212,7 +223,7 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                   ),
                   const SizedBox(height: 8),
                   const Text(
-                    'Subscribe to activate your TukunTech.',
+                    'Register the caregiver first, then the patients included in your plan.',
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.black54,
@@ -226,15 +237,7 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                   const SizedBox(height: 24),
                   
                   if (_currentStep == 0) ...[
-                    _buildPlanCard(
-                      title: 'Individual',
-                      price: '\$15/mo',
-                      description: '\$90 one-time setup fee + 1 TukunTech device · vitals · reminders',
-                      isRecommended: true,
-                      isSelected: _selectedPlanIndex == 0,
-                      onTap: () => setState(() => _selectedPlanIndex = 0),
-                      primaryColor: primaryColor,
-                    ),
+                    _buildPlanCard(primaryColor),
                   ] 
                   else if (_currentStep == 1) StepAccount(
                     onContinue: _nextStep, 
@@ -272,7 +275,7 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                   if (_currentStep == 0) ...[
                     // Continue Button
                     Align(
-                      alignment: Alignment.centerRight,
+                      alignment: Alignment.centerLeft,
                       child: ElevatedButton(
                         onPressed: _nextStep,
                         style: ElevatedButton.styleFrom(
@@ -387,47 +390,40 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
     );
   }
 
-  Widget _buildPlanCard({
-    required String title,
-    required String price,
-    required String description,
-    required bool isRecommended,
-    required bool isSelected,
-    required VoidCallback onTap,
-    required Color primaryColor,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: isSelected ? primaryColor.withOpacity(0.05) : Colors.white,
-          border: Border.all(color: isSelected ? primaryColor : Colors.grey.shade300, width: isSelected ? 1.5 : 1),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+  Widget _buildPlanCard(Color primaryColor) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: primaryColor.withOpacity(0.05),
+        border: Border.all(color: primaryColor.withOpacity(0.5), width: 1.5),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
               children: [
                 Row(
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      title,
+                      widget.planTitle,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black87,
+                        color: Color(0xFF112A24),
                       ),
                     ),
-                    if (isRecommended) ...[
+                    if (widget.isRecommended) ...[
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
                           color: primaryColor,
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Text(
                           'RECOMMENDED',
@@ -442,26 +438,42 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                     ],
                   ],
                 ),
+                const SizedBox(height: 6),
                 Text(
-                  price,
+                  widget.planSubtitle,
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    fontSize: 12,
+                    color: Colors.black54,
+                    height: 1.3,
                   ),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              style: const TextStyle(
-                fontSize: 13,
-                color: Colors.black54,
+          ),
+          const SizedBox(width: 16),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Initial payment: ${widget.initialPayment}',
+                style: const TextStyle(
+                  fontSize: 10,
+                  color: Colors.black54,
+                ),
               ),
-            ),
-          ],
-        ),
+              const SizedBox(height: 2),
+              Text(
+                'Monthly: ${widget.monthlyPayment}',
+                style: const TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
