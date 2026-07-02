@@ -236,6 +236,25 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  Row(
+                    children: [
+                      Image.asset(
+                        'assets/icon_tukuntech.png',
+                        width: 24,
+                        height: 24,
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        'TukunTech',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
                   const Text(
                     'Create your TukunTech account',
                     style: TextStyle(
