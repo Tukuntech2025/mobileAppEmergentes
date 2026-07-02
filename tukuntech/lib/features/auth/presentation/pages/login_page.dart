@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tukuntech/features/auth/presentation/pages/patient_create_account_page.dart';
+import 'package:tukuntech/features/auth/presentation/pages/plan_selection_page.dart';
 import 'package:tukuntech/features/patient/presentation/pages/vital_signs_page.dart';
+import 'package:tukuntech/features/caregiver/presentation/pages/caregiver_dashboard_page.dart';
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
@@ -60,27 +61,38 @@ class _LoginScreenState extends State<LoginScreen> {
 
           if (profileResponse.statusCode == 200 || profileResponse.statusCode == 201) {
             final profileData = jsonDecode(utf8.decode(profileResponse.bodyBytes));
-            if (profileData['role'] != 'PATIENT') {
+            final String role = profileData['role'] ?? '';
+            
+            if (role == 'PATIENT') {
+              AuthStore.token = token;
+              if (mounted) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const VitalSignsPage(),
+                  ),
+                );
+              }
+            } else if (role == 'CAREGIVER') {
+              AuthStore.token = token;
+              if (mounted) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const CaregiverDashboardPage(),
+                  ),
+                );
+              }
+            } else {
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Access denied: You are not a Patient'),
+                  SnackBar(
+                    content: Text('Access denied: Unauthorized role ($role)'),
                     backgroundColor: Colors.red,
                   ),
                 );
               }
               return;
-            }
-            
-            // Success, save token and navigate to dashboard
-            AuthStore.token = token;
-            if (mounted) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const VitalSignsPage(),
-                ),
-              );
             }
           } else {
             throw Exception('Failed to fetch profile info');
@@ -159,7 +171,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   
                   // Headings
                   const Text(
-                    'Patient sign in',
+                    'Sign in',
                     style: TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
@@ -189,10 +201,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.person_outline, size: 18, color: Colors.blue[600]),
+                          Icon(Icons.people_outline, size: 18, color: Colors.blue[600]),
                           const SizedBox(width: 8),
                           Text(
-                            'Patient',
+                            'Patient / Caregiver',
                             style: TextStyle(
                               color: Colors.blue[600],
                               fontWeight: FontWeight.w500,
@@ -352,7 +364,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         onPressed: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const PatientCreateAccountPage()),
+                            MaterialPageRoute(builder: (context) => const PlanSelectionPage()),
                           );
                         },
                         style: TextButton.styleFrom(

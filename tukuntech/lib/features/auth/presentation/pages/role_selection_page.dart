@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:tukuntech/features/auth/presentation/pages/login_page.dart';
-import 'package:tukuntech/features/auth/presentation/pages/caregiver_login_page.dart';
 
 class RoleSelectionPage extends StatelessWidget {
   const RoleSelectionPage({super.key});
@@ -55,22 +54,12 @@ class RoleSelectionPage extends StatelessWidget {
                   // Role Options
                   _buildRoleCard(
                     context,
-                    title: 'I\'m a Patient',
-                    subtitle: 'Access your vital signs, device, and subscription.',
-                    icon: Icons.person_outline,
+                    title: 'I\'m a patient or caregiver',
+                    subtitle: 'Sign in with your email. The system will recognize your access automatically.',
+                    icon: Icons.people_outline,
                     iconColor: Colors.blue[300]!,
                     iconBgColor: Colors.blue.withOpacity(0.1),
                     destination: const LoginScreen(),
-                  ),
-                  const SizedBox(height: 12),
-                  _buildRoleCard(
-                    context,
-                    title: 'I\'m a Caregiver / Family',
-                    subtitle: 'Monitor up to 5 people under your care.',
-                    icon: Icons.favorite_border,
-                    iconColor: primaryColor,
-                    iconBgColor: primaryColor.withOpacity(0.15),
-                    destination: const CaregiverLoginScreen(),
                   ),
                   const SizedBox(height: 24),
                   // Language pill
