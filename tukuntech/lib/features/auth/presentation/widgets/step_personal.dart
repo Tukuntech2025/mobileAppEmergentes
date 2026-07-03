@@ -219,7 +219,7 @@ class _StepPersonalState extends State<StepPersonal> {
                       children: [
                         _buildLabel('Gender'),
                         const SizedBox(height: 4),
-                        _buildDropdown(widget.gender, ['Select gender', 'Female', 'Male', 'Other'], widget.onGenderChanged),
+                        _buildDropdown(widget.gender, ['Select gender', 'MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY'], widget.onGenderChanged),
                       ],
                     ),
                   ),
@@ -229,7 +229,7 @@ class _StepPersonalState extends State<StepPersonal> {
 
               _buildLabel('Blood type'),
               const SizedBox(height: 4),
-              _buildDropdown(widget.bloodType, ['Select blood type', 'A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'], widget.onBloodTypeChanged),
+              _buildDropdown(widget.bloodType, ['Select blood type', 'A_POSITIVE', 'A_NEGATIVE', 'B_POSITIVE', 'B_NEGATIVE', 'AB_POSITIVE', 'AB_NEGATIVE', 'O_POSITIVE', 'O_NEGATIVE', 'UNKNOWN'], widget.onBloodTypeChanged),
               const SizedBox(height: 12),
 
               _buildLabel('Additional notes'),
@@ -463,10 +463,28 @@ class _StepPersonalState extends State<StepPersonal> {
   }
 
   Widget _buildDropdown(String value, List<String> items, ValueChanged<String?> onChanged) {
+    final Map<String, String> displayNameMap = {
+      'Select gender': 'Select gender',
+      'MALE': 'Male',
+      'FEMALE': 'Female',
+      'OTHER': 'Other',
+      'PREFER_NOT_TO_SAY': 'Prefer not to say',
+      'Select blood type': 'Select blood type',
+      'A_POSITIVE': 'A+',
+      'A_NEGATIVE': 'A-',
+      'B_POSITIVE': 'B+',
+      'B_NEGATIVE': 'B-',
+      'AB_POSITIVE': 'AB+',
+      'AB_NEGATIVE': 'AB-',
+      'O_POSITIVE': 'O+',
+      'O_NEGATIVE': 'O-',
+      'UNKNOWN': 'UNKNOWN',
+    };
+
     return DropdownButtonFormField<String>(
       value: value,
       isExpanded: true,
-      hint: Text(value, style: const TextStyle(color: Colors.black45, fontWeight: FontWeight.normal)),
+      hint: Text(displayNameMap[value] ?? value, style: const TextStyle(color: Colors.black45, fontWeight: FontWeight.normal)),
       icon: const Icon(Icons.keyboard_arrow_down, color: Colors.grey),
       decoration: InputDecoration(
         filled: true,
@@ -489,7 +507,7 @@ class _StepPersonalState extends State<StepPersonal> {
         return DropdownMenuItem(
           value: item,
           child: Text(
-            item,
+            displayNameMap[item] ?? item,
             style: const TextStyle(
               fontSize: 13,
               color: Colors.black87,

@@ -51,18 +51,7 @@ class _ProfileBodyState extends State<ProfileBody> {
   late TextEditingController _ageCtrl;
   late TextEditingController _genderCtrl;
   late TextEditingController _addressCtrl;
-  String _bloodType = 'A+';
-
-  final List<String> _bloodTypes = [
-    'A+',
-    'A-',
-    'B+',
-    'B-',
-    'O+',
-    'O-',
-    'AB+',
-    'AB-',
-  ];
+  String _bloodType = 'A_POSITIVE';
 
   // ── Contactos de emergencia ──────────────────────────────────
   final List<EmergencyContact> _contacts = [
@@ -107,7 +96,9 @@ class _ProfileBodyState extends State<ProfileBody> {
         if (mounted) {
           setState(() {
             _patientData['name'] = data['fullName'] ?? '';
-            if (data['birthDate'] != null) {
+            if (data['age'] != null) {
+              _patientData['age'] = data['age'].toString();
+            } else if (data['birthDate'] != null) {
               final birthDate = DateTime.tryParse(data['birthDate']);
               if (birthDate != null) {
                 _patientData['age'] = (DateTime.now().year - birthDate.year).toString();
@@ -122,13 +113,7 @@ class _ProfileBodyState extends State<ProfileBody> {
             _patientData['address'] = data['address'] ?? '';
 
             String rawBlood = data['bloodType'] ?? 'A_POSITIVE';
-            final bloodMap = {
-              'A_POSITIVE': 'A+', 'A_NEGATIVE': 'A-',
-              'B_POSITIVE': 'B+', 'B_NEGATIVE': 'B-',
-              'AB_POSITIVE': 'AB+', 'AB_NEGATIVE': 'AB-',
-              'O_POSITIVE': 'O+', 'O_NEGATIVE': 'O-',
-            };
-            _bloodType = bloodMap[rawBlood] ?? 'A+';
+            _bloodType = rawBlood;
             _patientData['bloodType'] = _bloodType;
 
             List<String> parts = _patientData['name']!.trim().split(' ');
@@ -714,11 +699,17 @@ class _ProfileBodyState extends State<ProfileBody> {
                       filled: true,
                       fillColor: const Color(0xFFFAFAFA),
                     ),
-                    items: _bloodTypes
-                        .map(
-                          (bt) => DropdownMenuItem(value: bt, child: Text(bt)),
-                        )
-                        .toList(),
+                    items: const [
+                      DropdownMenuItem(value: 'A_POSITIVE', child: Text('A+')),
+                      DropdownMenuItem(value: 'A_NEGATIVE', child: Text('A-')),
+                      DropdownMenuItem(value: 'B_POSITIVE', child: Text('B+')),
+                      DropdownMenuItem(value: 'B_NEGATIVE', child: Text('B-')),
+                      DropdownMenuItem(value: 'AB_POSITIVE', child: Text('AB+')),
+                      DropdownMenuItem(value: 'AB_NEGATIVE', child: Text('AB-')),
+                      DropdownMenuItem(value: 'O_POSITIVE', child: Text('O+')),
+                      DropdownMenuItem(value: 'O_NEGATIVE', child: Text('O-')),
+                      DropdownMenuItem(value: 'UNKNOWN', child: Text('UNKNOWN')),
+                    ],
                     onChanged: (v) => setState(() => _bloodType = v!),
                   ),
                 ],

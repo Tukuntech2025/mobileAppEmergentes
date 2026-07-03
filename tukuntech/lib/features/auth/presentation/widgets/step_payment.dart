@@ -61,7 +61,7 @@ class StepPayment extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               const Text(
-                'This is a mock payment step. The real payment gateway will be\nconnected later.',
+                'You will be redirected to the secure Stripe payment gateway to complete your subscription.',
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: Colors.black54),
               ),
@@ -128,7 +128,7 @@ class StepPayment extends StatelessWidget {
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
-                    : const Text('Simulate payment and continue', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                    : const Text('Simulate payment', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
               ),
             ],
           ),

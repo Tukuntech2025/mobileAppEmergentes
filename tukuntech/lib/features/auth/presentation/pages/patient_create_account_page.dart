@@ -10,6 +10,7 @@ import 'package:tukuntech/features/auth/presentation/pages/create_account_page.d
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 import 'package:tukuntech/core/environment_config.dart';
 
 class PatientCreateAccountPage extends StatefulWidget {
@@ -90,93 +91,94 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
     setState(() { _isRegistering = true; });
 
     try {
-      // 1. Register Auth
-      final registerRes = await http.post(
-        Uri.parse('$_baseUrl/auth/register'),
+      String apiGender = _gender == 'Select gender' ? 'OTHER' : _gender;
+      String apiBloodType = _bloodType == 'Select blood type' ? 'UNKNOWN' : _bloodType;
+
+      final response = await http.post(
+        Uri.parse('$_baseUrl/profiles/onboarding'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'email': _emailController.text.trim(),
-          'password': _passwordController.text,
-          'role': 'PATIENT'
-        }),
-      ).timeout(const Duration(seconds: 10));
-
-      if (registerRes.statusCode != 200 && registerRes.statusCode != 201) {
-        throw Exception('Failed to register auth: ${registerRes.body}');
-      }
-
-      final loginRes = await http.post(
-        Uri.parse('$_baseUrl/auth/login'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': _emailController.text.trim(),
-          'password': _passwordController.text,
-        }),
-      ).timeout(const Duration(seconds: 10));
-
-      String? token;
-      if (loginRes.statusCode == 200 || loginRes.statusCode == 201) {
-        final loginData = jsonDecode(loginRes.body);
-        token = loginData['token'] ?? loginData['accessToken']; 
-      }
-
-      final Map<String, String> headers = {'Content-Type': 'application/json'};
-      if (token != null) {
-        headers['Authorization'] = 'Bearer $token';
-      }
-
-      String apiGender = 'OTHER';
-      if (_gender == 'Male') apiGender = 'MALE';
-      if (_gender == 'Female') apiGender = 'FEMALE';
-
-      String apiBloodType = 'A_POSITIVE';
-      final bloodMap = {
-        'A+': 'A_POSITIVE', 'A-': 'A_NEGATIVE',
-        'B+': 'B_POSITIVE', 'B-': 'B_NEGATIVE',
-        'AB+': 'AB_POSITIVE', 'AB-': 'AB_NEGATIVE',
-        'O+': 'O_POSITIVE', 'O-': 'O_NEGATIVE',
-      };
-      if (bloodMap.containsKey(_bloodType)) {
-        apiBloodType = bloodMap[_bloodType]!;
-      }
-
-      int birthYear = DateTime.now().year - (int.tryParse(_ageController.text) ?? 30);
-      String birthDate = '$birthYear-01-01';
-
-      // 2. Create Profile
-      final profileRes = await http.post(
-        Uri.parse('$_baseUrl/profiles/me'),
-        headers: headers,
-        body: jsonEncode({
-          'fullName': _fullNameController.text,
-          'birthDate': birthDate,
-          'address': _addressController.text,
-          'bloodType': apiBloodType,
-          'gender': apiGender,
-          'notes': _notesController.text,
-          'emergencyContacts': [
-             {
-               "name": "Emergency Contact",
-               "relationship": "FAMILY",
-               "phoneNumber": "123456789"
-             }
+          'caregiverEmail': _emailController.text.trim(),
+          'caregiverPassword': _passwordController.text,
+          'plan': 'INDIVIDUAL',
+          'patients': [
+            {
+              'email': _patientEmailController.text.trim(),
+              'password': _patientPasswordController.text,
+              'dni': _dniController.text.trim(),
+              'fullName': _fullNameController.text.trim(),
+              'age': int.tryParse(_ageController.text.trim()) ?? 0,
+              'address': _addressController.text.trim(),
+              'bloodType': apiBloodType,
+              'gender': apiGender,
+              'notes': _notesController.text.trim(),
+              'minHeartRate': int.tryParse(_minHrController.text.trim()) ?? 0,
+              'maxHeartRate': int.tryParse(_maxHrController.text.trim()) ?? 0,
+              'minOxygenSaturation': int.tryParse(_minO2Controller.text.trim()) ?? 0,
+              'maxOxygenSaturation': int.tryParse(_maxO2Controller.text.trim()) ?? 0,
+              'minTemperature': double.tryParse(_minTempController.text.trim()) ?? 0.0,
+              'maxTemperature': double.tryParse(_maxTempController.text.trim()) ?? 0.0,
+              'emergencyContacts': [
+                {
+                  'name': 'Emergency Contact',
+                  'relationship': 'FAMILY',
+                  'phoneNumber': '123456789'
+                }
+              ]
+            }
           ]
         }),
       ).timeout(const Duration(seconds: 10));
 
-      if (profileRes.statusCode != 200 && profileRes.statusCode != 201) {
-         throw Exception('Failed to create profile: ${profileRes.body}');
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception('Failed to create account: ${response.body}');
+      }
+
+      String stripeUrl = response.body.trim();
+      if (!stripeUrl.startsWith('http://') && !stripeUrl.startsWith('https://')) {
+        try {
+          final Map<String, dynamic> responseData = jsonDecode(response.body);
+          stripeUrl = responseData['url'] ?? responseData['stripeUrl'] ?? responseData['paymentUrl'] ?? response.body.trim();
+        } catch (e) {
+          stripeUrl = response.body.trim();
+        }
+      }
+      
+      if (stripeUrl.isNotEmpty) {
+        final Uri url = Uri.parse(stripeUrl);
+        launchUrl(url).catchError((e) {
+          print('Error launching default: $e');
+          return launchUrl(url, mode: LaunchMode.externalApplication);
+        }).catchError((e) {
+          print('Error launching Stripe URL: $e');
+          return false;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Redirecting to Stripe payment...'),
+              duration: const Duration(seconds: 8),
+              action: SnackBarAction(
+                label: 'Open manually',
+                onPressed: () {
+                  launchUrl(url).catchError((_) => false);
+                },
+              ),
+            ),
+          );
+        }
       }
 
       if (!mounted) return;
       setState(() { _currentStep++; });
     } catch (e) {
-       if (!mounted) return;
-       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
-       if (mounted) {
-         setState(() { _isRegistering = false; });
-       }
+      if (mounted) {
+        setState(() { _isRegistering = false; });
+      }
     }
   }
 

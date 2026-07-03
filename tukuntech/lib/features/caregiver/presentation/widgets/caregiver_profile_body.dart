@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/auth_store.dart';
+import 'package:tukuntech/core/environment_config.dart';
 
 class EmergencyContactData {
   String name;
@@ -65,53 +69,156 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
   static const Color _primary = Color(0xFF3B9784);
 
   int _selectedPatientIndex = 0;
-
-  final List<PatientProfileData> _patients = [
-    PatientProfileData(
-      initials: 'EM',
-      name: 'Eleanor Marsh',
-      age: '68',
-      gender: 'Female',
-      address: 'Av. siempre viva 235',
-      bloodType: 'A+',
-      contacts: [
-        EmergencyContactData(name: 'Sara Marsh', relation: 'Daughter', phone: '940999345'),
-        EmergencyContactData(name: 'Sara Marsh', relation: 'Daughter', phone: '840989345'),
-      ],
-    ),
-    PatientProfileData(
-      initials: 'CM',
-      name: 'Coco Manlin',
-      age: '45',
-      gender: 'Male',
-      address: '123 Fake Street',
-      bloodType: 'O+',
-      contacts: [],
-    ),
-    PatientProfileData(
-      initials: 'MM',
-      name: 'Miguel Montana',
-      age: '50',
-      gender: 'Male',
-      address: '456 Another St',
-      bloodType: 'B-',
-      contacts: [],
-    ),
-  ];
+  bool _isLoading = true;
+  List<PatientProfileData> _patients = [];
 
   late TextEditingController _nameCtrl;
   late TextEditingController _ageCtrl;
   late TextEditingController _genderCtrl;
   late TextEditingController _addressCtrl;
-  String _bloodType = 'A+';
+  String _bloodType = 'A_POSITIVE';
   List<EmergencyContactController> _contactControllers = [];
-
-  final List<String> _bloodTypes = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
 
   @override
   void initState() {
     super.initState();
-    _initControllersForSelectedPatient();
+    _nameCtrl = TextEditingController(text: '');
+    _ageCtrl = TextEditingController(text: '');
+    _genderCtrl = TextEditingController(text: '');
+    _addressCtrl = TextEditingController(text: '');
+    _fetchPatients();
+  }
+
+  Future<void> _fetchPatients() async {
+    try {
+      final token = AuthStore.token;
+      if (token == null) throw Exception("No token");
+
+      final res = await http.get(
+        Uri.parse('${EnvironmentConfig.baseUrl}/profiles/me/patients'),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(const Duration(seconds: 10));
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        final List<dynamic> data = jsonDecode(utf8.decode(res.bodyBytes));
+        final List<PatientProfileData> loaded = [];
+
+        for (var p in data) {
+          final String name = p['fullName'] ?? 'Unknown Patient';
+          
+          List<String> parts = name.trim().split(' ');
+          String initials = 'PT';
+          if (parts.isNotEmpty) {
+            initials = '';
+            if (parts[0].isNotEmpty) initials += parts[0][0].toUpperCase();
+            if (parts.length > 1 && parts[1].isNotEmpty) initials += parts[1][0].toUpperCase();
+          }
+          if (initials.isEmpty) initials = 'PT';
+
+          String ageStr = '30';
+          if (p['age'] != null) {
+            ageStr = p['age'].toString();
+          } else if (p['birthDate'] != null) {
+            final birthDate = DateTime.tryParse(p['birthDate']);
+            if (birthDate != null) {
+              ageStr = (DateTime.now().year - birthDate.year).toString();
+            }
+          }
+
+          String rawGender = p['gender'] ?? 'OTHER';
+          String gender = 'Other';
+          if (rawGender == 'MALE') gender = 'Male';
+          else if (rawGender == 'FEMALE') gender = 'Female';
+
+          String rawBlood = p['bloodType'] ?? 'A_POSITIVE';
+          String blood = rawBlood;
+
+          final List<EmergencyContactData> contacts = [];
+          if (p['emergencyContacts'] != null) {
+            for (var c in p['emergencyContacts']) {
+              contacts.add(EmergencyContactData(
+                name: c['name'] ?? '',
+                relation: c['relationship'] ?? '',
+                phone: c['phoneNumber'] ?? '',
+              ));
+            }
+          }
+
+          loaded.add(PatientProfileData(
+            initials: initials,
+            name: name,
+            age: ageStr,
+            gender: gender,
+            address: p['address'] ?? '',
+            bloodType: blood,
+            contacts: contacts,
+          ));
+        }
+
+        if (mounted) {
+          setState(() {
+            _patients = loaded;
+            if (_selectedPatientIndex >= _patients.length) {
+              _selectedPatientIndex = 0;
+            }
+            if (_patients.isNotEmpty) {
+              _disposeControllers();
+              _initControllersForSelectedPatient();
+            }
+            _isLoading = false;
+          });
+        }
+      } else {
+        throw Exception("Failed to load: ${res.statusCode}");
+      }
+    } catch (e) {
+      print("Error fetching caregiver patient profiles: $e");
+      final List<PatientProfileData> fallback = [
+        PatientProfileData(
+          initials: 'EM',
+          name: 'Eleanor Marsh',
+          age: '68',
+          gender: 'Female',
+          address: 'Av. siempre viva 235',
+          bloodType: 'A_POSITIVE',
+          contacts: [
+            EmergencyContactData(name: 'Sara Marsh', relation: 'Daughter', phone: '940999345'),
+            EmergencyContactData(name: 'Sara Marsh', relation: 'Daughter', phone: '840989345'),
+          ],
+        ),
+        PatientProfileData(
+          initials: 'CM',
+          name: 'Coco Manlin',
+          age: '45',
+          gender: 'Male',
+          address: '123 Fake Street',
+          bloodType: 'O_POSITIVE',
+          contacts: [],
+        ),
+        PatientProfileData(
+          initials: 'MM',
+          name: 'Miguel Montana',
+          age: '50',
+          gender: 'Male',
+          address: '456 Another St',
+          bloodType: 'B_NEGATIVE',
+          contacts: [],
+        ),
+      ];
+      if (mounted) {
+        setState(() {
+          _patients = fallback;
+          if (_selectedPatientIndex >= _patients.length) {
+            _selectedPatientIndex = 0;
+          }
+          if (_patients.isNotEmpty) {
+            _disposeControllers();
+            _initControllersForSelectedPatient();
+          }
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   void _initControllersForSelectedPatient() {
@@ -200,7 +307,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
     final modalAgeCtrl = TextEditingController();
     final modalGenderCtrl = TextEditingController();
     final modalAddressCtrl = TextEditingController();
-    String modalBloodType = 'A+';
+    String modalBloodType = 'A_POSITIVE';
 
     showDialog(
       context: context,
@@ -303,11 +410,17 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                             filled: true,
                             fillColor: const Color(0xFFFAFAFA),
                           ),
-                          items: _bloodTypes
-                              .map(
-                                (bt) => DropdownMenuItem(value: bt, child: Text(bt)),
-                              )
-                              .toList(),
+                          items: const [
+                            DropdownMenuItem(value: 'A_POSITIVE', child: Text('A+')),
+                            DropdownMenuItem(value: 'A_NEGATIVE', child: Text('A-')),
+                            DropdownMenuItem(value: 'B_POSITIVE', child: Text('B+')),
+                            DropdownMenuItem(value: 'B_NEGATIVE', child: Text('B-')),
+                            DropdownMenuItem(value: 'AB_POSITIVE', child: Text('AB+')),
+                            DropdownMenuItem(value: 'AB_NEGATIVE', child: Text('AB-')),
+                            DropdownMenuItem(value: 'O_POSITIVE', child: Text('O+')),
+                            DropdownMenuItem(value: 'O_NEGATIVE', child: Text('O-')),
+                            DropdownMenuItem(value: 'UNKNOWN', child: Text('UNKNOWN')),
+                          ],
                           onChanged: (v) => setModalState(() => modalBloodType = v!),
                         ),
                       ],
@@ -551,6 +664,21 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(
+          color: _primary,
+        ),
+      );
+    }
+    if (_patients.isEmpty) {
+      return const Center(
+        child: Text(
+          'No patients assigned.',
+          style: TextStyle(color: Colors.black54),
+        ),
+      );
+    }
     final currentPatient = _patients[_selectedPatientIndex];
 
     return ListView(
@@ -931,7 +1059,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                   ),
                   const SizedBox(height: 6),
                   DropdownButtonFormField<String>(
-                    value: _bloodType,
+                    value: ['A_POSITIVE', 'A_NEGATIVE', 'B_POSITIVE', 'B_NEGATIVE', 'AB_POSITIVE', 'AB_NEGATIVE', 'O_POSITIVE', 'O_NEGATIVE', 'UNKNOWN'].contains(_bloodType) ? _bloodType : 'UNKNOWN',
                     icon: const Icon(
                       Icons.keyboard_arrow_down,
                       color: Colors.black54,
@@ -960,11 +1088,17 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                       filled: true,
                       fillColor: const Color(0xFFFAFAFA),
                     ),
-                    items: _bloodTypes
-                        .map(
-                          (bt) => DropdownMenuItem(value: bt, child: Text(bt)),
-                        )
-                        .toList(),
+                    items: const [
+                      DropdownMenuItem(value: 'A_POSITIVE', child: Text('A+')),
+                      DropdownMenuItem(value: 'A_NEGATIVE', child: Text('A-')),
+                      DropdownMenuItem(value: 'B_POSITIVE', child: Text('B+')),
+                      DropdownMenuItem(value: 'B_NEGATIVE', child: Text('B-')),
+                      DropdownMenuItem(value: 'AB_POSITIVE', child: Text('AB+')),
+                      DropdownMenuItem(value: 'AB_NEGATIVE', child: Text('AB-')),
+                      DropdownMenuItem(value: 'O_POSITIVE', child: Text('O+')),
+                      DropdownMenuItem(value: 'O_NEGATIVE', child: Text('O-')),
+                      DropdownMenuItem(value: 'UNKNOWN', child: Text('UNKNOWN')),
+                    ],
                     onChanged: (v) => setState(() => _bloodType = v!),
                   ),
                 ],

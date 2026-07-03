@@ -42,7 +42,15 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
     super.dispose();
   }
 
-  int get _currentPatientId => _selectedPatientIndex + 2;
+  String get _currentPatientId {
+    if (widget.patients.isEmpty) return '${_selectedPatientIndex + 2}';
+    return widget.patients[_selectedPatientIndex].patientId ?? '${_selectedPatientIndex + 2}';
+  }
+
+  String get _currentPatientEmail {
+    if (widget.patients.isEmpty) return 'patient$_currentPatientId@test.com';
+    return widget.patients[_selectedPatientIndex].email ?? 'patient$_currentPatientId@test.com';
+  }
 
   Future<void> _fetchReports({bool silent = false}) async {
     if (!silent && _reports.isEmpty) {
@@ -54,7 +62,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
     try {
       // Generamos un token al vuelo simulando ser el paciente para poder usar el endpoint /me
       final jwt = JWT(
-        {'role': 'PATIENT', 'email': 'patient$_currentPatientId@test.com'},
+        {'role': 'PATIENT', 'email': _currentPatientEmail},
         subject: '$_currentPatientId',
       );
       final fakePatientToken = jwt.sign(SecretKey('TuClaveSecretaSuperSeguraYExtremadamenteLargaParaElProyectoTukunTech2026'));
@@ -128,7 +136,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
     try {
       // Generamos un token al vuelo simulando ser el paciente para poder usar el endpoint /me/generate
       final jwt = JWT(
-        {'role': 'PATIENT', 'email': 'patient$_currentPatientId@test.com'},
+        {'role': 'PATIENT', 'email': _currentPatientEmail},
         subject: '$_currentPatientId',
       );
       final fakePatientToken = jwt.sign(SecretKey('TuClaveSecretaSuperSeguraYExtremadamenteLargaParaElProyectoTukunTech2026'));
@@ -166,10 +174,34 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
     }
   }
 
+  DateTime? _parseReportDate(String dateStr) {
+    if (dateStr.contains('T')) {
+      final hasTimezone = dateStr.endsWith('Z') || 
+                          RegExp(r'[+-]\d{2}(:?\d{2})?$').hasMatch(dateStr.substring(dateStr.indexOf('T')));
+      if (!hasTimezone) {
+        return DateTime.tryParse('${dateStr}Z')?.toLocal();
+      } else {
+        return DateTime.tryParse(dateStr)?.toLocal();
+      }
+    } else {
+      final parts = dateStr.split('-');
+      if (parts.length == 3) {
+        final y = int.tryParse(parts[0]);
+        final m = int.tryParse(parts[1]);
+        final d = int.tryParse(parts[2]);
+        if (y != null && m != null && d != null) {
+          return DateTime(y, m, d);
+        }
+      }
+      return DateTime.tryParse(dateStr);
+    }
+  }
+
   String _formatDate(String? dateStr) {
     if (dateStr == null) return 'Unknown Date';
     try {
-      final DateTime date = DateTime.parse(dateStr);
+      final DateTime? date = _parseReportDate(dateStr);
+      if (date == null) return dateStr;
       const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
       return '${months[date.month - 1]} ${date.day}';
     } catch (_) {
@@ -183,7 +215,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
       final dateStr = r['generatedAt'] ?? r['startDate'] ?? r['endDate'];
       if (dateStr == null) return true;
       
-      final date = DateTime.tryParse(dateStr);
+      final date = _parseReportDate(dateStr);
       if (date == null) return true;
 
       switch (_selectedPeriod) {

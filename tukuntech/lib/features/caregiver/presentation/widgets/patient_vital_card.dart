@@ -14,6 +14,8 @@ class PatientVitalData {
   final String oxygenSubtitle;
   final String temperature;
   final String temperatureSubtitle;
+  final String? patientId;
+  final String? email;
 
   PatientVitalData({
     required this.initials,
@@ -29,6 +31,8 @@ class PatientVitalData {
     required this.oxygenSubtitle,
     required this.temperature,
     required this.temperatureSubtitle,
+    this.patientId,
+    this.email,
   });
 }
 
