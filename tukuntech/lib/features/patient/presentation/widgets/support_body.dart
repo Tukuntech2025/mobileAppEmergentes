@@ -44,19 +44,7 @@ class _SupportBodyState extends State<SupportBody> {
       
       final String baseUrl = EnvironmentConfig.baseUrl;
 
-      // 1. Fetch profile to get ID
-      final profileRes = await http.get(
-        Uri.parse('$baseUrl/profiles/me'),
-        headers: {'Authorization': 'Bearer $token'},
-      ).timeout(const Duration(seconds: 5));
-
-      if (profileRes.statusCode != 200 && profileRes.statusCode != 201) {
-        throw Exception("Failed to fetch profile");
-      }
-      final profileData = jsonDecode(utf8.decode(profileRes.bodyBytes));
-      final String myId = profileData['id']?.toString() ?? '';
-
-      // 2. Fetch tickets
+      // Fetch tickets
       final res = await http.get(
         Uri.parse('$baseUrl/tickets/me'),
         headers: {'Authorization': 'Bearer $token'},
@@ -65,18 +53,16 @@ class _SupportBodyState extends State<SupportBody> {
       if (res.statusCode == 200 || res.statusCode == 201) {
         final List<dynamic> data = jsonDecode(utf8.decode(res.bodyBytes));
         
-        final loadedTickets = data
-          .where((json) => json['reporterId']?.toString() == myId)
-          .map((json) {
-            final createdAt = json['createdAt'] as String? ?? '';
-            final dateStr = createdAt.length >= 10 ? createdAt.substring(0, 10) : '';
-            
-            return SupportTicket(
-              subject: json['subject'] ?? 'No subject',
-              date: dateStr,
-              status: json['status'] ?? 'Pending',
-            );
-          }).toList();
+        final loadedTickets = data.map((json) {
+          final createdAt = json['createdAt'] as String? ?? '';
+          final dateStr = createdAt.length >= 10 ? createdAt.substring(0, 10) : '';
+          
+          return SupportTicket(
+            subject: json['subject'] ?? 'No subject',
+            date: dateStr,
+            status: json['status'] ?? 'OPEN',
+          );
+        }).toList();
 
         if (mounted) {
           setState(() {
@@ -102,10 +88,6 @@ class _SupportBodyState extends State<SupportBody> {
     super.dispose();
   }
 
-  String _today() {
-    final now = DateTime.now();
-    return '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-  }
 
   Future<void> _sendTicket() async {
     final subject = _subjectCtrl.text.trim();
@@ -160,15 +142,10 @@ class _SupportBodyState extends State<SupportBody> {
       ).timeout(const Duration(seconds: 5));
 
       if (res.statusCode == 200 || res.statusCode == 201) {
+        _subjectCtrl.clear();
+        _descCtrl.clear();
+        _fetchTickets(); // Refresh tickets from backend
         if (mounted) {
-          setState(() {
-            _tickets.insert(
-              0,
-              SupportTicket(subject: subject, date: _today(), status: 'PENDING'),
-            );
-            _subjectCtrl.clear();
-            _descCtrl.clear();
-          });
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Ticket sent successfully'),
