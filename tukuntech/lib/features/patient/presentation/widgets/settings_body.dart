@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
+import 'package:tukuntech/core/localization/language_manager.dart';
 
 class SettingsBody extends StatefulWidget {
   const SettingsBody({super.key});
@@ -10,19 +12,25 @@ class SettingsBody extends StatefulWidget {
 class _SettingsBodyState extends State<SettingsBody> {
   static const Color _primary = Color(0xFF3B9784);
 
-  String _selectedLanguage = 'English';
+  late String _selectedLanguage;
   final List<String> _languages = [
     'English',
     'Spanish',
-    'French',
-    'Portuguese',
-    'German',
   ];
 
+  @override
+  void initState() {
+    super.initState();
+    final currentLocale = LanguageManager.instance.currentLocale.languageCode;
+    _selectedLanguage = currentLocale == 'es' ? 'Spanish' : 'English';
+  }
+
   void _save() {
+    final newLocale = _selectedLanguage == 'Spanish' ? const Locale('es') : const Locale('en');
+    LanguageManager.instance.setLocale(newLocale);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Language set to $_selectedLanguage'),
+        content: Text('${context.translate('language_saved')} ${context.translate(_selectedLanguage == 'Spanish' ? 'lang_es' : 'lang_en')}'),
         backgroundColor: _primary,
         behavior: SnackBarBehavior.floating,
       ),
@@ -39,21 +47,21 @@ class _SettingsBodyState extends State<SettingsBody> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Settings',
-                  style: TextStyle(
+                  context.translate('settings'),
+                  style: const TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
                   ),
                 ),
-                SizedBox(height: 2),
+                const SizedBox(height: 2),
                 Text(
-                  'Personalize your app!',
-                  style: TextStyle(fontSize: 12, color: Colors.grey),
+                  context.translate('personalize_app'),
+                  style: const TextStyle(fontSize: 12, color: Colors.grey),
                 ),
               ],
             ),
@@ -71,7 +79,7 @@ class _SettingsBodyState extends State<SettingsBody> {
                   borderRadius: BorderRadius.circular(30),
                 ),
               ),
-              child: const Text('Save'),
+              child: Text(context.translate('save')),
             ),
           ],
         ),
@@ -112,28 +120,30 @@ class _SettingsBodyState extends State<SettingsBody> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Language',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.bold,
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          context.translate('language'),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                      ),
-                      Text(
-                        'Choose your preferred app language',
-                        style: TextStyle(fontSize: 11, color: Colors.grey),
-                      ),
-                    ],
+                        Text(
+                          context.translate('preferred_language'),
+                          style: const TextStyle(fontSize: 11, color: Colors.grey),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 14),
-              const Text(
-                'App language',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              Text(
+                context.translate('app_language'),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 8),
               DropdownButtonFormField<String>(
@@ -157,7 +167,10 @@ class _SettingsBodyState extends State<SettingsBody> {
                   ),
                 ),
                 items: _languages
-                    .map((l) => DropdownMenuItem(value: l, child: Text(l)))
+                    .map((l) => DropdownMenuItem(
+                          value: l,
+                          child: Text(context.translate(l == 'Spanish' ? 'lang_es' : 'lang_en')),
+                        ))
                     .toList(),
                 onChanged: (v) => setState(() => _selectedLanguage = v!),
               ),

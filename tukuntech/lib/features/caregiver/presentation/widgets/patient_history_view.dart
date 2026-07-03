@@ -5,6 +5,7 @@ import 'package:tukuntech/core/environment_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:tukuntech/features/caregiver/presentation/widgets/patient_vital_card.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class PatientHistoryView extends StatefulWidget {
   final List<PatientVitalData> patients;
@@ -83,7 +84,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
       } else {
         if (mounted && !silent) {
           setState(() {
-            _error = 'Failed to load: ${response.statusCode}';
+            _error = '${context.translate('err_failed_load')}: ${response.statusCode}';
             _isLoading = false;
           });
         }
@@ -93,9 +94,9 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
         setState(() {
           if (!silent) {
             if (e is TimeoutException) {
-              _error = 'Connection timed out.';
+              _error = context.translate('err_timeout');
             } else {
-              _error = 'Connection error.';
+              _error = context.translate('err_connection');
             }
           }
           _isLoading = false;
@@ -155,7 +156,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
       } else {
         if (mounted) {
           setState(() {
-            _error = 'Failed to generate: ${response.statusCode}';
+            _error = '${context.translate('err_failed_generate')}: ${response.statusCode}';
             _isLoading = false;
           });
         }
@@ -164,9 +165,9 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
       if (mounted) {
         setState(() {
           if (e is TimeoutException) {
-            _error = 'Connection timed out.';
+            _error = context.translate('err_timeout');
           } else {
-            _error = 'Connection error.';
+            _error = context.translate('err_connection');
           }
           _isLoading = false;
         });
@@ -253,9 +254,9 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
         physics: const AlwaysScrollableScrollPhysics(),
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
         children: [
-          const Text(
-            'Patient history',
-            style: TextStyle(
+          Text(
+            context.translate('patient_history'),
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
@@ -263,7 +264,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
           ),
           const SizedBox(height: 2),
           Text(
-            'Patient recent vital signs - heart rate, oxygen, and temperature.',
+            context.translate('patient_history_sub'),
             style: TextStyle(
               fontSize: 13,
               color: Colors.grey[600],
@@ -353,7 +354,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
                       child: const Icon(Icons.download_outlined, color: primaryColor),
                     ),
                     const SizedBox(width: 12),
-                    const Text('Generate report', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87)),
+                    Text(context.translate('generate_report'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87)),
                   ],
                 ),
                 const SizedBox(height: 16),
@@ -364,9 +365,9 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Export a vital signs summary report', style: TextStyle(color: Colors.black54, fontSize: 12)),
+                          Text(context.translate('export_report_sub'), style: const TextStyle(color: Colors.black54, fontSize: 12)),
                           const SizedBox(height: 16),
-                          const Text('Period', style: TextStyle(color: Colors.black54, fontSize: 12)),
+                          Text(context.translate('period'), style: const TextStyle(color: Colors.black54, fontSize: 12)),
                           const SizedBox(height: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
@@ -383,7 +384,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
                                 items: <String>['Daily', 'Weekly', 'Monthly', 'Yearly'].map((String value) {
                                   return DropdownMenuItem<String>(
                                     value: value,
-                                    child: Text(value),
+                                    child: Text(context.translate(value.toLowerCase())),
                                   );
                                 }).toList(),
                                 onChanged: (String? newValue) {
@@ -404,7 +405,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text('Patient', style: TextStyle(color: Colors.black54, fontSize: 12)),
+                          Text(context.translate('patient_label'), style: const TextStyle(color: Colors.black54, fontSize: 12)),
                           const SizedBox(height: 4),
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -432,7 +433,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
                             child: ElevatedButton.icon(
                               onPressed: _isLoading ? null : _generateReport,
                               icon: const Icon(Icons.download, size: 14),
-                              label: const Text('Generate Report', style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
+                              label: Text(context.translate('generate_report'), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: primaryColor,
                                 foregroundColor: Colors.white,
@@ -474,7 +475,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
                       child: const Icon(Icons.show_chart, color: primaryColor),
                     ),
                     const SizedBox(width: 16),
-                    const Text('Vital signs history', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87)),
+                    Text(context.translate('vital_signs_history'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87)),
                   ],
                 ),
                 const SizedBox(height: 24),
@@ -493,10 +494,10 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
                     ),
                   )
                 else if (filteredReports.isEmpty)
-                  const Center(
+                  Center(
                     child: Padding(
-                      padding: EdgeInsets.all(16.0),
-                      child: Text('No reports available for this period.', style: TextStyle(color: Colors.grey)),
+                      padding: const EdgeInsets.all(16.0),
+                      child: Text(context.translate('no_reports'), style: const TextStyle(color: Colors.grey)),
                     ),
                   )
                 else
@@ -521,9 +522,9 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
                       children: [
                         _buildHistoryRow(
                           date,
-                          '${hrAvg.toInt()} bpm avg. ${hrMin.toInt()}-${hrMax.toInt()}',
-                          '${spo2Avg.toInt()}% avg. ${spo2Min.toInt()}-100',
-                          '${tempAvg.toStringAsFixed(1)} °C - $tempStatus',
+                          '${hrAvg.toInt()} ${context.translate('bpm_avg')} ${hrMin.toInt()}-${hrMax.toInt()}',
+                          '${spo2Avg.toInt()}% ${context.translate('avg')} ${spo2Min.toInt()}-100',
+                          '${tempAvg.toStringAsFixed(1)} °C - ${context.translate(tempStatus + '_status')}',
                         ),
                         if (!isLast) const Padding(
                           padding: EdgeInsets.symmetric(vertical: 16),

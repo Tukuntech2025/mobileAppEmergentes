@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/auth_store.dart';
 import 'package:tukuntech/core/environment_config.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class EmergencyContactData {
   String name;
@@ -293,8 +294,8 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
         .toList();
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Changes saved successfully'),
+      SnackBar(
+        content: Text(context.translate('changes_saved_success')),
         backgroundColor: _primary,
         behavior: SnackBarBehavior.floating,
       ),
@@ -324,21 +325,21 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                   children: [
                     Row(
                       children: [
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Add new patient',
-                                style: TextStyle(
+                                context.translate('add_new_patient'),
+                                style: const TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               Text(
-                                'Enter the new patient information.',
-                                style: TextStyle(fontSize: 12, color: Colors.grey),
+                                context.translate('enter_patient_info'),
+                                style: const TextStyle(fontSize: 12, color: Colors.grey),
                               ),
                             ],
                           ),
@@ -350,30 +351,30 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    _field('Full name', modalNameCtrl),
+                    _field(context.translate('full_name'), modalNameCtrl),
                     const SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(
                           child: _field(
-                            'Age',
+                            context.translate('age'),
                             modalAgeCtrl,
                             keyboardType: TextInputType.number,
                           ),
                         ),
                         const SizedBox(width: 12),
-                        Expanded(child: _field('Gender', modalGenderCtrl)),
+                        Expanded(child: _field(context.translate('gender'), modalGenderCtrl)),
                       ],
                     ),
                     const SizedBox(height: 12),
-                    _field('Address', modalAddressCtrl),
+                    _field(context.translate('address'), modalAddressCtrl),
                     const SizedBox(height: 12),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Blood type',
-                          style: TextStyle(
+                        Text(
+                          context.translate('blood_type'),
+                          style: const TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                             color: Colors.black87,
@@ -438,9 +439,9 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                               ),
                               padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
-                            child: const Text(
-                              'Cancel',
-                              style: TextStyle(color: Colors.black54),
+                            child: Text(
+                              context.translate('cancel'),
+                              style: const TextStyle(color: Colors.black54),
                             ),
                           ),
                         ),
@@ -487,7 +488,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                               padding: const EdgeInsets.symmetric(vertical: 12),
                               elevation: 0,
                             ),
-                            child: const Text('Add patient'),
+                            child: Text(context.translate('add_patient')),
                           ),
                         ),
                       ],
@@ -520,21 +521,21 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
             children: [
               Row(
                 children: [
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Add emergency contact',
-                          style: TextStyle(
+                          context.translate('add_emergency_contact'),
+                          style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 2),
+                        const SizedBox(height: 2),
                         Text(
-                          'Enter the contact information for\nemergency situations.',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                          context.translate('enter_emergency_info'),
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -546,12 +547,12 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                 ],
               ),
               const SizedBox(height: 20),
-              _field('Name', modalNameCtrl),
+              _field(context.translate('name'), modalNameCtrl),
               const SizedBox(height: 12),
-              _field('Relation', modalRelationCtrl),
+              _field(context.translate('relation'), modalRelationCtrl),
               const SizedBox(height: 12),
               _field(
-                'Phone',
+                context.translate('phone'),
                 modalPhoneCtrl,
                 keyboardType: TextInputType.phone,
               ),
@@ -568,9 +569,9 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 12),
                       ),
-                      child: const Text(
-                        'Cancel',
-                        style: TextStyle(color: Colors.black54),
+                      child: Text(
+                        context.translate('cancel'),
+                        style: const TextStyle(color: Colors.black54),
                       ),
                     ),
                   ),
@@ -599,7 +600,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         elevation: 0,
                       ),
-                      child: const Text('Save changes'),
+                      child: Text(context.translate('save_changes')),
                     ),
                   ),
                 ],
@@ -624,24 +625,24 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
       context: context,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Cancel subscription'),
-        content: const Text(
-          'Are you sure you want to cancel the TukunTech Premium subscription for this patient?',
+        title: Text(context.translate('cancel_subscription')),
+        content: Text(
+          context.translate('confirm_cancel_sub'),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text(
-              'No, keep it',
-              style: TextStyle(color: Colors.black54),
+            child: Text(
+              context.translate('no_keep_it'),
+              style: const TextStyle(color: Colors.black54),
             ),
           ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(ctx);
               ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Subscription cancelled'),
+                SnackBar(
+                  content: Text(context.translate('subscription_cancelled')),
                   backgroundColor: Colors.redAccent,
                   behavior: SnackBarBehavior.floating,
                 ),
@@ -655,7 +656,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                 borderRadius: BorderRadius.circular(20),
               ),
             ),
-            child: const Text('Cancel subscription'),
+            child: Text(context.translate('cancel_subscription')),
           ),
         ],
       ),
@@ -672,10 +673,10 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
       );
     }
     if (_patients.isEmpty) {
-      return const Center(
+      return Center(
         child: Text(
-          'No patients assigned.',
-          style: TextStyle(color: Colors.black54),
+          context.translate('no_patients_assigned'),
+          style: const TextStyle(color: Colors.black54),
         ),
       );
     }
@@ -692,9 +693,9 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Patient profile',
-                    style: TextStyle(
+                  Text(
+                    context.translate('patient_profile'),
+                    style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
                       color: Colors.black87,
@@ -702,7 +703,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                   ),
                   const SizedBox(height: 2),
                   Text(
-                    'Personal information, subscription, and emergency contacts.',
+                    context.translate('caregiver_profile_sub'),
                     style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
                   ),
                 ],
@@ -712,8 +713,8 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
               onTap: () {
                 if (_patients.length >= 5) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('You can only have up to 5 patients.'),
+                    SnackBar(
+                      content: Text(context.translate('limit_5_patients')),
                       backgroundColor: Colors.redAccent,
                       behavior: SnackBarBehavior.floating,
                     ),
@@ -832,7 +833,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${currentPatient.age} years old',
+                    '${currentPatient.age} ${context.translate('years_old')}',
                     style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
                   ),
                 ],
@@ -847,9 +848,9 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Subscription',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              Text(
+                context.translate('subscription'),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               Container(
@@ -878,21 +879,21 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                           ),
                         ),
                         const SizedBox(width: 12),
-                        const Expanded(
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
+                              const Text(
                                 'TukunTech Premium',
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              SizedBox(height: 2),
+                              const SizedBox(height: 2),
                               Text(
-                                'Renews on June 9, 2026. - \$200',
-                                style: TextStyle(
+                                context.translate('renew_message'),
+                                style: const TextStyle(
                                   fontSize: 12,
                                   color: Colors.black54,
                                 ),
@@ -909,9 +910,9 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                             color: const Color(0xFF4CAF50),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Text(
-                            'Active',
-                            style: TextStyle(
+                          child: Text(
+                            context.translate('active'),
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 11,
                               fontWeight: FontWeight.bold,
@@ -931,20 +932,20 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Column(
+                      child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Plan',
-                            style: TextStyle(
+                            context.translate('plan'),
+                            style: const TextStyle(
                               fontSize: 11,
                               color: Colors.black54,
                             ),
                           ),
-                          SizedBox(height: 2),
+                          const SizedBox(height: 2),
                           Text(
-                            'Personal Pro - monthly',
-                            style: TextStyle(
+                            context.translate('personal_pro_monthly'),
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.bold,
                             ),
@@ -959,17 +960,17 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                           child: ElevatedButton.icon(
                             onPressed: () {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Subscription renewed!'),
+                                SnackBar(
+                                  content: Text(context.translate('subscription_renewed')),
                                   backgroundColor: _primary,
                                   behavior: SnackBarBehavior.floating,
                                 ),
                               );
                             },
                             icon: const Icon(Icons.refresh, size: 18),
-                            label: const Text(
-                              'Renew subscription',
-                              style: TextStyle(
+                            label: Text(
+                              context.translate('renew_subscription'),
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -990,9 +991,9 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                           child: ElevatedButton.icon(
                             onPressed: _cancelSubscription,
                             icon: const Icon(Icons.cancel_outlined, size: 18),
-                            label: const Text(
-                              'Cancel subscription',
-                              style: TextStyle(
+                            label: Text(
+                              context.translate('cancel_subscription'),
+                              style: const TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -1023,35 +1024,35 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Personal information',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              Text(
+                context.translate('personal_info'),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-              _field('Full name', _nameCtrl),
+              _field(context.translate('full_name'), _nameCtrl),
               const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
                     child: _field(
-                      'Age',
+                      context.translate('age'),
                       _ageCtrl,
                       keyboardType: TextInputType.number,
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(child: _field('Gender', _genderCtrl)),
+                  Expanded(child: _field(context.translate('gender'), _genderCtrl)),
                 ],
               ),
               const SizedBox(height: 12),
-              _field('Address', _addressCtrl),
+              _field(context.translate('address'), _addressCtrl),
               const SizedBox(height: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Blood type',
-                    style: TextStyle(
+                  Text(
+                    context.translate('blood_type'),
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
@@ -1118,9 +1119,9 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Text(
-                  'Save changes',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                child: Text(
+                  context.translate('save_changes'),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -1140,21 +1141,21 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                     size: 24,
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Emergency contacts',
-                          style: TextStyle(
+                          context.translate('emergency_contacts'),
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 2),
+                        const SizedBox(height: 2),
                         Text(
-                          'Here you can add your emergency\ncontacts',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                          context.translate('add_contacts_here'),
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -1170,17 +1171,17 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                         color: const Color(0xFFE0F2F1),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.person_add_alt_1,
                             size: 16,
                             color: _primary,
                           ),
-                          SizedBox(width: 6),
+                          const SizedBox(width: 6),
                           Text(
-                            'Add',
-                            style: TextStyle(
+                            context.translate('add'),
+                            style: const TextStyle(
                               fontSize: 13,
                               color: _primary,
                               fontWeight: FontWeight.bold,
@@ -1197,7 +1198,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   child: Text(
-                    'No emergency contacts added yet.',
+                    context.translate('no_contacts'),
                     style: TextStyle(color: Colors.grey[400], fontSize: 13),
                   ),
                 ),
@@ -1217,7 +1218,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: _field('Name', c.nameCtrl)),
+                          Expanded(child: _field(context.translate('name'), c.nameCtrl)),
                           const SizedBox(width: 12),
                           GestureDetector(
                             onTap: () => _deleteContact(i),
@@ -1235,11 +1236,11 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          Expanded(child: _field('Relation', c.relationCtrl)),
+                          Expanded(child: _field(context.translate('relation'), c.relationCtrl)),
                           const SizedBox(width: 12),
                           Expanded(
                             child: _field(
-                              'Phone',
+                              context.translate('phone'),
                               c.phoneCtrl,
                               keyboardType: TextInputType.phone,
                             ),

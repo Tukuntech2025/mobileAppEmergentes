@@ -1,39 +1,61 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
+import 'package:tukuntech/features/patient/presentation/pages/device_form_page.dart';
 
 class DeviceBody extends StatelessWidget {
-  const DeviceBody({super.key});
+  final String email;
+  const DeviceBody({super.key, required this.email});
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
-      children: [
-        const Text(
-          'My device',
-          style: TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-            color: Colors.black87,
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: ListView(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+        children: [
+          Text(
+            context.translate('my_device'),
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Colors.black87,
+            ),
           ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          'Status and conection details for your TukunTech IOT',
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.grey[600],
+          const SizedBox(height: 4),
+          Text(
+            context.translate('device_status_subtitle'),
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey[600],
+            ),
           ),
+          const SizedBox(height: 16),
+          _buildDeviceCard(context),
+          const SizedBox(height: 24),
+          _buildInfoAlert(context),
+          const SizedBox(height: 16),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => DeviceFormPage(initialEmail: email),
+            ),
+          );
+        },
+        backgroundColor: const Color(0xFF3B9784),
+        elevation: 4,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
         ),
-        const SizedBox(height: 16),
-        _buildDeviceCard(),
-        const SizedBox(height: 24),
-        _buildInfoAlert(),
-        const SizedBox(height: 16),
-      ],
+        child: const Icon(Icons.add, color: Colors.white, size: 28),
+      ),
     );
   }
 
-  Widget _buildDeviceCard() {
+  Widget _buildDeviceCard(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -76,7 +98,7 @@ class DeviceBody extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'TukunTech IOT',
+                        context.translate('device_name'),
                         style: TextStyle(color: Colors.grey[700], fontSize: 11),
                       ),
                       const Text(
@@ -88,7 +110,7 @@ class DeviceBody extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Version 1.0.5',
+                        '${context.translate('version')} 1.0.5',
                         style: TextStyle(color: Colors.grey[600], fontSize: 11),
                       ),
                     ],
@@ -100,9 +122,9 @@ class DeviceBody extends StatelessWidget {
                     color: Colors.green[400],
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: const Text(
-                    'Online',
-                    style: TextStyle(
+                  child: Text(
+                    context.translate('online'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontSize: 11,
                       fontWeight: FontWeight.bold,
@@ -118,11 +140,11 @@ class DeviceBody extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                _buildStatusRow('Battery', '88%', Icons.battery_full, 0.88),
+                _buildStatusRow(context.translate('battery'), '88%', Icons.battery_full, 0.88),
                 const Divider(height: 24),
-                _buildStatusRow('WiFi', 'Strong', Icons.wifi, 0.9),
+                _buildStatusRow(context.translate('wifi'), context.translate('strong'), Icons.wifi, 0.9),
                 const Divider(height: 24),
-                _buildStatusRow('Sync', 'Good', Icons.check_circle_outline, 0.95),
+                _buildStatusRow(context.translate('sync'), context.translate('good'), Icons.check_circle_outline, 0.95),
               ],
             ),
           ),
@@ -170,7 +192,7 @@ class DeviceBody extends StatelessWidget {
     );
   }
 
-  Widget _buildInfoAlert() {
+  Widget _buildInfoAlert(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -183,7 +205,7 @@ class DeviceBody extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Your device is reporting normally. We\'ll notify you here if anything changes.',
+              context.translate('device_normal_alert'),
               style: TextStyle(color: Colors.grey[700], fontSize: 12),
             ),
           ),

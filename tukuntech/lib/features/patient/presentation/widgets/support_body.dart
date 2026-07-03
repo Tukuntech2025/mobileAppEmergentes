@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/auth_store.dart';
 import 'package:tukuntech/core/environment_config.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class SupportTicket {
   final String subject;
@@ -94,8 +95,8 @@ class _SupportBodyState extends State<SupportBody> {
     final description = _descCtrl.text.trim();
     if (subject.isEmpty || description.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Please enter a subject and description'),
+        SnackBar(
+          content: Text(context.translate('err_empty_ticket')),
           behavior: SnackBarBehavior.floating,
         ),
       );
@@ -147,8 +148,8 @@ class _SupportBodyState extends State<SupportBody> {
         _fetchTickets(); // Refresh tickets from backend
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Ticket sent successfully'),
+            SnackBar(
+              content: Text(context.translate('ticket_sent_success')),
               backgroundColor: _primary,
               behavior: SnackBarBehavior.floating,
             ),
@@ -162,7 +163,7 @@ class _SupportBodyState extends State<SupportBody> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error sending ticket: $e'),
+            content: Text('${context.translate('ticket_send_failed')}: $e'),
             backgroundColor: Colors.red,
             behavior: SnackBarBehavior.floating,
           ),
@@ -195,9 +196,9 @@ class _SupportBodyState extends State<SupportBody> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       children: [
         // ── Header ──────────────────────────────────────────────
-        const Text(
-          'Support',
-          style: TextStyle(
+        Text(
+          context.translate('support'),
+          style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
@@ -205,7 +206,7 @@ class _SupportBodyState extends State<SupportBody> {
         ),
         const SizedBox(height: 2),
         Text(
-          "We're here whenever you need us.",
+          context.translate('support_greeting'),
           style: TextStyle(fontSize: 12, color: Colors.grey[500]),
         ),
         const SizedBox(height: 16),
@@ -242,15 +243,15 @@ class _SupportBodyState extends State<SupportBody> {
                 ),
               ),
               const SizedBox(width: 14),
-              const Column(
+              Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Call us',
-                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                    context.translate('call_us'),
+                    style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 2),
-                  Text(
+                  const SizedBox(height: 2),
+                  const Text(
                     '(51) 444-222-333',
                     style: TextStyle(fontSize: 13, color: Colors.black54),
                   ),
@@ -266,23 +267,23 @@ class _SupportBodyState extends State<SupportBody> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Send us a message',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              Text(
+                context.translate('send_message'),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 14),
               // Subject
-              const Text(
-                'Subject',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              Text(
+                context.translate('subject'),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 6),
               TextField(controller: _subjectCtrl, decoration: _inputDeco()),
               const SizedBox(height: 12),
               // Description
-              const Text(
-                'Description',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              Text(
+                context.translate('description'),
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
               const SizedBox(height: 6),
               TextField(
@@ -296,7 +297,7 @@ class _SupportBodyState extends State<SupportBody> {
                 child: ElevatedButton.icon(
                   onPressed: _sendTicket,
                   icon: const Icon(Icons.send, size: 16),
-                  label: const Text('Send'),
+                  label: Text(context.translate('send')),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _primary,
                     foregroundColor: Colors.white,
@@ -321,9 +322,9 @@ class _SupportBodyState extends State<SupportBody> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'History tickets',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              Text(
+                context.translate('history_tickets'),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 14),
               if (_isLoadingTickets)
@@ -337,7 +338,7 @@ class _SupportBodyState extends State<SupportBody> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   child: Text(
-                    'No tickets submitted yet.',
+                    context.translate('no_tickets'),
                     style: TextStyle(color: Colors.grey[400], fontSize: 13),
                   ),
                 )
@@ -348,9 +349,9 @@ class _SupportBodyState extends State<SupportBody> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Subject',
-                        style: TextStyle(
+                      Text(
+                        context.translate('subject'),
+                        style: const TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -379,9 +380,9 @@ class _SupportBodyState extends State<SupportBody> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Date',
-                                  style: TextStyle(
+                                Text(
+                                  context.translate('date'),
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -412,9 +413,9 @@ class _SupportBodyState extends State<SupportBody> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
-                                  'Status',
-                                  style: TextStyle(
+                                Text(
+                                  context.translate('status'),
+                                  style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                   ),
@@ -474,17 +475,15 @@ class _SupportBodyState extends State<SupportBody> {
               const SizedBox(width: 10),
               Expanded(
                 child: RichText(
-                  text: const TextSpan(
-                    style: TextStyle(fontSize: 12, color: Colors.black54),
+                  text: TextSpan(
+                    style: const TextStyle(fontSize: 12, color: Colors.black54),
                     children: [
                       TextSpan(
-                        text:
-                            'In case of an emergency, Tukuntech will call the emergency numbers. ',
+                        text: context.translate('emergency_disclaimer'),
                       ),
                       TextSpan(
-                        text:
-                            'It needs that it is connected to the network to function correctly.',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        text: context.translate('emergency_network_req'),
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ],
                   ),

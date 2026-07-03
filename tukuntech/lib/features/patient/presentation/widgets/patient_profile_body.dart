@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/auth_store.dart';
 import 'package:tukuntech/core/environment_config.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 // ── Modelos locales ────────────────────────────────────────────────────────────
 class EmergencyContact {
@@ -166,33 +167,86 @@ class _ProfileBodyState extends State<ProfileBody> {
   }
 
   // ── Guardar información personal ────────────────────────────
-  void _savePersonalInfo() {
+  Future<void> _savePersonalInfo() async {
     setState(() {
-      _patientData['name'] = _nameCtrl.text;
-      _patientData['age'] = _ageCtrl.text;
-      _patientData['gender'] = _genderCtrl.text;
-      _patientData['address'] = _addressCtrl.text;
-      _patientData['bloodType'] = _bloodType;
-
-      // Recalcular iniciales si cambió el nombre
-      List<String> parts = _nameCtrl.text.trim().split(' ');
-      String ini = '';
-      if (parts.isNotEmpty && parts[0].isNotEmpty) {
-        ini += parts[0][0].toUpperCase();
-      }
-      if (parts.length > 1 && parts[1].isNotEmpty) {
-        ini += parts[1][0].toUpperCase();
-      }
-      if (ini.isNotEmpty) _patientData['initials'] = ini;
+      _isLoading = true;
     });
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Changes saved successfully'),
-        backgroundColor: _primary,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    try {
+      final token = AuthStore.token;
+      if (token == null) throw Exception("No token found");
+
+      final String baseUrl = EnvironmentConfig.baseUrl;
+
+      // Map gender back to backend enums
+      String apiGender = 'OTHER';
+      final String genderText = _genderCtrl.text.trim().toLowerCase();
+      if (genderText == 'male') {
+        apiGender = 'MALE';
+      } else if (genderText == 'female') {
+        apiGender = 'FEMALE';
+      } else if (genderText.contains('prefer')) {
+        apiGender = 'PREFER_NOT_TO_SAY';
+      }
+
+      // Map emergency contacts
+      final List<Map<String, dynamic>> apiContacts = _contacts.map((c) {
+        String rel = c.relationCtrl.text.trim().toUpperCase();
+        if (rel.isEmpty) rel = 'FAMILY';
+        return {
+          'name': c.nameCtrl.text.trim(),
+          'relationship': rel,
+          'phoneNumber': c.phoneCtrl.text.trim(),
+        };
+      }).toList();
+
+      final body = jsonEncode({
+        'fullName': _nameCtrl.text.trim(),
+        'age': int.tryParse(_ageCtrl.text.trim()) ?? 0,
+        'gender': apiGender,
+        'address': _addressCtrl.text.trim(),
+        'bloodType': _bloodType,
+        'emergencyContacts': apiContacts,
+      });
+
+      final res = await http.put(
+        Uri.parse('$baseUrl/profiles/me'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      ).timeout(const Duration(seconds: 5));
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        await _fetchProfile();
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(context.translate('changes_saved_success')),
+              backgroundColor: _primary,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+      } else {
+        throw Exception("Failed to update profile: ${res.statusCode}");
+      }
+    } catch (e) {
+      print("Error saving profile: $e");
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${context.translate('error_saving_changes')}: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   // ── Modal: agregar contacto de emergencia ───────────────────
@@ -214,21 +268,21 @@ class _ProfileBodyState extends State<ProfileBody> {
               children: [
                 Row(
                   children: [
-                    const Expanded(
+                    Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'Add emergency contact',
-                            style: TextStyle(
+                            context.translate('add_emergency_contact'),
+                            style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 2),
+                          const SizedBox(height: 2),
                           Text(
-                            'Enter the contact information for\nemergency situations.',
-                            style: TextStyle(fontSize: 12, color: Colors.grey),
+                            context.translate('enter_emergency_info'),
+                            style: const TextStyle(fontSize: 12, color: Colors.grey),
                           ),
                         ],
                       ),
@@ -240,12 +294,12 @@ class _ProfileBodyState extends State<ProfileBody> {
                   ],
                 ),
                 const SizedBox(height: 20),
-                _field('Name', modalNameCtrl),
+                _field(context.translate('name'), modalNameCtrl),
                 const SizedBox(height: 12),
-                _field('Relation', modalRelationCtrl),
+                _field(context.translate('relation'), modalRelationCtrl),
                 const SizedBox(height: 12),
                 _field(
-                  'Phone',
+                  context.translate('phone'),
                   modalPhoneCtrl,
                   keyboardType: TextInputType.phone,
                 ),
@@ -262,9 +316,9 @@ class _ProfileBodyState extends State<ProfileBody> {
                           ),
                           padding: const EdgeInsets.symmetric(vertical: 12),
                         ),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(color: Colors.black54),
+                        child: Text(
+                          context.translate('cancel'),
+                          style: const TextStyle(color: Colors.black54),
                         ),
                       ),
                     ),
@@ -293,7 +347,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                           padding: const EdgeInsets.symmetric(vertical: 12),
                           elevation: 0,
                         ),
-                        child: const Text('Save changes'),
+                        child: Text(context.translate('save_changes')),
                       ),
                     ),
                   ],
@@ -321,9 +375,9 @@ class _ProfileBodyState extends State<ProfileBody> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       children: [
         // ── Título ──────────────────────────────────────────────
-        const Text(
-          'My profile',
-          style: TextStyle(
+        Text(
+          context.translate('my_profile'),
+          style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
@@ -331,7 +385,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         ),
         const SizedBox(height: 2),
         Text(
-          'Personal information and emergency contacts.',
+          context.translate('profile_subtitle'),
           style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
         ),
         const SizedBox(height: 20),
@@ -371,7 +425,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${_patientData['age']} years old',
+                    '${_patientData['age']} ${context.translate('years_old')}',
                     style: TextStyle(fontSize: 14, color: Colors.grey.shade500),
                   ),
                 ],
@@ -386,35 +440,35 @@ class _ProfileBodyState extends State<ProfileBody> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Personal information',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+              Text(
+                context.translate('personal_info'),
+                style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-              _field('Full name', _nameCtrl),
+              _field(context.translate('full_name'), _nameCtrl),
               const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
                     child: _field(
-                      'Age',
+                      context.translate('age'),
                       _ageCtrl,
                       keyboardType: TextInputType.number,
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(child: _field('Gender', _genderCtrl)),
+                  Expanded(child: _field(context.translate('gender'), _genderCtrl)),
                 ],
               ),
               const SizedBox(height: 12),
-              _field('Address', _addressCtrl),
+              _field(context.translate('address'), _addressCtrl),
               const SizedBox(height: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Blood type',
-                    style: TextStyle(
+                  Text(
+                    context.translate('blood_type'),
+                    style: const TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
@@ -481,9 +535,9 @@ class _ProfileBodyState extends State<ProfileBody> {
                     borderRadius: BorderRadius.circular(30),
                   ),
                 ),
-                child: const Text(
-                  'Save changes',
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                child: Text(
+                  context.translate('save_changes'),
+                  style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -503,21 +557,21 @@ class _ProfileBodyState extends State<ProfileBody> {
                     size: 24,
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Emergency contacts',
-                          style: TextStyle(
+                          context.translate('emergency_contacts'),
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(height: 2),
+                        const SizedBox(height: 2),
                         Text(
-                          'Here you can add your emergency\ncontacts',
-                          style: TextStyle(fontSize: 12, color: Colors.grey),
+                          context.translate('add_contacts_here'),
+                          style: const TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                       ],
                     ),
@@ -533,17 +587,17 @@ class _ProfileBodyState extends State<ProfileBody> {
                         color: const Color(0xFFE0F2F1),
                         borderRadius: BorderRadius.circular(20),
                       ),
-                      child: const Row(
+                      child: Row(
                         children: [
-                          Icon(
+                          const Icon(
                             Icons.person_add_alt_1,
                             size: 16,
                             color: _primary,
                           ),
-                          SizedBox(width: 6),
+                          const SizedBox(width: 6),
                           Text(
-                            'Add',
-                            style: TextStyle(
+                            context.translate('add'),
+                            style: const TextStyle(
                               fontSize: 13,
                               color: _primary,
                               fontWeight: FontWeight.bold,
@@ -560,7 +614,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 16),
                   child: Text(
-                    'No emergency contacts added yet.',
+                    context.translate('no_contacts'),
                     style: TextStyle(color: Colors.grey[400], fontSize: 13),
                   ),
                 ),
@@ -580,7 +634,7 @@ class _ProfileBodyState extends State<ProfileBody> {
                       Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(child: _field('Name', c.nameCtrl)),
+                          Expanded(child: _field(context.translate('name'), c.nameCtrl)),
                           const SizedBox(width: 12),
                           GestureDetector(
                             onTap: () => _deleteContact(i),
@@ -598,11 +652,11 @@ class _ProfileBodyState extends State<ProfileBody> {
                       const SizedBox(height: 12),
                       Row(
                         children: [
-                          Expanded(child: _field('Relation', c.relationCtrl)),
+                          Expanded(child: _field(context.translate('relation'), c.relationCtrl)),
                           const SizedBox(width: 12),
                           Expanded(
                             child: _field(
-                              'Phone',
+                              context.translate('phone'),
                               c.phoneCtrl,
                               keyboardType: TextInputType.phone,
                             ),

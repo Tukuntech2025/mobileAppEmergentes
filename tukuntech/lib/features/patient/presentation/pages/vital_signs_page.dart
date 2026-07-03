@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/auth_store.dart';
 import 'package:tukuntech/core/environment_config.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class VitalSignsPage extends StatefulWidget {
   const VitalSignsPage({super.key});
@@ -75,12 +76,12 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
       builder: (BuildContext ctx) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text('Confirm Logout'),
-          content: const Text('Are you sure you want to log out of your session?'),
+          title: Text(context.translate('confirm_logout')),
+          content: Text(context.translate('logout_message')),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
+              child: Text(context.translate('cancel'), style: const TextStyle(color: Colors.black54)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -100,7 +101,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 elevation: 0,
               ),
-              child: const Text('Log out'),
+              child: Text(context.translate('log_out')),
             ),
           ],
         );
@@ -134,7 +135,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
               ),
             ),
             Text(
-              'patient', // O 'Patient' según la vista que uses
+              context.translate('patient_role'), // O 'Patient' según la vista que uses
               style: TextStyle(color: Colors.grey[500], fontSize: 11),
             ),
           ],
@@ -174,11 +175,11 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Text(
-                  'Menu',
-                  style: TextStyle(
+                  context.translate('menu'),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -189,9 +190,9 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
               // Opción Settings
               ListTile(
                 leading: const Icon(Icons.settings_outlined, color: _primary),
-                title: const Text(
-                  'Settings',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                title: Text(
+                  context.translate('settings'),
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                 ),
                 onTap: () {
                   setState(() => _drawerSection = 'settings');
@@ -204,9 +205,9 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
                   Icons.support_agent_outlined,
                   color: _primary,
                 ),
-                title: const Text(
-                  'Support',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                title: Text(
+                  context.translate('support'),
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                 ),
                 onTap: () {
                   setState(() => _drawerSection = 'support');
@@ -230,7 +231,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
                   // 0: Vital Signs
                   _buildVitalSignsTab(),
                   // 1: Device
-                  const DeviceBody(),
+                  DeviceBody(email: _profileData?['email'] ?? ''),
                   // 2: Report
                   const ReportBody(),
                   // 3: Profile (Tu archivo modificado anteriormente)
@@ -258,43 +259,43 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       children: [
-        const Text(
-          'Vital Signs',
-          style: TextStyle(
+        Text(
+          context.translate('vital_signs'),
+          style: const TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
           ),
         ),
         Text(
-          'Detail view of today\'s activity',
+          context.translate('activity_today'),
           style: TextStyle(fontSize: 12, color: Colors.grey[600]),
         ),
         const SizedBox(height: 12),
         _buildGreetingCard(),
         const SizedBox(height: 12),
         _buildMetricCard(
-          label: 'Heart rate',
+          label: context.translate('heart_rate'),
           value: '74 bpm',
-          sub: 'Resting - normal',
+          sub: context.translate('resting_normal'),
           color: _primaryLight,
           icon: Icons.favorite_border,
           iconColor: _primary,
         ),
         const SizedBox(height: 12),
         _buildMetricCard(
-          label: 'Oxygen',
+          label: context.translate('oxygen_label'),
           value: '98%',
-          sub: 'SpO2',
+          sub: context.translate('spo2'),
           color: const Color(0xFFE8F4F8),
           icon: Icons.air,
           iconColor: const Color(0xFF4FC3F7),
         ),
         const SizedBox(height: 12),
         _buildMetricCard(
-          label: 'Temperature',
+          label: context.translate('temperature_label'),
           value: '36.7 °C',
-          sub: 'Normal',
+          sub: context.translate('normal'),
           color: const Color(0xFFF9F5E8),
           icon: Icons.thermostat,
           iconColor: const Color(0xFFFFCA28),
@@ -374,7 +375,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Hello',
+                        context.translate('hello'),
                         style: TextStyle(color: Colors.grey[600], fontSize: 11),
                       ),
                       Text(
@@ -387,7 +388,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        'all good! You are feeling calm.',
+                        context.translate('greeting_calm'),
                         style: TextStyle(color: Colors.grey[700], fontSize: 12),
                       ),
                     ],
@@ -416,9 +417,9 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
                     ),
                   ),
                   const SizedBox(width: 6),
-                  const Text(
-                    'Calm and stable',
-                    style: TextStyle(
+                  Text(
+                    context.translate('calm_stable'),
+                    style: const TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                       fontSize: 12,
@@ -497,9 +498,9 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
             children: [
               const Icon(Icons.favorite_border, color: _primary, size: 16),
               const SizedBox(width: 6),
-              const Text(
-                'Heart rate - live',
-                style: TextStyle(
+              Text(
+                context.translate('heart_rate_live'),
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 12,
                   color: Colors.black87,
@@ -509,7 +510,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
           ),
           const SizedBox(height: 2),
           Text(
-            'Real-time electrocardiogram waveform from the wearable',
+            context.translate('ecg_description'),
             style: TextStyle(color: Colors.grey[500], fontSize: 10),
           ),
           const SizedBox(height: 8),

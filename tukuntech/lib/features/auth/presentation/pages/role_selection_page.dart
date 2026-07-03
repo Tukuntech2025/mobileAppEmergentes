@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
+import 'package:tukuntech/core/localization/language_manager.dart';
 import 'package:tukuntech/features/auth/presentation/pages/login_page.dart';
 
 class RoleSelectionPage extends StatelessWidget {
@@ -8,6 +10,7 @@ class RoleSelectionPage extends StatelessWidget {
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF3B9784);
     const backgroundColor = Color(0xFFF7F8F9);
+    final currentLang = Localizations.localeOf(context).languageCode;
 
     return Scaffold(
       backgroundColor: backgroundColor,
@@ -33,18 +36,18 @@ class RoleSelectionPage extends StatelessWidget {
                   const SizedBox(height: 12),
                   
                   // Headings
-                  const Text(
-                    'Welcome to TukunTech',
-                    style: TextStyle(
+                  Text(
+                    context.translate('welcome_title'),
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF112A24),
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Choose your role to continue.',
-                    style: TextStyle(
+                  Text(
+                    context.translate('welcome_subtitle'),
+                    style: const TextStyle(
                       fontSize: 14,
                       color: Colors.black54,
                     ),
@@ -54,8 +57,8 @@ class RoleSelectionPage extends StatelessWidget {
                   // Role Options
                   _buildRoleCard(
                     context,
-                    title: 'I\'m a patient or caregiver',
-                    subtitle: 'Sign in with your email. The system will recognize your access automatically.',
+                    title: context.translate('role_patient_caregiver'),
+                    subtitle: context.translate('role_patient_caregiver_sub'),
                     icon: Icons.people_outline,
                     iconColor: Colors.blue[300]!,
                     iconBgColor: Colors.blue.withOpacity(0.1),
@@ -81,8 +84,14 @@ class RoleSelectionPage extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          _buildLangButton('EN', true, primaryColor),
-                          _buildLangButton('ES', false, primaryColor),
+                          GestureDetector(
+                            onTap: () => LanguageManager.instance.setLocale(const Locale('en')),
+                            child: _buildLangButton('EN', currentLang == 'en', primaryColor),
+                          ),
+                          GestureDetector(
+                            onTap: () => LanguageManager.instance.setLocale(const Locale('es')),
+                            child: _buildLangButton('ES', currentLang == 'es', primaryColor),
+                          ),
                           const SizedBox(width: 8),
                           Icon(Icons.translate, size: 18, color: primaryColor),
                           const SizedBox(width: 12),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 import 'package:tukuntech/features/auth/presentation/pages/plan_selection_page.dart';
 import 'package:tukuntech/features/patient/presentation/pages/vital_signs_page.dart';
 import 'package:tukuntech/features/caregiver/presentation/pages/caregiver_dashboard_page.dart';
@@ -46,7 +47,7 @@ class _LoginScreenState extends State<LoginScreen> {
           final String token = responseData['token'] ?? responseData['accessToken'] ?? '';
           
           if (token.isEmpty) {
-            throw Exception('No token received');
+            throw Exception(context.translate('error_no_token'));
           }
 
           final String profileUrl = '${EnvironmentConfig.baseUrl}/profiles/me';
@@ -84,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
               if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Access denied: Unauthorized role ($role)'),
+                    content: Text('${context.translate('error_unauthorized_role')} ($role)'),
                     backgroundColor: Colors.red,
                   ),
                 );
@@ -92,25 +93,25 @@ class _LoginScreenState extends State<LoginScreen> {
               return;
             }
           } else {
-            throw Exception('Failed to fetch profile info');
+            throw Exception(context.translate('error_profile_fetch'));
           }
         } catch (e) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: $e')),
+              SnackBar(content: Text('${context.translate('error_label')}: $e')),
             );
           }
         }
       } else {
         // Show error
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: ${response.statusCode}')),
+          SnackBar(content: Text('${context.translate('login_failed')}: ${response.statusCode}')),
         );
       }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $e')),
+        SnackBar(content: Text('${context.translate('error_label')}: $e')),
       );
     } finally {
       if (mounted) {
@@ -167,9 +168,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 16),
                   
                   // Headings
-                  const Text(
-                    'Sign in',
-                    style: TextStyle(
+                  Text(
+                    context.translate('sign_in'),
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.w600,
                       color: Colors.black87,
@@ -177,9 +178,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Enter your credentials to continue.',
-                    style: TextStyle(
+                  Text(
+                    context.translate('enter_credentials'),
+                    style: const TextStyle(
                       fontSize: 14,
                       color: Colors.black54,
                     ),
@@ -201,7 +202,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           Icon(Icons.people_outline, size: 18, color: Colors.blue[600]),
                           const SizedBox(width: 8),
                           Text(
-                            'Patient / Caregiver',
+                            context.translate('patient_caregiver_badge'),
                             style: TextStyle(
                               color: Colors.blue[600],
                               fontWeight: FontWeight.w500,
@@ -215,9 +216,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 16),
                   
                   // Email Field
-                  const Text(
-                    'Email',
-                    style: TextStyle(
+                  Text(
+                    context.translate('email_label'),
+                    style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
                       color: Colors.black87,
@@ -251,9 +252,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
-                        'Password',
-                        style: TextStyle(
+                      Text(
+                        context.translate('password_label'),
+                        style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 14,
                           color: Colors.black87,
@@ -266,9 +267,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
-                        child: const Text(
-                          'Forgot password?',
-                          style: TextStyle(
+                        child: Text(
+                          context.translate('forgot_password'),
+                          style: const TextStyle(
                             color: primaryColor, 
                             fontSize: 14,
                             fontWeight: FontWeight.w400,
@@ -335,9 +336,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           )
-                        : const Text(
-                            'Sign in',
-                            style: TextStyle(
+                        : Text(
+                            context.translate('sign_in'),
+                            style: const TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w600,
                             ),
@@ -349,9 +350,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Text(
-                        "Don't have an account?",
-                        style: TextStyle(
+                      Text(
+                        context.translate('dont_have_account'),
+                        style: const TextStyle(
                           color: Colors.black54,
                           fontSize: 14,
                         ),
@@ -369,9 +370,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           minimumSize: Size.zero,
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         ),
-                        child: const Text(
-                          'Create one',
-                          style: TextStyle(
+                        child: Text(
+                          context.translate('create_one'),
+                          style: const TextStyle(
                             color: primaryColor,
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
@@ -389,9 +390,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextButton.styleFrom(
                         foregroundColor: Colors.black54,
                       ),
-                      child: const Text(
-                        '← Choose a different role',
-                        style: TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
+                      child: Text(
+                        context.translate('choose_different_role'),
+                        style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 12),
                       ),
                     ),
                   ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:tukuntech/core/environment_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/auth_store.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class ReportBody extends StatefulWidget {
   const ReportBody({super.key});
@@ -65,7 +66,7 @@ class _ReportBodyState extends State<ReportBody> {
       } else {
         if (mounted && !silent) {
           setState(() {
-            _error = 'Failed to load: ${response.statusCode}';
+            _error = '${context.translate('err_failed_load')}: ${response.statusCode}';
             _isLoading = false;
           });
         }
@@ -75,9 +76,9 @@ class _ReportBodyState extends State<ReportBody> {
         setState(() {
           if (!silent) {
             if (e is TimeoutException) {
-              _error = 'Connection timed out. Backend is not reachable.';
+              _error = context.translate('err_timeout');
             } else {
-              _error = 'Connection error. Check your backend.';
+              _error = context.translate('err_connection');
             }
           }
           _isLoading = false;
@@ -131,7 +132,7 @@ class _ReportBodyState extends State<ReportBody> {
       } else {
         if (mounted) {
           setState(() {
-            _error = 'Failed to generate: ${response.statusCode}';
+            _error = '${context.translate('err_failed_generate')}: ${response.statusCode}';
             _isLoading = false;
           });
         }
@@ -140,9 +141,9 @@ class _ReportBodyState extends State<ReportBody> {
       if (mounted) {
         setState(() {
           if (e is TimeoutException) {
-            _error = 'Connection timed out. Backend is not reachable.';
+            _error = context.translate('err_timeout');
           } else {
-            _error = 'Connection error. Check your backend.';
+            _error = context.translate('err_connection');
           }
           _isLoading = false;
         });
@@ -194,9 +195,9 @@ class _ReportBodyState extends State<ReportBody> {
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
         physics: const AlwaysScrollableScrollPhysics(), // Ensure scrolling for RefreshIndicator
         children: [
-          const Text(
-            'My history',
-            style: TextStyle(
+          Text(
+            context.translate('my_history'),
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.bold,
               color: Colors.black87,
@@ -204,7 +205,7 @@ class _ReportBodyState extends State<ReportBody> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Your recent vital signs - heart rate, oxygen, and temperature.',
+            context.translate('history_subtitle'),
             style: TextStyle(
               fontSize: 12,
               color: Colors.grey[600],
@@ -250,16 +251,16 @@ class _ReportBodyState extends State<ReportBody> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      'Generate report',
-                      style: TextStyle(
+                    Text(
+                      context.translate('generate_report'),
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                         color: Colors.black87,
                       ),
                     ),
                     Text(
-                      'Export a vital signs summary report',
+                      context.translate('export_report_sub'),
                       style: TextStyle(
                         color: Colors.grey[600],
                         fontSize: 12,
@@ -272,7 +273,7 @@ class _ReportBodyState extends State<ReportBody> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Period',
+            context.translate('period'),
             style: TextStyle(
               color: Colors.grey[700],
               fontSize: 12,
@@ -298,7 +299,7 @@ class _ReportBodyState extends State<ReportBody> {
                       items: <String>['Daily', 'Weekly', 'Monthly', 'Yearly'].map((String value) {
                         return DropdownMenuItem<String>(
                           value: value,
-                          child: Text(value),
+                          child: Text(context.translate(value.toLowerCase())),
                         );
                       }).toList(),
                       onChanged: (String? newValue) {
@@ -325,9 +326,9 @@ class _ReportBodyState extends State<ReportBody> {
                   padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                 ),
                 icon: const Icon(Icons.download_outlined, size: 16),
-                label: const Text(
-                  'Generate Report',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                label: Text(
+                  context.translate('generate_report'),
+                  style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -396,9 +397,9 @@ class _ReportBodyState extends State<ReportBody> {
                 ),
               ),
               const SizedBox(width: 12),
-              const Text(
-                'Vital signs history',
-                style: TextStyle(
+              Text(
+                context.translate('vital_signs_history'),
+                style: const TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                   color: Colors.black87,
@@ -422,10 +423,10 @@ class _ReportBodyState extends State<ReportBody> {
               ),
             )
           else if (filteredReports.isEmpty)
-            const Center(
+            Center(
               child: Padding(
-                padding: EdgeInsets.all(16.0),
-                child: Text('No reports available for this period.', style: TextStyle(color: Colors.grey)),
+                padding: const EdgeInsets.all(16.0),
+                child: Text(context.translate('no_reports'), style: const TextStyle(color: Colors.grey)),
               ),
             )
           else
@@ -451,9 +452,9 @@ class _ReportBodyState extends State<ReportBody> {
                 children: [
                   _buildHistoryItem(
                     date: date,
-                    hrText: '${hrAvg.toInt()} bpm avg. ${hrMin.toInt()}-${hrMax.toInt()}',
-                    spo2Text: '${spo2Avg.toInt()}% avg. ${spo2Min.toInt()}-100',
-                    tempText: '${tempAvg.toStringAsFixed(1)} °C - $tempStatus',
+                    hrText: '${hrAvg.toInt()} ${context.translate('bpm_avg')} ${hrMin.toInt()}-${hrMax.toInt()}',
+                    spo2Text: '${spo2Avg.toInt()}% ${context.translate('avg')} ${spo2Min.toInt()}-100',
+                    tempText: '${tempAvg.toStringAsFixed(1)} °C - ${context.translate(tempStatus + '_status')}',
                   ),
                   if (!isLast) const Divider(height: 24),
                 ],

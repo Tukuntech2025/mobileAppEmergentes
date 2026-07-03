@@ -11,6 +11,7 @@ import 'package:tukuntech/features/caregiver/presentation/widgets/patient_histor
 import 'package:tukuntech/features/caregiver/presentation/widgets/caregiver_profile_body.dart';
 import 'package:tukuntech/features/patient/presentation/widgets/settings_body.dart';
 import 'package:tukuntech/features/patient/presentation/widgets/support_body.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class CaregiverDashboardPage extends StatefulWidget {
   const CaregiverDashboardPage({super.key});
@@ -60,8 +61,8 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
           }
           if (initials.isEmpty) initials = 'PT';
 
-          String subtitle = 'all good! You are feeling calm.';
-          String badgeText = 'Calm and stable';
+          String subtitleKey = 'greeting_calm';
+          String badgeTextKey = 'calm_stable';
           Color badgeColor = const Color(0xFFA5D6A7).withOpacity(0.5);
           Color badgeDotColor = const Color(0xFF4CAF50);
           String heartRate = '74 bpm';
@@ -69,16 +70,16 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
           String temperature = '36.7 °C';
 
           if (name.toLowerCase().contains('miguel') || name.toLowerCase().contains('montana')) {
-            subtitle = 'Alert! low oxygen';
-            badgeText = 'Low Oxygen';
+            subtitleKey = 'alert_low_oxygen';
+            badgeTextKey = 'low_oxygen';
             badgeColor = Colors.red.withOpacity(0.2);
             badgeDotColor = Colors.red;
             heartRate = '74 bpm';
             oxygen = '87%';
             temperature = '36.7 °C';
           } else if (name.toLowerCase().contains('coco') || name.toLowerCase().contains('manlin')) {
-            subtitle = 'all good! You are feeling calm.';
-            badgeText = 'Slight HR variability';
+            subtitleKey = 'greeting_calm';
+            badgeTextKey = 'slight_hr_variability';
             badgeColor = Colors.blue.withOpacity(0.2);
             badgeDotColor = Colors.blue;
             heartRate = '99 bpm';
@@ -89,18 +90,18 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
           fetchedPatients.add(
             PatientVitalData(
               initials: initials,
-              titlePrefix: badgeText.contains('Oxygen') ? 'WARNING' : 'Hello',
+              titlePrefixKey: badgeTextKey.contains('oxygen') ? 'warning' : 'hello',
               name: name,
-              subtitle: subtitle,
-              badgeText: badgeText,
+              subtitleKey: subtitleKey,
+              badgeTextKey: badgeTextKey,
               badgeColor: badgeColor,
               badgeDotColor: badgeDotColor,
               heartRate: heartRate,
-              heartRateSubtitle: 'Resting - normal',
+              heartRateSubtitleKey: 'resting_normal',
               oxygen: oxygen,
-              oxygenSubtitle: 'SpO2',
+              oxygenSubtitleKey: 'spo2',
               temperature: temperature,
-              temperatureSubtitle: 'Normal',
+              temperatureSubtitleKey: 'normal',
               patientId: id,
               email: email,
             ),
@@ -121,52 +122,52 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
       final List<PatientVitalData> fallbackPatients = [
         PatientVitalData(
           initials: 'EM',
-          titlePrefix: 'Hello',
+          titlePrefixKey: 'hello',
           name: 'Eleanor Marsh',
-          subtitle: 'all good! You are feeling calm.',
-          badgeText: 'Calm and stable',
+          subtitleKey: 'greeting_calm',
+          badgeTextKey: 'calm_stable',
           badgeColor: const Color(0xFFA5D6A7).withOpacity(0.5),
           badgeDotColor: const Color(0xFF4CAF50),
           heartRate: '74 bpm',
-          heartRateSubtitle: 'Resting - normal',
+          heartRateSubtitleKey: 'resting_normal',
           oxygen: '98%',
-          oxygenSubtitle: 'SpO2',
+          oxygenSubtitleKey: 'spo2',
           temperature: '36.7 °C',
-          temperatureSubtitle: 'Normal',
+          temperatureSubtitleKey: 'normal',
           patientId: '2',
           email: 'patient2@test.com',
         ),
         PatientVitalData(
           initials: 'CM',
-          titlePrefix: 'Hello',
+          titlePrefixKey: 'hello',
           name: 'Coco Manlin',
-          subtitle: 'all good! You are feeling calm.',
-          badgeText: 'Slight HR variability',
+          subtitleKey: 'greeting_calm',
+          badgeTextKey: 'slight_hr_variability',
           badgeColor: Colors.blue.withOpacity(0.2),
           badgeDotColor: Colors.blue,
           heartRate: '99 bpm',
-          heartRateSubtitle: 'Resting - normal',
+          heartRateSubtitleKey: 'resting_normal',
           oxygen: '98%',
-          oxygenSubtitle: 'SpO2',
+          oxygenSubtitleKey: 'spo2',
           temperature: '36.7 °C',
-          temperatureSubtitle: 'Normal',
+          temperatureSubtitleKey: 'normal',
           patientId: '3',
           email: 'patient3@test.com',
         ),
         PatientVitalData(
           initials: 'MM',
-          titlePrefix: 'WARNING',
+          titlePrefixKey: 'warning',
           name: 'Miguel Montana',
-          subtitle: 'Alert! low oxygen',
-          badgeText: 'Low Oxygen',
+          subtitleKey: 'alert_low_oxygen',
+          badgeTextKey: 'low_oxygen',
           badgeColor: Colors.red.withOpacity(0.2),
           badgeDotColor: Colors.red,
           heartRate: '74 bpm',
-          heartRateSubtitle: 'Resting - normal',
+          heartRateSubtitleKey: 'resting_normal',
           oxygen: '87%',
-          oxygenSubtitle: 'SpO2',
+          oxygenSubtitleKey: 'spo2',
           temperature: '36.7 °C',
-          temperatureSubtitle: 'Normal',
+          temperatureSubtitleKey: 'normal',
           patientId: '4',
           email: 'patient4@test.com',
         ),
@@ -185,18 +186,18 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
       _patients.add(
         PatientVitalData(
           initials: initials,
-          titlePrefix: 'Hello',
+          titlePrefixKey: 'hello',
           name: name,
-          subtitle: 'Waiting for device connection...',
-          badgeText: 'Pending',
+          subtitleKey: 'waiting_device_conn',
+          badgeTextKey: 'pending',
           badgeColor: Colors.grey.withOpacity(0.2),
           badgeDotColor: Colors.grey,
-          heartRate: '-- bmp',
-          heartRateSubtitle: 'No data',
+          heartRate: '-- bpm',
+          heartRateSubtitleKey: 'no_data',
           oxygen: '--%',
-          oxygenSubtitle: 'SpO2',
+          oxygenSubtitleKey: 'spo2',
           temperature: '-- °C',
-          temperatureSubtitle: 'No data',
+          temperatureSubtitleKey: 'no_data',
         ),
       );
     });
@@ -208,12 +209,12 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
       builder: (BuildContext ctx) {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text('Confirm Logout'),
-          content: const Text('Are you sure you want to log out of your session?'),
+          title: Text(context.translate('confirm_logout')),
+          content: Text(context.translate('logout_message')),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx),
-              child: const Text('Cancel', style: TextStyle(color: Colors.black54)),
+              child: Text(context.translate('cancel'), style: const TextStyle(color: Colors.black54)),
             ),
             ElevatedButton(
               onPressed: () {
@@ -233,7 +234,7 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
                 elevation: 0,
               ),
-              child: const Text('Log out'),
+              child: Text(context.translate('log_out')),
             ),
           ],
         );
@@ -265,7 +266,7 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
               ),
             ),
             Text(
-              'caregiver',
+              context.translate('caregiver_role'),
               style: TextStyle(
                 color: Colors.grey[500],
                 fontSize: 12,
@@ -303,11 +304,11 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                 child: Text(
-                  'Menu',
-                  style: TextStyle(
+                  context.translate('menu'),
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -317,9 +318,9 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
               const Divider(),
               ListTile(
                 leading: const Icon(Icons.settings_outlined, color: Color(0xFF3B9784)),
-                title: const Text(
-                  'Settings',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                title: Text(
+                  context.translate('settings'),
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                 ),
                 onTap: () {
                   setState(() => _drawerSection = 'settings');
@@ -328,9 +329,9 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
               ),
               ListTile(
                 leading: const Icon(Icons.support_agent_outlined, color: Color(0xFF3B9784)),
-                title: const Text(
-                  'Support',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                title: Text(
+                  context.translate('support'),
+                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
                 ),
                 onTap: () {
                   setState(() => _drawerSection = 'support');
@@ -354,9 +355,9 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
                             ListView(
                               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                               children: [
-                                const Text(
-                                  'Vital Signs',
-                                  style: TextStyle(
+                                Text(
+                                  context.translate('vital_signs'),
+                                  style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black87,
@@ -364,7 +365,7 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'Detail view of today\'s activity',
+                                  context.translate('activity_today'),
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: Colors.grey[600],
@@ -380,9 +381,9 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
                             ListView(
                               padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
                               children: [
-                                const Text(
-                                  'Patient devices',
-                                  style: TextStyle(
+                                Text(
+                                  context.translate('patient_devices'),
+                                  style: const TextStyle(
                                     fontSize: 20,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.black87,
@@ -390,7 +391,7 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'Status and conection details for your TukunTech IOT',
+                                  context.translate('device_status_sub'),
                                   style: TextStyle(
                                     fontSize: 13,
                                     color: Colors.grey[600],
@@ -413,10 +414,10 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
                                     children: [
                                       const Icon(Icons.check_circle_outline, color: Colors.blue, size: 24),
                                       const SizedBox(width: 12),
-                                      const Expanded(
+                                      Expanded(
                                         child: Text(
-                                          "Your device is reporting normally. We'll notify you here if anything changes.",
-                                          style: TextStyle(color: Colors.black54, fontSize: 12),
+                                          context.translate('device_normal_alert'),
+                                          style: const TextStyle(color: Colors.black54, fontSize: 12),
                                         ),
                                       ),
                                     ],
@@ -427,7 +428,7 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
                             ),
                             PatientHistoryView(patients: _patients),
                             CaregiverProfileBody(onPatientAdded: _addNewPatient),
-                            const Center(child: Text('Reports')),
+                            Center(child: Text(context.translate('reports'))),
                           ],
                         ),
       ),

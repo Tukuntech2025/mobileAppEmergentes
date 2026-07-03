@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tukuntech/features/caregiver/presentation/widgets/patient_vital_card.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class DeviceStatusCard extends StatelessWidget {
   final PatientVitalData data;
@@ -57,10 +58,10 @@ class DeviceStatusCard extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text('TukunTech IOT', style: TextStyle(color: Colors.black54, fontSize: 11)),
+                      Text(context.translate('device_name'), style: const TextStyle(color: Colors.black54, fontSize: 11)),
                       const Text('CB-9F32-01', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87)),
                       const SizedBox(height: 2),
-                      const Text('Version 1.0.5', style: TextStyle(color: Colors.black54, fontSize: 12)),
+                      Text('${context.translate('version')} 1.0.5', style: const TextStyle(color: Colors.black54, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -104,7 +105,7 @@ class DeviceStatusCard extends StatelessWidget {
                         color: primaryColor,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Text('Online', style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                      child: Text(context.translate('online'), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -117,15 +118,15 @@ class DeviceStatusCard extends StatelessWidget {
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
             child: Column(
               children: [
-                _buildProgressRow('Battery', '88%', Icons.battery_full, primaryColor, 0.88),
+                _buildProgressRow(context.translate('battery'), '88%', Icons.battery_full, primaryColor, 0.88),
                 const SizedBox(height: 12),
                 Divider(color: Colors.grey.shade100, height: 1),
                 const SizedBox(height: 12),
-                _buildProgressRow('WiFi', 'Strong', Icons.wifi, primaryColor, 0.9),
+                _buildProgressRow(context.translate('wifi'), context.translate('strong'), Icons.wifi, primaryColor, 0.9),
                 const SizedBox(height: 12),
                 Divider(color: Colors.grey.shade100, height: 1),
                 const SizedBox(height: 12),
-                _buildProgressRow('Sync', 'Good', Icons.check_circle_outline, primaryColor, 0.9),
+                _buildProgressRow(context.translate('sync'), context.translate('good'), Icons.check_circle_outline, primaryColor, 0.9),
               ],
             ),
           ),

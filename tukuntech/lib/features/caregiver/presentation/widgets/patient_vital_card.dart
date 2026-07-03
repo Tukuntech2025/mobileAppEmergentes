@@ -1,36 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class PatientVitalData {
   final String initials;
-  final String titlePrefix; // 'Hello' or 'WARNING'
+  final String titlePrefixKey; // key for 'Hello' or 'WARNING'
   final String name;
-  final String subtitle;
-  final String badgeText;
+  final String subtitleKey;
+  final String badgeTextKey;
   final Color badgeColor;
   final Color badgeDotColor;
   final String heartRate;
-  final String heartRateSubtitle;
+  final String heartRateSubtitleKey;
   final String oxygen;
-  final String oxygenSubtitle;
+  final String oxygenSubtitleKey;
   final String temperature;
-  final String temperatureSubtitle;
+  final String temperatureSubtitleKey;
   final String? patientId;
   final String? email;
 
   PatientVitalData({
     required this.initials,
-    required this.titlePrefix,
+    required this.titlePrefixKey,
     required this.name,
-    required this.subtitle,
-    required this.badgeText,
+    required this.subtitleKey,
+    required this.badgeTextKey,
     required this.badgeColor,
     required this.badgeDotColor,
     required this.heartRate,
-    required this.heartRateSubtitle,
+    required this.heartRateSubtitleKey,
     required this.oxygen,
-    required this.oxygenSubtitle,
+    required this.oxygenSubtitleKey,
     required this.temperature,
-    required this.temperatureSubtitle,
+    required this.temperatureSubtitleKey,
     this.patientId,
     this.email,
   });
@@ -104,11 +105,11 @@ class PatientVitalCard extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            data.titlePrefix,
+                            context.translate(data.titlePrefixKey),
                             style: TextStyle(
-                              color: data.titlePrefix == 'WARNING' ? Colors.red.shade700 : Colors.grey[600],
+                              color: data.titlePrefixKey == 'warning' ? Colors.red.shade700 : Colors.grey[600],
                               fontSize: 11,
-                              fontWeight: data.titlePrefix == 'WARNING' ? FontWeight.bold : FontWeight.normal,
+                              fontWeight: data.titlePrefixKey == 'warning' ? FontWeight.bold : FontWeight.normal,
                             ),
                           ),
                           Text(
@@ -121,7 +122,7 @@ class PatientVitalCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            data.subtitle,
+                            context.translate(data.subtitleKey),
                             style: TextStyle(color: Colors.grey[700], fontSize: 12),
                           ),
                         ],
@@ -151,9 +152,9 @@ class PatientVitalCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        data.badgeText,
-                        style: TextStyle(
-                          color: data.badgeDotColor == Colors.red ? Colors.white : (data.badgeDotColor == Colors.blue ? Colors.white : Colors.white),
+                        context.translate(data.badgeTextKey),
+                        style: const TextStyle(
+                          color: Colors.white,
                           fontWeight: FontWeight.bold,
                           fontSize: 12,
                         ),
@@ -172,30 +173,30 @@ class PatientVitalCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: _buildStatColumn(
-                    'Heart rate',
+                    context.translate('heart_rate'),
                     Icons.favorite_border,
                     data.heartRate,
-                    data.heartRateSubtitle,
+                    context.translate(data.heartRateSubtitleKey),
                     const Color(0xFF3B9784),
                   ),
                 ),
                 _buildVerticalDivider(),
                 Expanded(
                   child: _buildStatColumn(
-                    'Oxigen',
+                    context.translate('oxygen_label'),
                     Icons.air,
                     data.oxygen,
-                    data.oxygenSubtitle,
+                    context.translate(data.oxygenSubtitleKey),
                     const Color(0xFF3B9784),
                   ),
                 ),
                 _buildVerticalDivider(),
                 Expanded(
                   child: _buildStatColumn(
-                    'Temperature',
+                    context.translate('temperature_label'),
                     Icons.thermostat,
                     data.temperature,
-                    data.temperatureSubtitle,
+                    context.translate(data.temperatureSubtitleKey),
                     Colors.orange.shade300,
                   ),
                 ),
@@ -229,7 +230,7 @@ class PatientVitalCard extends StatelessWidget {
             ),
             child: Row(
               children: [
-                const Text('Device', style: TextStyle(color: Colors.black54, fontSize: 12)),
+                Text(context.translate('device_label'), style: const TextStyle(color: Colors.black54, fontSize: 12)),
                 const SizedBox(width: 12),
                 const Text('CB-8DF3-01', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
                 const Spacer(),
@@ -237,7 +238,7 @@ class PatientVitalCard extends StatelessWidget {
                 const SizedBox(width: 4),
                 const Icon(Icons.battery_full, color: Color(0xFF3B9784), size: 16),
                 const SizedBox(width: 12),
-                const Text('Strong', style: TextStyle(color: Colors.black54, fontSize: 12)),
+                Text(context.translate('strong'), style: const TextStyle(color: Colors.black54, fontSize: 12)),
                 const SizedBox(width: 4),
                 const Icon(Icons.wifi, color: Colors.blue, size: 16),
               ],
