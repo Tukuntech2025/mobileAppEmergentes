@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:tukuntech/core/environment_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/auth_store.dart';
 
@@ -19,10 +19,7 @@ class _ReportBodyState extends State<ReportBody> {
   String? _error;
   Timer? _pollingTimer;
 
-  // Use 10.0.2.2 for Android emulator, otherwise localhost
-  final String _baseUrl = Platform.isAndroid 
-      ? 'http://10.0.2.2:8080/api/v1/reports' 
-      : 'http://localhost:8080/api/v1/reports';
+  final String _baseUrl = '${EnvironmentConfig.baseUrl}/reports';
 
   @override
   void initState() {

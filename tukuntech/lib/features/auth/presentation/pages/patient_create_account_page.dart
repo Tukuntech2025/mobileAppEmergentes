@@ -10,6 +10,7 @@ import 'package:tukuntech/features/auth/presentation/pages/create_account_page.d
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/environment_config.dart';
 
 class PatientCreateAccountPage extends StatefulWidget {
   final String planTitle;
@@ -62,9 +63,7 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
 
   bool _isRegistering = false;
 
-  final String _baseUrl = Platform.isAndroid 
-      ? 'http://10.0.2.2:8080/api/v1' 
-      : 'http://localhost:8080/api/v1';
+  final String _baseUrl = EnvironmentConfig.baseUrl;
 
   @override
   void dispose() {

@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:tukuntech/core/environment_config.dart';
 import 'package:http/http.dart' as http;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:tukuntech/features/caregiver/presentation/widgets/patient_vital_card.dart';
@@ -24,10 +24,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
   String? _error;
   Timer? _pollingTimer;
 
-  // Use 10.0.2.2 for Android emulator, otherwise localhost
-  final String _baseUrl = Platform.isAndroid 
-      ? 'http://10.0.2.2:8080/api/v1/reports' 
-      : 'http://localhost:8080/api/v1/reports';
+  final String _baseUrl = '${EnvironmentConfig.baseUrl}/reports';
 
   @override
   void initState() {

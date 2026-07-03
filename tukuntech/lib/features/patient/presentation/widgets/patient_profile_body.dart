@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:io' show Platform;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/auth_store.dart';
+import 'package:tukuntech/core/environment_config.dart';
 
 // ── Modelos locales ────────────────────────────────────────────────────────────
 class EmergencyContact {
@@ -95,9 +95,7 @@ class _ProfileBodyState extends State<ProfileBody> {
       final token = AuthStore.token;
       if (token == null) throw Exception("No token");
 
-      final String baseUrl = Platform.isAndroid 
-          ? 'http://10.0.2.2:8080/api/v1' 
-          : 'http://localhost:8080/api/v1';
+      final String baseUrl = EnvironmentConfig.baseUrl;
 
       final res = await http.get(
         Uri.parse('$baseUrl/profiles/me'),

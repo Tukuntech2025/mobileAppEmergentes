@@ -11,6 +11,7 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:tukuntech/core/environment_config.dart';
 
 class CaregiverCreateAccountPage extends StatefulWidget {
   final String planTitle;
@@ -53,9 +54,7 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
     _patients = List.generate(count, (_) => PatientData());
   }
 
-  final String _baseUrl = Platform.isAndroid 
-      ? 'http://10.0.2.2:8080/api/v1' 
-      : 'http://localhost:8080/api/v1';
+  final String _baseUrl = EnvironmentConfig.baseUrl;
 
   @override
   void dispose() {

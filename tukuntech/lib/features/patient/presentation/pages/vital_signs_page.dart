@@ -6,10 +6,10 @@ import 'package:tukuntech/features/patient/presentation/widgets/report_body.dart
 import 'package:tukuntech/features/patient/presentation/widgets/patient_profile_body.dart';
 import 'package:tukuntech/features/patient/presentation/widgets/settings_body.dart';
 import 'package:tukuntech/features/patient/presentation/widgets/support_body.dart';
-import 'dart:io' show Platform;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/auth_store.dart';
+import 'package:tukuntech/core/environment_config.dart';
 
 class VitalSignsPage extends StatefulWidget {
   const VitalSignsPage({super.key});
@@ -28,9 +28,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
   // null = muestra los tabs del BottomNav, 'settings' = Settings, 'support' = Support
   String? _drawerSection;
 
-  final String _baseUrl = Platform.isAndroid 
-      ? 'http://10.0.2.2:8080/api/v1' 
-      : 'http://localhost:8080/api/v1';
+  final String _baseUrl = EnvironmentConfig.baseUrl;
 
   Map<String, dynamic>? _profileData;
   bool _isLoading = true;

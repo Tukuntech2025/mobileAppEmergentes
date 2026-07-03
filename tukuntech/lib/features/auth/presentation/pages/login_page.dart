@@ -6,6 +6,7 @@ import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/auth_store.dart';
+import 'package:tukuntech/core/environment_config.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -20,9 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
   bool _obscurePassword = true;
 
-  final String _loginUrl = Platform.isAndroid 
-      ? 'http://10.0.2.2:8080/api/v1/auth/login' 
-      : 'http://localhost:8080/api/v1/auth/login';
+  final String _loginUrl = '${EnvironmentConfig.baseUrl}/auth/login';
 
   Future<void> _login() async {
     setState(() {
@@ -50,9 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
             throw Exception('No token received');
           }
 
-          final String profileUrl = Platform.isAndroid 
-              ? 'http://10.0.2.2:8080/api/v1/profiles/me' 
-              : 'http://localhost:8080/api/v1/profiles/me';
+          final String profileUrl = '${EnvironmentConfig.baseUrl}/profiles/me';
 
           final profileResponse = await http.get(
             Uri.parse(profileUrl),

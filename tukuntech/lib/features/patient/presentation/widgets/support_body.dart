@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:io' show Platform;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/auth_store.dart';
+import 'package:tukuntech/core/environment_config.dart';
 
 class SupportTicket {
   final String subject;
@@ -42,9 +42,7 @@ class _SupportBodyState extends State<SupportBody> {
       final token = AuthStore.token;
       if (token == null) return;
       
-      final String baseUrl = Platform.isAndroid 
-          ? 'http://10.0.2.2:8080/api/v1' 
-          : 'http://localhost:8080/api/v1';
+      final String baseUrl = EnvironmentConfig.baseUrl;
 
       // 1. Fetch profile to get ID
       final profileRes = await http.get(
@@ -126,9 +124,7 @@ class _SupportBodyState extends State<SupportBody> {
       final token = AuthStore.token;
       if (token == null) throw Exception("No token");
 
-      final String baseUrl = Platform.isAndroid 
-          ? 'http://10.0.2.2:8080/api/v1' 
-          : 'http://localhost:8080/api/v1';
+      final String baseUrl = EnvironmentConfig.baseUrl;
 
       // 1. Fetch profile to get email
       final profileRes = await http.get(
