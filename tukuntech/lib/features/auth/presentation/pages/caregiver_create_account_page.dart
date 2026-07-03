@@ -5,13 +5,12 @@ import 'package:tukuntech/features/auth/presentation/widgets/step_delivery.dart'
 import 'package:tukuntech/features/auth/presentation/widgets/step_payment.dart';
 import 'package:tukuntech/features/auth/presentation/widgets/step_success.dart';
 import 'package:tukuntech/features/auth/presentation/pages/plan_selection_page.dart';
-import 'package:tukuntech/features/auth/presentation/pages/create_account_page.dart';
 import 'package:tukuntech/features/auth/presentation/widgets/step_account.dart';
 import 'dart:convert';
-import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:tukuntech/core/environment_config.dart';
+
 
 class CaregiverCreateAccountPage extends StatefulWidget {
   final String planTitle;
@@ -71,140 +70,113 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
     setState(() { _isRegistering = true; });
 
     try {
-      // 1. Register Auth
-      final registerRes = await http.post(
-        Uri.parse('$_baseUrl/auth/register'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'email': _dummyEmail.text.trim(),
-          'password': _dummyPassword.text,
-          'role': 'CAREGIVER'
-        }),
-      ).timeout(const Duration(seconds: 10));
-
-      if (registerRes.statusCode != 200 && registerRes.statusCode != 201) {
-        throw Exception('Failed to register auth: ${registerRes.body}');
+      final activePatients = _patients.where((p) => p.fullNameCtrl.text.trim().isNotEmpty).toList();
+      if (activePatients.isEmpty) {
+        throw Exception('Please fill in details for at least one patient.');
       }
 
-      final loginRes = await http.post(
-        Uri.parse('$_baseUrl/auth/login'),
+      final response = await http.post(
+        Uri.parse('$_baseUrl/profiles/onboarding'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
-          'email': _dummyEmail.text.trim(),
-          'password': _dummyPassword.text,
+          'caregiverEmail': _dummyEmail.text.trim(),
+          'caregiverPassword': _dummyPassword.text,
+          'plan': 'FAMILY',
+          'patients': activePatients.map((patient) {
+            String apiGender = 'OTHER';
+            if (patient.gender == 'Male') apiGender = 'MALE';
+            if (patient.gender == 'Female') apiGender = 'FEMALE';
+
+            String apiBloodType = 'UNKNOWN';
+            final bloodMap = {
+              'A+': 'A_POSITIVE', 'A-': 'A_NEGATIVE',
+              'B+': 'B_POSITIVE', 'B-': 'B_NEGATIVE',
+              'AB+': 'AB_POSITIVE', 'AB-': 'AB_NEGATIVE',
+              'O+': 'O_POSITIVE', 'O-': 'O_NEGATIVE',
+            };
+            if (patient.bloodType != null && bloodMap.containsKey(patient.bloodType)) {
+              apiBloodType = bloodMap[patient.bloodType]!;
+            }
+
+            return {
+              'email': patient.emailCtrl.text.trim().isEmpty 
+                  ? 'patient_${DateTime.now().millisecondsSinceEpoch}_${activePatients.indexOf(patient)}@tukuntech.app' 
+                  : patient.emailCtrl.text.trim(),
+              'password': patient.passwordCtrl.text.trim().isEmpty ? '123456' : patient.passwordCtrl.text,
+              'dni': patient.dniCtrl.text.trim(),
+              'fullName': patient.fullNameCtrl.text.trim(),
+              'age': int.tryParse(patient.ageCtrl.text.trim()) ?? 0,
+              'address': _dummyAddress.text.trim(),
+              'bloodType': apiBloodType,
+              'gender': apiGender,
+              'notes': patient.notesCtrl.text.trim(),
+              'minHeartRate': int.tryParse(patient.minHrCtrl.text.trim()) ?? 0,
+              'maxHeartRate': int.tryParse(patient.maxHrCtrl.text.trim()) ?? 0,
+              'minOxygenSaturation': int.tryParse(patient.minO2Ctrl.text.trim()) ?? 0,
+              'maxOxygenSaturation': int.tryParse(patient.maxO2Ctrl.text.trim()) ?? 0,
+              'minTemperature': double.tryParse(patient.minTempCtrl.text.trim()) ?? 0.0,
+              'maxTemperature': double.tryParse(patient.maxTempCtrl.text.trim()) ?? 0.0,
+              'emergencyContacts': [
+                {
+                  'name': 'Emergency Contact',
+                  'relationship': 'FAMILY',
+                  'phoneNumber': '123456789'
+                }
+              ]
+            };
+          }).toList(),
         }),
       ).timeout(const Duration(seconds: 10));
 
-      String? token;
-      if (loginRes.statusCode == 200 || loginRes.statusCode == 201) {
-        final loginData = jsonDecode(loginRes.body);
-        String? originalToken = loginData['token'] ?? loginData['accessToken'];
-        token = originalToken;
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        throw Exception('Failed to create account: ${response.body}');
+      }
 
-        if (originalToken != null) {
-          try {
-            final jwt = JWT.decode(originalToken);
-            final payload = Map<String, dynamic>.from(jwt.payload);
-            payload['subscription_plan'] = 'FAMILY'; // Forzamos el plan desde Flutter
-            
-            final newJwt = JWT(
-              payload,
-              issuer: jwt.issuer,
-              subject: jwt.subject,
-              audience: jwt.audience,
-              jwtId: jwt.jwtId,
-            );
-            token = newJwt.sign(SecretKey('TuClaveSecretaSuperSeguraYExtremadamenteLargaParaElProyectoTukunTech2026'));
-          } catch (e) {
-            print('Error tampering token: $e');
-          }
+      String stripeUrl = response.body.trim();
+      if (!stripeUrl.startsWith('http://') && !stripeUrl.startsWith('https://')) {
+        try {
+          final Map<String, dynamic> responseData = jsonDecode(response.body);
+          stripeUrl = responseData['url'] ?? responseData['stripeUrl'] ?? responseData['paymentUrl'] ?? response.body.trim();
+        } catch (e) {
+          stripeUrl = response.body.trim();
         }
       }
 
-      final Map<String, String> headers = {'Content-Type': 'application/json'};
-      if (token != null) {
-        headers['Authorization'] = 'Bearer $token';
-      }
+      if (stripeUrl.isNotEmpty) {
+        final Uri url = Uri.parse(stripeUrl);
+        launchUrl(url).catchError((e) {
+          print('Error launching default: $e');
+          return launchUrl(url, mode: LaunchMode.externalApplication);
+        }).catchError((e) {
+          print('Error launching Stripe URL: $e');
+          return false;
+        });
 
-      // 2. Create Caregiver Profile
-      final caregiverProfileRes = await http.post(
-        Uri.parse('$_baseUrl/profiles/me'),
-        headers: headers,
-        body: jsonEncode({
-          'fullName': 'Caregiver User',
-          'birthDate': '1980-01-01',
-          'address': _dummyAddress.text,
-          'bloodType': 'A_POSITIVE',
-          'gender': 'OTHER',
-          'notes': 'Caregiver account',
-          'emergencyContacts': []
-        }),
-      ).timeout(const Duration(seconds: 10));
-
-      if (caregiverProfileRes.statusCode != 200 && caregiverProfileRes.statusCode != 201) {
-         throw Exception('Failed to create caregiver profile: ${caregiverProfileRes.body}');
-      }
-
-      // 3. Create Patients
-      for (int i = 0; i < _patients.length; i++) {
-        var patient = _patients[i];
-        if (patient.fullNameCtrl.text.trim().isEmpty) continue; // Skip empty patients
-        
-        String apiGender = 'OTHER';
-        if (patient.gender == 'Male') apiGender = 'MALE';
-        if (patient.gender == 'Female') apiGender = 'FEMALE';
-
-        String apiBloodType = 'A_POSITIVE';
-        final bloodMap = {
-          'A+': 'A_POSITIVE', 'A-': 'A_NEGATIVE',
-          'B+': 'B_POSITIVE', 'B-': 'B_NEGATIVE',
-          'AB+': 'AB_POSITIVE', 'AB-': 'AB_NEGATIVE',
-          'O+': 'O_POSITIVE', 'O-': 'O_NEGATIVE',
-        };
-        if (patient.bloodType != null && bloodMap.containsKey(patient.bloodType)) {
-          apiBloodType = bloodMap[patient.bloodType]!;
-        }
-
-        int birthYear = DateTime.now().year - (int.tryParse(patient.ageCtrl.text) ?? 30);
-        String birthDate = '$birthYear-01-01';
-
-        final profileRes = await http.post(
-          Uri.parse('$_baseUrl/profiles/me/patients'),
-          headers: headers,
-          body: jsonEncode({
-            'patientAuthId': 'patient_${DateTime.now().millisecondsSinceEpoch}_$i', 
-            'email': patient.emailCtrl.text.trim().isEmpty ? 'patient_$i@tukuntech.app' : patient.emailCtrl.text.trim(), 
-            'fullName': patient.fullNameCtrl.text,
-            'birthDate': birthDate,
-            'address': _dummyAddress.text,
-            'bloodType': apiBloodType,
-            'gender': apiGender,
-            'notes': patient.notesCtrl.text,
-            'emergencyContacts': [
-              {
-                "name": "Emergency Contact",
-                "relationship": "FAMILY",
-                "phoneNumber": "123456789"
-              }
-            ]
-          }),
-        ).timeout(const Duration(seconds: 10));
-
-        if (profileRes.statusCode != 200 && profileRes.statusCode != 201) {
-           throw Exception('Failed to create patient: ${profileRes.body}');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text('Redirecting to Stripe payment...'),
+              duration: const Duration(seconds: 8),
+              action: SnackBarAction(
+                label: 'Open manually',
+                onPressed: () {
+                  launchUrl(url).catchError((_) => false);
+                },
+              ),
+            ),
+          );
         }
       }
 
       if (!mounted) return;
       setState(() { _currentStep++; });
     } catch (e) {
-       if (!mounted) return;
-       
-       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
     } finally {
-       if (mounted) {
-         setState(() { _isRegistering = false; });
-       }
+      if (mounted) {
+        setState(() { _isRegistering = false; });
+      }
     }
   }
 

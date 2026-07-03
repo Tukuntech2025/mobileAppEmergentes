@@ -354,96 +354,75 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
                       child: const Icon(Icons.download_outlined, color: primaryColor),
                     ),
                     const SizedBox(width: 12),
-                    Text(context.translate('generate_report'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87)),
+                    Expanded(
+                      child: Text(
+                        context.translate('generate_report'),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
+                const SizedBox(height: 12),
+                Text(
+                  context.translate('export_report_sub'),
+                  style: const TextStyle(color: Colors.black54, fontSize: 12),
+                ),
                 const SizedBox(height: 16),
+                Text(
+                  context.translate('period'),
+                  style: const TextStyle(color: Colors.black54, fontSize: 12),
+                ),
+                const SizedBox(height: 4),
                 Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(context.translate('export_report_sub'), style: const TextStyle(color: Colors.black54, fontSize: 12)),
-                          const SizedBox(height: 16),
-                          Text(context.translate('period'), style: const TextStyle(color: Colors.black54, fontSize: 12)),
-                          const SizedBox(height: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: DropdownButtonHideUnderline(
-                              child: DropdownButton<String>(
-                                value: _selectedPeriod,
-                                isExpanded: true,
-                                icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black54, size: 16),
-                                style: const TextStyle(fontSize: 12, color: Colors.black87),
-                                items: <String>['Daily', 'Weekly', 'Monthly', 'Yearly'].map((String value) {
-                                  return DropdownMenuItem<String>(
-                                    value: value,
-                                    child: Text(context.translate(value.toLowerCase())),
-                                  );
-                                }).toList(),
-                                onChanged: (String? newValue) {
-                                  if (newValue != null) {
-                                    setState(() {
-                                      _selectedPeriod = newValue;
-                                    });
-                                  }
-                                },
-                              ),
-                            ),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 0),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: DropdownButtonHideUnderline(
+                          child: DropdownButton<String>(
+                            value: _selectedPeriod,
+                            isExpanded: true,
+                            icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black54, size: 16),
+                            style: const TextStyle(fontSize: 12, color: Colors.black87),
+                            items: <String>['Daily', 'Weekly', 'Monthly', 'Yearly'].map((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(context.translate(value.toLowerCase())),
+                              );
+                            }).toList(),
+                            onChanged: (String? newValue) {
+                              if (newValue != null) {
+                                setState(() {
+                                  _selectedPeriod = newValue;
+                                });
+                              }
+                            },
                           ),
-                        ],
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(context.translate('patient_label'), style: const TextStyle(color: Colors.black54, fontSize: 12)),
-                          const SizedBox(height: 4),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    widget.patients[_selectedPatientIndex].name,
-                                    style: const TextStyle(fontSize: 12, color: Colors.black87),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                const Icon(Icons.keyboard_arrow_down, size: 16, color: Colors.black54),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 12),
-                          SizedBox(
-                            height: 36,
-                            child: ElevatedButton.icon(
-                              onPressed: _isLoading ? null : _generateReport,
-                              icon: const Icon(Icons.download, size: 14),
-                              label: Text(context.translate('generate_report'), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.bold)),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryColor,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                elevation: 0,
-                              ),
-                            ),
-                          ),
-                        ],
+                    ElevatedButton.icon(
+                      onPressed: _isLoading ? null : _generateReport,
+                      icon: const Icon(Icons.download, size: 14),
+                      label: Text(
+                        context.translate('generate_report'),
+                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                        elevation: 0,
                       ),
                     ),
                   ],
@@ -475,7 +454,16 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
                       child: const Icon(Icons.show_chart, color: primaryColor),
                     ),
                     const SizedBox(width: 16),
-                    Text(context.translate('vital_signs_history'), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87)),
+                    Expanded(
+                      child: Text(
+                        context.translate('vital_signs_history'),
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 24),
