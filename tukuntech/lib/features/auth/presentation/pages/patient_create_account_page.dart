@@ -104,7 +104,6 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
           'caregiverEmail': _emailController.text.trim(),
           'caregiverPassword': _passwordController.text,
           'plan': 'INDIVIDUAL',
-          'acceptedTermsAndConditions': _acceptedTerms,
           'patients': [
             {
               'email': _patientEmailController.text.trim(),
@@ -122,6 +121,7 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
               'maxOxygenSaturation': int.tryParse(_maxO2Controller.text.trim()) ?? 0,
               'minTemperature': double.tryParse(_minTempController.text.trim()) ?? 0.0,
               'maxTemperature': double.tryParse(_maxTempController.text.trim()) ?? 0.0,
+              'termsAccepted': _acceptedTerms,
               'emergencyContacts': [
                 {
                   'name': 'Emergency Contact',

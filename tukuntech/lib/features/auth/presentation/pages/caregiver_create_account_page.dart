@@ -84,7 +84,6 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
           'caregiverEmail': _dummyEmail.text.trim(),
           'caregiverPassword': _dummyPassword.text,
           'plan': 'FAMILY',
-          'acceptedTermsAndConditions': _acceptedTerms,
           'patients': activePatients.map((patient) {
             String apiGender = 'OTHER';
             if (patient.gender == 'Male') apiGender = 'MALE';
@@ -119,6 +118,7 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
               'maxOxygenSaturation': int.tryParse(patient.maxO2Ctrl.text.trim()) ?? 0,
               'minTemperature': double.tryParse(patient.minTempCtrl.text.trim()) ?? 0.0,
               'maxTemperature': double.tryParse(patient.maxTempCtrl.text.trim()) ?? 0.0,
+              'termsAccepted': _acceptedTerms,
               'emergencyContacts': [
                 {
                   'name': 'Emergency Contact',
