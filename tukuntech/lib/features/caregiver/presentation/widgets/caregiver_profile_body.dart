@@ -6,11 +6,13 @@ import 'package:tukuntech/core/environment_config.dart';
 import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class EmergencyContactData {
+  String? internalId;
   String name;
   String relation;
   String phone;
 
   EmergencyContactData({
+    this.internalId,
     required this.name,
     required this.relation,
     required this.phone,
@@ -18,11 +20,13 @@ class EmergencyContactData {
 }
 
 class EmergencyContactController {
+  String? internalId;
   TextEditingController nameCtrl;
   TextEditingController relationCtrl;
   TextEditingController phoneCtrl;
 
   EmergencyContactController({
+    this.internalId,
     required String name,
     required String relation,
     required String phone,
@@ -38,6 +42,7 @@ class EmergencyContactController {
 }
 
 class PatientProfileData {
+  String id;
   String initials;
   String name;
   String age;
@@ -47,6 +52,7 @@ class PatientProfileData {
   List<EmergencyContactData> contacts;
 
   PatientProfileData({
+    required this.id,
     required this.initials,
     required this.name,
     required this.age,
@@ -138,6 +144,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
           if (p['emergencyContacts'] != null) {
             for (var c in p['emergencyContacts']) {
               contacts.add(EmergencyContactData(
+                internalId: c['internalId'],
                 name: c['name'] ?? '',
                 relation: c['relationship'] ?? '',
                 phone: c['phoneNumber'] ?? '',
@@ -146,6 +153,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
           }
 
           loaded.add(PatientProfileData(
+            id: p['id'] ?? '',
             initials: initials,
             name: name,
             age: ageStr,
@@ -176,6 +184,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
       print("Error fetching caregiver patient profiles: $e");
       final List<PatientProfileData> fallback = [
         PatientProfileData(
+          id: '',
           initials: 'EM',
           name: 'Eleanor Marsh',
           age: '68',
@@ -188,6 +197,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
           ],
         ),
         PatientProfileData(
+          id: '',
           initials: 'CM',
           name: 'Coco Manlin',
           age: '45',
@@ -197,6 +207,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
           contacts: [],
         ),
         PatientProfileData(
+          id: '',
           initials: 'MM',
           name: 'Miguel Montana',
           age: '50',
@@ -232,6 +243,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
 
     _contactControllers = patient.contacts
         .map((c) => EmergencyContactController(
+              internalId: c.internalId,
               name: c.name,
               relation: c.relation,
               phone: c.phone,
@@ -287,6 +299,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
     // Guardar contactos
     patient.contacts = _contactControllers
         .map((c) => EmergencyContactData(
+              internalId: c.internalId,
               name: c.nameCtrl.text,
               relation: c.relationCtrl.text,
               phone: c.phoneCtrl.text,
@@ -301,6 +314,43 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
       ),
     );
     setState(() {});
+  }
+
+  Future<void> _addEmergencyContact(String patientId, String name, String relation, String phone, BuildContext ctx) async {
+    try {
+      final token = AuthStore.token;
+      if (token == null) throw Exception("No token");
+
+      final String baseUrl = EnvironmentConfig.baseUrl;
+      final body = jsonEncode({
+        'name': name,
+        'relationship': relation.isEmpty ? 'FAMILY' : relation.toUpperCase(),
+        'phoneNumber': phone,
+      });
+
+      final res = await http.post(
+        Uri.parse('$baseUrl/profiles/$patientId/emergency-contacts'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      ).timeout(const Duration(seconds: 5));
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        if (mounted) {
+          Navigator.pop(ctx);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.translate('changes_saved_success')), backgroundColor: _primary));
+        }
+        await _fetchPatients();
+      } else {
+        throw Exception("Failed to add contact");
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${context.translate('error_saving_changes')}: $e'), backgroundColor: Colors.red));
+      }
+    }
   }
 
   void _showAddContactModal() {
@@ -380,16 +430,15 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                     child: ElevatedButton(
                       onPressed: () {
                         if (modalNameCtrl.text.trim().isEmpty) return;
-                        setState(() {
-                          _contactControllers.add(
-                            EmergencyContactController(
-                              name: modalNameCtrl.text.trim(),
-                              relation: modalRelationCtrl.text.trim(),
-                              phone: modalPhoneCtrl.text.trim(),
-                            ),
-                          );
-                        });
-                        Navigator.pop(ctx);
+                        final patientId = _patients[_selectedPatientIndex].id;
+                        if (patientId.isEmpty) return;
+                        _addEmergencyContact(
+                          patientId,
+                          modalNameCtrl.text.trim(),
+                          modalRelationCtrl.text.trim(),
+                          modalPhoneCtrl.text.trim(),
+                          ctx
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _primary,
@@ -413,9 +462,33 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
     );
   }
 
-  void _deleteContact(int index) {
+  Future<void> _deleteContact(int index) async {
+    final c = _contactControllers[index];
+    final patientId = _patients[_selectedPatientIndex].id;
+
+    if (c.internalId != null && patientId.isNotEmpty) {
+      try {
+        final token = AuthStore.token;
+        if (token == null) throw Exception("No token");
+
+        final res = await http.delete(
+          Uri.parse('${EnvironmentConfig.baseUrl}/profiles/$patientId/emergency-contacts/${c.internalId}'),
+          headers: {'Authorization': 'Bearer $token'},
+        ).timeout(const Duration(seconds: 5));
+
+        if (res.statusCode != 200 && res.statusCode != 204) {
+          throw Exception("Failed to delete contact");
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
+        }
+        return; // do not remove visually if api fails
+      }
+    }
+
     setState(() {
-      _contactControllers[index].dispose();
+      c.dispose();
       _contactControllers.removeAt(index);
     });
   }

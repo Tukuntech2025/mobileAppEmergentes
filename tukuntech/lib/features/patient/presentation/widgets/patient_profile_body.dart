@@ -7,11 +7,13 @@ import 'package:tukuntech/core/localization/app_localizations.dart';
 
 // ── Modelos locales ────────────────────────────────────────────────────────────
 class EmergencyContact {
+  String? internalId;
   TextEditingController nameCtrl;
   TextEditingController relationCtrl;
   TextEditingController phoneCtrl;
 
   EmergencyContact({
+    this.internalId,
     required String name,
     required String relation,
     required String phone,
@@ -55,20 +57,10 @@ class _ProfileBodyState extends State<ProfileBody> {
   String _bloodType = 'A_POSITIVE';
 
   // ── Contactos de emergencia ──────────────────────────────────
-  final List<EmergencyContact> _contacts = [
-    EmergencyContact(
-      name: 'Sara Marsh',
-      relation: 'Daughter',
-      phone: '940999345',
-    ),
-    EmergencyContact(
-      name: 'Sara Marsh',
-      relation: 'Daughter',
-      phone: '940999345',
-    ),
-  ];
+  final List<EmergencyContact> _contacts = [];
 
   bool _isLoading = true;
+  String? _patientId;
 
   @override
   void initState() {
@@ -96,6 +88,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         final data = jsonDecode(utf8.decode(res.bodyBytes));
         if (mounted) {
           setState(() {
+            _patientId = data['id'];
             _patientData['name'] = data['fullName'] ?? '';
             if (data['age'] != null) {
               _patientData['age'] = data['age'].toString();
@@ -132,6 +125,7 @@ class _ProfileBodyState extends State<ProfileBody> {
             if (data['emergencyContacts'] != null) {
               for (var c in data['emergencyContacts']) {
                 _contacts.add(EmergencyContact(
+                  internalId: c['internalId'],
                   name: c['name'] ?? '',
                   relation: c['relationship'] ?? '',
                   phone: c['phoneNumber'] ?? '',
@@ -249,6 +243,44 @@ class _ProfileBodyState extends State<ProfileBody> {
     }
   }
 
+  Future<void> _addEmergencyContact(String name, String relation, String phone, BuildContext ctx) async {
+    if (_patientId == null) return;
+    try {
+      final token = AuthStore.token;
+      if (token == null) throw Exception("No token");
+
+      final String baseUrl = EnvironmentConfig.baseUrl;
+      final body = jsonEncode({
+        'name': name,
+        'relationship': relation.isEmpty ? 'FAMILY' : relation.toUpperCase(),
+        'phoneNumber': phone,
+      });
+
+      final res = await http.post(
+        Uri.parse('$baseUrl/profiles/$_patientId/emergency-contacts'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      ).timeout(const Duration(seconds: 5));
+
+      if (res.statusCode == 200 || res.statusCode == 201) {
+        if (mounted) {
+          Navigator.pop(ctx);
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.translate('changes_saved_success')), backgroundColor: _primary));
+        }
+        await _fetchProfile(); // Refresh to get the new internalId
+      } else {
+        throw Exception("Failed to add contact");
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('${context.translate('error_saving_changes')}: $e'), backgroundColor: Colors.red));
+      }
+    }
+  }
+
   // ── Modal: agregar contacto de emergencia ───────────────────
   void _showAddContactModal() {
     final modalNameCtrl = TextEditingController();
@@ -327,16 +359,12 @@ class _ProfileBodyState extends State<ProfileBody> {
                       child: ElevatedButton(
                         onPressed: () {
                           if (modalNameCtrl.text.trim().isEmpty) return;
-                          setState(() {
-                            _contacts.add(
-                              EmergencyContact(
-                                name: modalNameCtrl.text.trim(),
-                                relation: modalRelationCtrl.text.trim(),
-                                phone: modalPhoneCtrl.text.trim(),
-                              ),
-                            );
-                          });
-                          Navigator.pop(ctx);
+                          _addEmergencyContact(
+                            modalNameCtrl.text.trim(),
+                            modalRelationCtrl.text.trim(),
+                            modalPhoneCtrl.text.trim(),
+                            ctx
+                          );
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _primary,
@@ -361,9 +389,32 @@ class _ProfileBodyState extends State<ProfileBody> {
   }
 
   // ── Eliminar contacto ────────────────────────────────────────
-  void _deleteContact(int index) {
+  Future<void> _deleteContact(int index) async {
+    final contact = _contacts[index];
+    
+    if (contact.internalId != null && _patientId != null) {
+      try {
+        final token = AuthStore.token;
+        if (token == null) throw Exception("No token");
+
+        final res = await http.delete(
+          Uri.parse('${EnvironmentConfig.baseUrl}/profiles/$_patientId/emergency-contacts/${contact.internalId}'),
+          headers: {'Authorization': 'Bearer $token'},
+        ).timeout(const Duration(seconds: 5));
+
+        if (res.statusCode != 200 && res.statusCode != 204) {
+          throw Exception("Failed to delete contact");
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red));
+        }
+        return; // No lo eliminamos visualmente si falló
+      }
+    }
+
     setState(() {
-      _contacts[index].dispose();
+      contact.dispose();
       _contacts.removeAt(index);
     });
   }
