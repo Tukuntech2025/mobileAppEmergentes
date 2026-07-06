@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class StepAddress extends StatelessWidget {
   final VoidCallback onContinue;
@@ -26,9 +27,9 @@ class StepAddress extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Address',
-            style: TextStyle(
+          Text(
+            context.translate('address'),
+            style: const TextStyle(
               fontWeight: FontWeight.w600,
               fontSize: 13,
               color: Colors.black87,
@@ -38,7 +39,7 @@ class StepAddress extends StatelessWidget {
           TextField(
             controller: addressController,
             decoration: InputDecoration(
-              hintText: 'Enter your address',
+              hintText: context.translate('enter_address'),
               hintStyle: const TextStyle(color: Colors.black45, fontWeight: FontWeight.normal),
               filled: true,
               fillColor: Colors.white,
@@ -146,9 +147,9 @@ class StepAddress extends StatelessWidget {
               TextButton.icon(
                 onPressed: onBack,
                 icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 18),
-                label: const Text(
-                  'Back',
-                  style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 14),
+                label: Text(
+                  context.translate('back_btn'),
+                  style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 14),
                 ),
               ),
               Flexible(
@@ -165,16 +166,16 @@ class StepAddress extends StatelessWidget {
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       Flexible(
                         child: Text(
-                          'Continue',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                          context.translate('continue_btn'),
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Icon(Icons.check, size: 18),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.check, size: 18),
                     ],
                   ),
                 ),

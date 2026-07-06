@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:tukuntech/features/auth/presentation/pages/patient_create_account_page.dart';
 import 'package:tukuntech/features/auth/presentation/pages/caregiver_create_account_page.dart';
 import 'package:tukuntech/features/auth/presentation/pages/role_selection_page.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class PlanSelectionPage extends StatelessWidget {
   const PlanSelectionPage({super.key});
@@ -24,9 +25,9 @@ class PlanSelectionPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     // Title and Subtitle
-                    const Text(
-                      'Create your account',
-                      style: TextStyle(
+                    Text(
+                      context.translate('create_account_title'),
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF112A24),
@@ -34,9 +35,9 @@ class PlanSelectionPage extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Choose the plan that fits you. Accounts are created during checkout.',
-                      style: TextStyle(
+                    Text(
+                      context.translate('choose_plan_subtitle'),
+                      style: const TextStyle(
                         fontSize: 14,
                         color: Colors.black54,
                       ),
@@ -49,15 +50,20 @@ class PlanSelectionPage extends StatelessWidget {
                       icon: Icons.person_outline,
                       iconColor: Colors.blue,
                       iconBgColor: Colors.blue.shade50,
-                      title: 'Individual plan',
-                      subtitle: '1 patient + 1 caregiver · vital signs monitoring · web and mobile access',
+                      title: context.translate('individual_plan'),
+                      subtitle: context.translate('plan_desc_1_patient'),
                       initialPayment: '\$50',
                       monthlyPayment: '\$15/mo',
                       onTap: () {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const PatientCreateAccountPage(),
+                            builder: (context) => PatientCreateAccountPage(
+                              planTitle: context.translate('individual_plan'),
+                              planSubtitle: context.translate('plan_desc_1_patient'),
+                              initialPayment: '\$50',
+                              monthlyPayment: '\$15/mo',
+                            ),
                           ),
                         );
                       },
@@ -70,17 +76,17 @@ class PlanSelectionPage extends StatelessWidget {
                       icon: Icons.people_outline,
                       iconColor: primaryColor,
                       iconBgColor: primaryColor.withOpacity(0.1),
-                      title: 'Family plan 2',
-                      subtitle: '2 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+                      title: context.translate('family_plan_2'),
+                      subtitle: context.translate('plan_desc_2_patients'),
                       initialPayment: '\$95',
                       monthlyPayment: '\$28/mo',
                       onTap: () {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const CaregiverCreateAccountPage(
-                              planTitle: 'Family plan 2',
-                              planSubtitle: '2 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+                            builder: (context) => CaregiverCreateAccountPage(
+                              planTitle: context.translate('family_plan_2'),
+                              planSubtitle: context.translate('plan_desc_2_patients'),
                               initialPayment: '\$95',
                               monthlyPayment: '\$28/mo',
                             ),
@@ -96,17 +102,17 @@ class PlanSelectionPage extends StatelessWidget {
                       icon: Icons.people_outline,
                       iconColor: primaryColor,
                       iconBgColor: primaryColor.withOpacity(0.1),
-                      title: 'Family plan 3',
-                      subtitle: '3 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+                      title: context.translate('family_plan_3'),
+                      subtitle: context.translate('plan_desc_3_patients'),
                       initialPayment: '\$140',
                       monthlyPayment: '\$40/mo',
                       onTap: () {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const CaregiverCreateAccountPage(
-                              planTitle: 'Family plan 3',
-                              planSubtitle: '3 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+                            builder: (context) => CaregiverCreateAccountPage(
+                              planTitle: context.translate('family_plan_3'),
+                              planSubtitle: context.translate('plan_desc_3_patients'),
                               initialPayment: '\$140',
                               monthlyPayment: '\$40/mo',
                               isRecommended: true,
@@ -123,17 +129,17 @@ class PlanSelectionPage extends StatelessWidget {
                       icon: Icons.people_outline,
                       iconColor: primaryColor,
                       iconBgColor: primaryColor.withOpacity(0.1),
-                      title: 'Family plan 4',
-                      subtitle: '4 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+                      title: context.translate('family_plan_4'),
+                      subtitle: context.translate('plan_desc_4_patients'),
                       initialPayment: '\$180',
                       monthlyPayment: '\$52/mo',
                       onTap: () {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const CaregiverCreateAccountPage(
-                              planTitle: 'Family plan 4',
-                              planSubtitle: '4 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+                            builder: (context) => CaregiverCreateAccountPage(
+                              planTitle: context.translate('family_plan_4'),
+                              planSubtitle: context.translate('plan_desc_4_patients'),
                               initialPayment: '\$180',
                               monthlyPayment: '\$52/mo',
                             ),
@@ -149,17 +155,17 @@ class PlanSelectionPage extends StatelessWidget {
                       icon: Icons.people_outline,
                       iconColor: primaryColor,
                       iconBgColor: primaryColor.withOpacity(0.1),
-                      title: 'Family plan 5',
-                      subtitle: '5 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+                      title: context.translate('family_plan_5'),
+                      subtitle: context.translate('plan_desc_5_patients'),
                       initialPayment: '\$215',
                       monthlyPayment: '\$62/mo',
                       onTap: () {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const CaregiverCreateAccountPage(
-                              planTitle: 'Family plan 5',
-                              planSubtitle: '5 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+                            builder: (context) => CaregiverCreateAccountPage(
+                              planTitle: context.translate('family_plan_5'),
+                              planSubtitle: context.translate('plan_desc_5_patients'),
                               initialPayment: '\$215',
                               monthlyPayment: '\$62/mo',
                             ),
@@ -173,9 +179,9 @@ class PlanSelectionPage extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
-                          'Already have an account?',
-                          style: TextStyle(color: Colors.black54, fontSize: 14),
+                        Text(
+                          context.translate('already_have_account'),
+                          style: const TextStyle(color: Colors.black54, fontSize: 14),
                         ),
                         const SizedBox(width: 4),
                         TextButton(
@@ -191,9 +197,9 @@ class PlanSelectionPage extends StatelessWidget {
                             minimumSize: Size.zero,
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
-                          child: const Text(
-                            'Sign in',
-                            style: TextStyle(
+                          child: Text(
+                            context.translate('sign_in'),
+                            style: const TextStyle(
                               color: primaryColor,
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
@@ -277,7 +283,7 @@ class PlanSelectionPage extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  'Initial payment: $initialPayment',
+                  '${context.translate('initial_payment_label')} $initialPayment',
                   style: TextStyle(
                     fontSize: 10,
                     color: Colors.grey.shade600,
@@ -285,7 +291,7 @@ class PlanSelectionPage extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Monthly: $monthlyPayment',
+                  '${context.translate('monthly_label')} $monthlyPayment',
                   style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.bold,

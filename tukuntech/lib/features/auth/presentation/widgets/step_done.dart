@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tukuntech/features/auth/presentation/pages/create_account_page.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class StepDone extends StatelessWidget {
   final PlanType planType;
@@ -35,15 +36,15 @@ class StepDone extends StatelessWidget {
           ),
           const SizedBox(height: 24),
           Text(
-            planType == PlanType.personal ? 'Account created' : 'Family Pro account created',
+            planType == PlanType.personal ? context.translate('account_created') : context.translate('family_account_created'),
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.black87),
           ),
           const SizedBox(height: 12),
           Text(
             planType == PlanType.personal
-                ? 'Your patient account has been created successfully.'
-                : 'Your caregiver account and patients were registered successfully.',
+                ? context.translate('patient_account_success')
+                : context.translate('family_account_success'),
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 14, color: Colors.black54),
           ),
@@ -60,7 +61,7 @@ class StepDone extends StatelessWidget {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: const Text('Go to website', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                child: Text(context.translate('go_to_website'), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
               ),
             ),
           ),

@@ -21,6 +21,49 @@ class AppLocalizations {
       'role_patient_caregiver_sub': 'Sign in with your email. The system will recognize your access automatically.',
       'lang_en': 'English',
       'lang_es': 'Spanish',
+      'accept_terms': 'I accept the terms and conditions',
+      
+      // Onboarding / Plan Selection
+      'create_account_title': 'Create your account',
+      'choose_plan_subtitle': 'Choose the plan that fits you. Accounts are created during checkout.',
+      'individual_plan': 'Individual plan',
+      'plan_desc_1_patient': '1 patient + 1 caregiver · vital signs monitoring · web and mobile access',
+      'family_plan_2': 'Family plan 2',
+      'plan_desc_2_patients': '2 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+      'family_plan_3': 'Family plan 3',
+      'plan_desc_3_patients': '3 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+      'family_plan_4': 'Family plan 4',
+      'plan_desc_4_patients': '4 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+      'family_plan_5': 'Family plan 5',
+      'plan_desc_5_patients': '5 patients + 1 caregiver · vital signs monitoring · web and mobile access',
+      'initial_payment_label': 'Initial payment:',
+      'monthly_label': 'Monthly:',
+      'already_have_account': 'Already have an account?',
+      'recommended': 'RECOMMENDED',
+      
+      // Account Creation
+      'create_tukuntech_account': 'Create your TukunTech account',
+      'register_caregiver_first': 'Register the caregiver first, then the patients included in your plan.',
+      'create_patient_account': 'Create your patient account',
+      'subscribe_activate': 'Subscribe to activate your TukunTech.',
+      'continue_btn': 'Continue',
+      'choose_different_plan': '← Choose a different plan',
+      
+      // Stepper
+      'step_plan': 'Plan',
+      'step_account': 'Account',
+      'step_personal': 'Personal',
+      'step_address': 'Address',
+      'step_delivery': 'Delivery',
+      'step_payment_title': 'Payment',
+      'step_done': 'Done',
+      
+      // Payment Step
+      'payment_redirect_msg': 'You will be redirected to the secure Stripe payment gateway to complete your subscription.',
+      'one_time_payment': 'One-time payment',
+      'simulate_payment': 'Simulate payment',
+      'back_btn': 'Back',
+
       
       // Auth / Login
       'sign_in': 'Sign in',
@@ -64,6 +107,64 @@ class AppLocalizations {
       'send': 'Send',
       'history_tickets': 'History tickets',
       'no_tickets': 'No tickets submitted yet.',
+      'done': 'Done',
+      
+      // Step Widgets
+      'caregiver_email': 'Caregiver email',
+      'caregiver_password': 'Caregiver password',
+      'confirm_caregiver_password': 'Confirm caregiver password',
+      
+      'register_patients_part_1': 'Register the ',
+      'register_patients_part_2_singular': ' patient included in this plan.',
+      'register_patients_part_2_plural': ' patients included in this plan.',
+      'patient_prefix': 'Patient ',
+      
+      'patient_account': 'Patient account',
+      'patient_account_desc': 'Each patient will have their own independent access.',
+      'patient_email': 'Patient email',
+      'enter_patient_email': 'Enter patient email',
+      'patient_password': 'Patient password',
+      'confirm_patient_password': 'Confirm patient password',
+      'dni': 'DNI',
+      'eight_digits': '8 digits',
+      'enter_full_name': 'Enter your full name',
+      'enter_age': 'Enter your age',
+      'select_gender': 'Select gender',
+      'select_blood_type': 'Select blood type',
+      'additional_notes': 'Additional notes',
+      'additional_notes_hint': 'Allergies, conditions, anything we should know...',
+      
+      'medical_parameters': 'Medical parameters',
+      'medical_parameters_desc': 'Set the personalized monitoring ranges for this patient.',
+      'min_heart_rate': 'Minimum heart rate',
+      'max_heart_rate': 'Maximum heart rate',
+      'min_o2_sat': 'Minimum oxygen saturation',
+      'max_o2_sat': 'Maximum oxygen saturation',
+      'min_temp': 'Minimum temperature',
+      'max_temp': 'Maximum temperature',
+      'parameters_info': 'These values belong to the patient and will be used to evaluate readings and alerts. Patients and caregivers cannot edit them.',
+      
+      'previous_patient': 'Previous patient',
+      'next_patient': 'Next patient',
+      
+      'enter_address': 'Enter your address',
+      
+      'phone_number': 'Phone number',
+      'enter_phone': 'Add your phone number',
+      'delivery_instructions': 'Delivery instructions',
+      'delivery_instructions_hint': 'Add additional delivery instructions',
+      
+      'account_created': 'Account created',
+      'family_account_created': 'Family Pro account created',
+      'patient_account_success': 'Your patient account has been created successfully.',
+      'family_account_success': 'Your caregiver account and patients were registered successfully.',
+      'go_to_website': 'Go to website',
+      
+      'male': 'Male',
+      'female': 'Female',
+      'other': 'Other',
+      'prefer_not_to_say': 'Prefer not to say',
+
       'date': 'Date',
       'status': 'Status',
       'emergency_disclaimer': 'In case of an emergency, Tukuntech will call the emergency numbers. ',
@@ -200,6 +301,100 @@ class AppLocalizations {
       'role_patient_caregiver_sub': 'Inicia sesión con tu correo. El sistema reconocerá tu acceso automáticamente.',
       'lang_en': 'Inglés',
       'lang_es': 'Español',
+      'accept_terms': 'Acepto los términos y condiciones',
+      
+      // Onboarding / Plan Selection
+      'create_account_title': 'Crea tu cuenta',
+      'choose_plan_subtitle': 'Elige el plan que se adapte a ti. Las cuentas se crean durante el pago.',
+      'individual_plan': 'Plan individual',
+      'plan_desc_1_patient': '1 paciente + 1 cuidador · monitoreo de signos vitales · acceso web y móvil',
+      'family_plan_2': 'Plan familiar 2',
+      'plan_desc_2_patients': '2 pacientes + 1 cuidador · monitoreo de signos vitales · acceso web y móvil',
+      'family_plan_3': 'Plan familiar 3',
+      'plan_desc_3_patients': '3 pacientes + 1 cuidador · monitoreo de signos vitales · acceso web y móvil',
+      'family_plan_4': 'Plan familiar 4',
+      'plan_desc_4_patients': '4 pacientes + 1 cuidador · monitoreo de signos vitales · acceso web y móvil',
+      'family_plan_5': 'Plan familiar 5',
+      'plan_desc_5_patients': '5 pacientes + 1 cuidador · monitoreo de signos vitales · acceso web y móvil',
+      'initial_payment_label': 'Pago inicial:',
+      'monthly_label': 'Mensual:',
+      'already_have_account': '¿Ya tienes una cuenta?',
+      'recommended': 'RECOMENDADO',
+      
+      // Account Creation
+      'create_tukuntech_account': 'Crea tu cuenta TukunTech',
+      'register_caregiver_first': 'Registra al cuidador primero, luego a los pacientes incluidos en tu plan.',
+      'create_patient_account': 'Crea tu cuenta de paciente',
+      'subscribe_activate': 'Suscríbete para activar tu TukunTech.',
+      'continue_btn': 'Continuar',
+      'choose_different_plan': '← Elegir un plan diferente',
+      
+      // Stepper
+      'step_plan': 'Plan',
+      'step_account': 'Cuenta',
+      'step_personal': 'Personal',
+      'step_address': 'Dirección',
+      'step_delivery': 'Envío',
+      'step_payment_title': 'Pago',
+      'step_done': 'Hecho',
+      
+      // Payment Step
+      'payment_redirect_msg': 'Serás redirigido a la pasarela de pago segura de Stripe para completar tu suscripción.',
+      'one_time_payment': 'Pago único',
+      'simulate_payment': 'Simular pago',
+      'back_btn': 'Volver',
+
+      // Step Widgets
+      'caregiver_email': 'Correo del cuidador',
+      'caregiver_password': 'Contraseña del cuidador',
+      'confirm_caregiver_password': 'Confirmar contraseña',
+      
+      'register_patients_part_1': 'Registra a los ',
+      'register_patients_part_2_singular': ' paciente incluido en este plan.',
+      'register_patients_part_2_plural': ' pacientes incluidos en este plan.',
+      'patient_prefix': 'Paciente ',
+      
+      'patient_account': 'Cuenta del paciente',
+      'patient_account_desc': 'Cada paciente tendrá su propio acceso independiente.',
+      'patient_email': 'Correo del paciente',
+      'enter_patient_email': 'Ingresa el correo del paciente',
+      'patient_password': 'Contraseña del paciente',
+      'confirm_patient_password': 'Confirmar contraseña',
+      'dni': 'DNI',
+      'eight_digits': '8 dígitos',
+      'enter_full_name': 'Ingresa tu nombre completo',
+      'enter_age': 'Ingresa tu edad',
+      'select_gender': 'Selecciona género',
+      'select_blood_type': 'Selecciona grupo sanguíneo',
+      'additional_notes': 'Notas adicionales',
+      'additional_notes_hint': 'Alergias, condiciones, cualquier cosa que debamos saber...',
+      
+      'medical_parameters': 'Parámetros médicos',
+      'medical_parameters_desc': 'Establece los rangos de monitoreo personalizados para este paciente.',
+      'min_heart_rate': 'Frecuencia cardíaca mínima',
+      'max_heart_rate': 'Frecuencia cardíaca máxima',
+      'min_o2_sat': 'Saturación de oxígeno mínima',
+      'max_o2_sat': 'Saturación de oxígeno máxima',
+      'min_temp': 'Temperatura mínima',
+      'max_temp': 'Temperatura máxima',
+      'parameters_info': 'Estos valores pertenecen al paciente y se usarán para evaluar lecturas y alertas. Ni pacientes ni cuidadores pueden editarlos.',
+      
+      'previous_patient': 'Paciente anterior',
+      'next_patient': 'Siguiente paciente',
+      
+      'enter_address': 'Ingresa tu dirección',
+      
+      'phone_number': 'Número de teléfono',
+      'enter_phone': 'Agrega tu número de teléfono',
+      'delivery_instructions': 'Instrucciones de envío',
+      'delivery_instructions_hint': 'Agrega instrucciones adicionales de envío',
+      
+      'account_created': 'Cuenta creada',
+      'family_account_created': 'Cuenta Family Pro creada',
+      'patient_account_success': 'Tu cuenta de paciente ha sido creada exitosamente.',
+      'family_account_success': 'Tu cuenta de cuidador y pacientes fueron registrados exitosamente.',
+      'go_to_website': 'Ir al sitio web',
+
       
       // Auth / Login
       'sign_in': 'Iniciar sesión',

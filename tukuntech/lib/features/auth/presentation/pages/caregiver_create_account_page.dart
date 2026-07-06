@@ -10,6 +10,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:tukuntech/core/environment_config.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 
 class CaregiverCreateAccountPage extends StatefulWidget {
@@ -35,8 +36,8 @@ class CaregiverCreateAccountPage extends StatefulWidget {
 class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage> {
   int _currentStep = 0;
   final int _totalSteps = 7;
-  final List<String> _stepNames = const [
-    'Plan', 'Account', 'Personal', 'Address', 'Delivery', 'Payment', 'Done'
+  List<String> get _stepNames => [
+    'step_plan', 'step_account', 'step_personal', 'step_address', 'step_delivery', 'step_payment_title', 'step_done'
   ];
 
   final _dummyEmail = TextEditingController();
@@ -44,6 +45,7 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
   final _dummyAddress = TextEditingController();
   late final List<PatientData> _patients;
   bool _isRegistering = false;
+  bool _acceptedTerms = false;
 
   @override
   void initState() {
@@ -82,6 +84,7 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
           'caregiverEmail': _dummyEmail.text.trim(),
           'caregiverPassword': _dummyPassword.text,
           'plan': 'FAMILY',
+          'acceptedTermsAndConditions': _acceptedTerms,
           'patients': activePatients.map((patient) {
             String apiGender = 'OTHER';
             if (patient.gender == 'Male') apiGender = 'MALE';
@@ -234,18 +237,18 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                     ],
                   ),
                   const SizedBox(height: 24),
-                  const Text(
-                    'Create your TukunTech account',
-                    style: TextStyle(
+                  Text(
+                    context.translate('create_tukuntech_account'),
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF112A24),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Register the caregiver first, then the patients included in your plan.',
-                    style: TextStyle(
+                  Text(
+                    context.translate('register_caregiver_first'),
+                    style: const TextStyle(
                       fontSize: 14,
                       color: Colors.black54,
                     ),
@@ -279,6 +282,8 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                     onContinue: _nextStep, 
                     onBack: _previousStep,
                     isRegistering: _isRegistering,
+                    acceptedTerms: _acceptedTerms,
+                    onAcceptedTermsChanged: (val) => setState(() => _acceptedTerms = val),
                   )
                   else if (_currentStep == 6) StepSuccess(onGoToWebsite: () => Navigator.of(context).popUntil((route) => route.isFirst))
                   else Center(child: Text('Step ${_currentStep + 1} Content', style: const TextStyle(fontSize: 18))),
@@ -300,12 +305,12 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                           ),
                           elevation: 0,
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Text('Continue', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                            SizedBox(width: 6),
-                            Icon(Icons.check, size: 18),
+                            Text(context.translate('continue_btn'), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                            const SizedBox(width: 6),
+                            const Icon(Icons.check, size: 18),
                           ],
                         ),
                       ),
@@ -320,7 +325,7 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                           );
                         },
                         style: TextButton.styleFrom(foregroundColor: Colors.black54),
-                        child: const Text('← Choose a different plan', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13)),
+                        child: Text(context.translate('choose_different_plan'), style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 13)),
                       ),
                     ),
                   ],
@@ -345,7 +350,7 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                 scrollDirection: Axis.horizontal,
                 child: Row(
                   children: List.generate(_stepNames.length, (index) {
-                    return _buildStep(index + 1, _stepNames[index], isActive: index == _currentStep, isCompleted: index < _currentStep, primaryColor: primaryColor);
+                    return _buildStep(index + 1, context.translate(_stepNames[index]), isActive: index == _currentStep, isCompleted: index < _currentStep, primaryColor: primaryColor);
                   }),
                 ),
               ),
@@ -456,12 +461,14 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      widget.planTitle,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF112A24),
+                    Flexible(
+                      child: Text(
+                        widget.planTitle,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF112A24),
+                        ),
                       ),
                     ),
                     if (widget.isRecommended) ...[
@@ -472,9 +479,9 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                           color: primaryColor,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Text(
-                          'RECOMMENDED',
-                          style: TextStyle(
+                        child: Text(
+                          context.translate('recommended'),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 9,
                             fontWeight: FontWeight.bold,
@@ -503,7 +510,7 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Initial payment: ${widget.initialPayment}',
+                '${context.translate('initial_payment_label')} ${widget.initialPayment}',
                 style: const TextStyle(
                   fontSize: 10,
                   color: Colors.black54,
@@ -511,7 +518,7 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
               ),
               const SizedBox(height: 2),
               Text(
-                'Monthly: ${widget.monthlyPayment}',
+                '${context.translate('monthly_label')} ${widget.monthlyPayment}',
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,

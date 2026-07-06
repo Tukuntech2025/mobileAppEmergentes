@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class StepAccount extends StatefulWidget {
   final VoidCallback onContinue;
@@ -36,15 +37,15 @@ class _StepAccountState extends State<StepAccount> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildLabel('Caregiver email'),
+          _buildLabel(context.translate('caregiver_email')),
           const SizedBox(height: 2),
           _buildTextField('you@example.com', controller: widget.emailController),
           const SizedBox(height: 20),
-          _buildLabel('Caregiver password'),
+          _buildLabel(context.translate('caregiver_password')),
           const SizedBox(height: 2),
           _buildPasswordField('••••••••', obscureText: _obscurePassword, controller: widget.passwordController, onToggle: () => setState(() => _obscurePassword = !_obscurePassword)),
           const SizedBox(height: 20),
-          _buildLabel('Confirm caregiver password'),
+          _buildLabel(context.translate('confirm_caregiver_password')),
           const SizedBox(height: 2),
           _buildPasswordField('••••••••', obscureText: _obscureConfirmPassword, onToggle: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword)), // mock confirm
           const SizedBox(height: 8),
@@ -54,9 +55,9 @@ class _StepAccountState extends State<StepAccount> {
               TextButton.icon(
                 onPressed: widget.onBack,
                 icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 18),
-                label: const Text(
-                  'Back',
-                  style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 14),
+                label: Text(
+                  context.translate('back_btn'),
+                  style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 14),
                 ),
               ),
               Flexible(
@@ -73,16 +74,16 @@ class _StepAccountState extends State<StepAccount> {
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       Flexible(
                         child: Text(
-                          'Continue',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                          context.translate('continue_btn'),
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Icon(Icons.check, size: 18),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.check, size: 18),
                     ],
                   ),
                 ),

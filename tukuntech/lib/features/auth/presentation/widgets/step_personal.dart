@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class StepPersonal extends StatefulWidget {
   final VoidCallback onContinue;
@@ -70,13 +71,13 @@ class _StepPersonalState extends State<StepPersonal> {
             border: Border.all(color: Colors.grey.shade200),
           ),
           child: Row(
-            children: const [
-              Icon(Icons.people_outline, color: primaryColor, size: 16),
+            children: [
+              const Icon(Icons.people_outline, color: primaryColor, size: 16),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
-                  'Register the 1 patient included in this plan.',
-                  style: TextStyle(color: Colors.black54, fontSize: 12),
+                  '${context.translate('register_patients_part_1')}1${context.translate('register_patients_part_2_singular')}',
+                  style: const TextStyle(color: Colors.black54, fontSize: 12),
                 ),
               ),
             ],
@@ -90,7 +91,7 @@ class _StepPersonalState extends State<StepPersonal> {
           child: Row(
             children: [
               ChoiceChip(
-                label: const Text('Patient 1', style: TextStyle(fontSize: 12)),
+                label: Text('${context.translate('patient_prefix')}1', style: const TextStyle(fontSize: 12)),
                 selected: true,
                 onSelected: (_) {},
                 selectedColor: primaryColor,
@@ -131,13 +132,13 @@ class _StepPersonalState extends State<StepPersonal> {
                     child: const Icon(Icons.assignment_ind_outlined, color: Colors.blue, size: 20),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Patient account',
-                          style: TextStyle(
+                          context.translate('patient_account'),
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -145,8 +146,8 @@ class _StepPersonalState extends State<StepPersonal> {
                         ),
                         SizedBox(height: 2),
                         Text(
-                          'Each patient will have their own independent access.',
-                          style: TextStyle(fontSize: 12, color: Colors.black54),
+                          context.translate('patient_account_desc'),
+                          style: const TextStyle(fontSize: 12, color: Colors.black54),
                         ),
                       ],
                     ),
@@ -155,9 +156,9 @@ class _StepPersonalState extends State<StepPersonal> {
               ),
               const SizedBox(height: 16),
 
-              _buildLabel('Patient email'),
+              _buildLabel(context.translate('patient_email')),
               const SizedBox(height: 4),
-              _buildTextField('Enter patient email', keyboardType: TextInputType.emailAddress, controller: widget.patientEmailController),
+              _buildTextField(context.translate('enter_patient_email'), keyboardType: TextInputType.emailAddress, controller: widget.patientEmailController),
               const SizedBox(height: 12),
 
               Row(
@@ -166,7 +167,7 @@ class _StepPersonalState extends State<StepPersonal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('Patient password'),
+                        _buildLabel(context.translate('patient_password')),
                         const SizedBox(height: 4),
                         _buildPasswordField('••••••••', obscureText: _obscurePassword, controller: widget.patientPasswordController, onToggle: () => setState(() => _obscurePassword = !_obscurePassword)),
                       ],
@@ -177,7 +178,7 @@ class _StepPersonalState extends State<StepPersonal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('Confirm patient password'),
+                        _buildLabel(context.translate('confirm_patient_password')),
                         const SizedBox(height: 4),
                         _buildPasswordField('••••••••', obscureText: _obscureConfirmPassword, controller: widget.patientConfirmPasswordController, onToggle: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword)),
                       ],
@@ -187,17 +188,17 @@ class _StepPersonalState extends State<StepPersonal> {
               ),
               const SizedBox(height: 12),
 
-              _buildLabel('DNI'),
+              _buildLabel(context.translate('dni')),
               const SizedBox(height: 4),
-              _buildTextField('8 digits', keyboardType: TextInputType.number, controller: widget.dniController, maxLength: 8),
+              _buildTextField(context.translate('eight_digits'), keyboardType: TextInputType.number, controller: widget.dniController, maxLength: 8),
               const SizedBox(height: 16),
 
               const Divider(color: Color(0xFFEEEEEE)),
               const SizedBox(height: 16),
 
-              _buildLabel('Full name'),
+              _buildLabel(context.translate('full_name')),
               const SizedBox(height: 4),
-              _buildTextField('Enter your full name', controller: widget.fullNameController),
+              _buildTextField(context.translate('enter_full_name'), controller: widget.fullNameController),
               const SizedBox(height: 12),
 
               Row(
@@ -206,9 +207,9 @@ class _StepPersonalState extends State<StepPersonal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('Age'),
+                        _buildLabel(context.translate('age')),
                         const SizedBox(height: 4),
-                        _buildTextField('Enter your age', keyboardType: TextInputType.number, controller: widget.ageController),
+                        _buildTextField(context.translate('enter_age'), keyboardType: TextInputType.number, controller: widget.ageController),
                       ],
                     ),
                   ),
@@ -217,7 +218,7 @@ class _StepPersonalState extends State<StepPersonal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('Gender'),
+                        _buildLabel(context.translate('gender')),
                         const SizedBox(height: 4),
                         _buildDropdown(widget.gender, ['Select gender', 'MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY'], widget.onGenderChanged),
                       ],
@@ -227,15 +228,15 @@ class _StepPersonalState extends State<StepPersonal> {
               ),
               const SizedBox(height: 12),
 
-              _buildLabel('Blood type'),
+              _buildLabel(context.translate('blood_type')),
               const SizedBox(height: 4),
               _buildDropdown(widget.bloodType, ['Select blood type', 'A_POSITIVE', 'A_NEGATIVE', 'B_POSITIVE', 'B_NEGATIVE', 'AB_POSITIVE', 'AB_NEGATIVE', 'O_POSITIVE', 'O_NEGATIVE', 'UNKNOWN'], widget.onBloodTypeChanged),
               const SizedBox(height: 12),
 
-              _buildLabel('Additional notes'),
+              _buildLabel(context.translate('additional_notes')),
               const SizedBox(height: 4),
               _buildTextField(
-                'Allergies, conditions, anything we should know...',
+                context.translate('additional_notes_hint'),
                 maxLines: 3,
                 controller: widget.notesController,
               ),
@@ -255,13 +256,13 @@ class _StepPersonalState extends State<StepPersonal> {
                     child: const Icon(Icons.monitor_heart_outlined, color: primaryColor, size: 20),
                   ),
                   const SizedBox(width: 12),
-                  const Expanded(
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Medical parameters',
-                          style: TextStyle(
+                          context.translate('medical_parameters'),
+                          style: const TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
@@ -269,8 +270,8 @@ class _StepPersonalState extends State<StepPersonal> {
                         ),
                         SizedBox(height: 2),
                         Text(
-                          'Set the personalized monitoring ranges for this patient.',
-                          style: TextStyle(fontSize: 12, color: Colors.black54),
+                          context.translate('medical_parameters_desc'),
+                          style: const TextStyle(fontSize: 12, color: Colors.black54),
                         ),
                       ],
                     ),
@@ -285,7 +286,7 @@ class _StepPersonalState extends State<StepPersonal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('Minimum heart rate'),
+                        _buildLabel(context.translate('min_heart_rate')),
                         const SizedBox(height: 4),
                         _buildSuffixTextField('bpm', keyboardType: TextInputType.number, controller: widget.minHrController),
                       ],
@@ -296,7 +297,7 @@ class _StepPersonalState extends State<StepPersonal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('Maximum heart rate'),
+                        _buildLabel(context.translate('max_heart_rate')),
                         const SizedBox(height: 4),
                         _buildSuffixTextField('bpm', keyboardType: TextInputType.number, controller: widget.maxHrController),
                       ],
@@ -312,7 +313,7 @@ class _StepPersonalState extends State<StepPersonal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('Minimum oxygen saturation'),
+                        _buildLabel(context.translate('min_o2_sat')),
                         const SizedBox(height: 4),
                         _buildSuffixTextField('%', keyboardType: TextInputType.number, controller: widget.minO2Controller),
                       ],
@@ -323,7 +324,7 @@ class _StepPersonalState extends State<StepPersonal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('Maximum oxygen saturation'),
+                        _buildLabel(context.translate('max_o2_sat')),
                         const SizedBox(height: 4),
                         _buildSuffixTextField('%', keyboardType: TextInputType.number, controller: widget.maxO2Controller),
                       ],
@@ -339,7 +340,7 @@ class _StepPersonalState extends State<StepPersonal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('Minimum temperature'),
+                        _buildLabel(context.translate('min_temp')),
                         const SizedBox(height: 4),
                         _buildSuffixTextField('°C', keyboardType: TextInputType.number, controller: widget.minTempController),
                       ],
@@ -350,7 +351,7 @@ class _StepPersonalState extends State<StepPersonal> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildLabel('Maximum temperature'),
+                        _buildLabel(context.translate('max_temp')),
                         const SizedBox(height: 4),
                         _buildSuffixTextField('°C', keyboardType: TextInputType.number, controller: widget.maxTempController),
                       ],
@@ -373,7 +374,7 @@ class _StepPersonalState extends State<StepPersonal> {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'These values belong to the patient and will be used to evaluate readings and alerts. Patients and caregivers cannot edit them.',
+                        context.translate('parameters_info'),
                         style: TextStyle(fontSize: 11, color: Colors.grey.shade700),
                       ),
                     ),
@@ -390,9 +391,9 @@ class _StepPersonalState extends State<StepPersonal> {
             TextButton.icon(
               onPressed: widget.onBack,
               icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 18),
-              label: const Text(
-                'Back',
-                style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 16),
+              label: Text(
+                context.translate('back_btn'),
+                style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 16),
               ),
             ),
             ElevatedButton(
@@ -408,10 +409,10 @@ class _StepPersonalState extends State<StepPersonal> {
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
-                children: const [
-                  Text('Continue', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                  SizedBox(width: 6),
-                  Icon(Icons.check, size: 18),
+                children: [
+                  Text(context.translate('continue_btn'), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.check, size: 18),
                 ],
               ),
             ),
@@ -464,12 +465,12 @@ class _StepPersonalState extends State<StepPersonal> {
 
   Widget _buildDropdown(String value, List<String> items, ValueChanged<String?> onChanged) {
     final Map<String, String> displayNameMap = {
-      'Select gender': 'Select gender',
-      'MALE': 'Male',
-      'FEMALE': 'Female',
-      'OTHER': 'Other',
-      'PREFER_NOT_TO_SAY': 'Prefer not to say',
-      'Select blood type': 'Select blood type',
+      'Select gender': context.translate('select_gender'),
+      'MALE': context.translate('male'),
+      'FEMALE': context.translate('female'),
+      'OTHER': context.translate('other'),
+      'PREFER_NOT_TO_SAY': context.translate('prefer_not_to_say'),
+      'Select blood type': context.translate('select_blood_type'),
       'A_POSITIVE': 'A+',
       'A_NEGATIVE': 'A-',
       'B_POSITIVE': 'B+',

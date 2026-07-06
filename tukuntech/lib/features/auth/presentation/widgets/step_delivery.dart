@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class StepDelivery extends StatelessWidget {
   final VoidCallback onContinue;
@@ -24,15 +25,15 @@ class StepDelivery extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          const Text(
-            'Phone number',
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87),
+          Text(
+            context.translate('phone_number'),
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87),
           ),
           const SizedBox(height: 4),
           TextField(
             keyboardType: TextInputType.phone,
             decoration: InputDecoration(
-              hintText: 'Add your phone number',
+              hintText: context.translate('enter_phone'),
               hintStyle: const TextStyle(color: Colors.black45, fontWeight: FontWeight.normal),
               filled: true,
               fillColor: Colors.white,
@@ -53,15 +54,15 @@ class StepDelivery extends StatelessWidget {
             style: const TextStyle(fontSize: 13),
           ),
           const SizedBox(height: 12),
-          const Text(
-            'Delivery instructions',
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87),
+          Text(
+            context.translate('delivery_instructions'),
+            style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: Colors.black87),
           ),
           const SizedBox(height: 4),
           TextField(
             maxLines: 2,
             decoration: InputDecoration(
-              hintText: 'Add additional delivery instructions',
+              hintText: context.translate('delivery_instructions_hint'),
               hintStyle: const TextStyle(color: Colors.black45, fontWeight: FontWeight.normal),
               filled: true,
               fillColor: Colors.white,
@@ -88,9 +89,9 @@ class StepDelivery extends StatelessWidget {
               TextButton.icon(
                 onPressed: onBack,
                 icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 18),
-                label: const Text(
-                  'Back',
-                  style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 14),
+                label: Text(
+                  context.translate('back_btn'),
+                  style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 14),
                 ),
               ),
               Flexible(
@@ -107,16 +108,16 @@ class StepDelivery extends StatelessWidget {
                   ),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
-                    children: const [
+                    children: [
                       Flexible(
                         child: Text(
-                          'Continue',
-                          style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                          context.translate('continue_btn'),
+                          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      SizedBox(width: 8),
-                      Icon(Icons.check, size: 18),
+                      const SizedBox(width: 8),
+                      const Icon(Icons.check, size: 18),
                     ],
                   ),
                 ),

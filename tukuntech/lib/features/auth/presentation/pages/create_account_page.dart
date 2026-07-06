@@ -34,6 +34,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   final _dummyNotes = TextEditingController();
   final _dummyAddress = TextEditingController();
   final List<PatientData> _dummyPatients = List.generate(5, (_) => PatientData());
+  bool _acceptedTerms = false;
 
   @override
   void dispose() {
@@ -224,6 +225,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
           onContinue: _nextStep, 
           onBack: _previousStep,
           isRegistering: false,
+          acceptedTerms: _acceptedTerms,
+          onAcceptedTermsChanged: (val) => setState(() => _acceptedTerms = val),
         );
       case 6:
         return StepDone(planType: widget.planType);

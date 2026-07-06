@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class StepPayment extends StatelessWidget {
   final String planTitle;
@@ -7,6 +8,8 @@ class StepPayment extends StatelessWidget {
   final VoidCallback onContinue;
   final VoidCallback onBack;
   final bool isRegistering;
+  final bool acceptedTerms;
+  final ValueChanged<bool> onAcceptedTermsChanged;
 
   const StepPayment({
     super.key,
@@ -16,6 +19,8 @@ class StepPayment extends StatelessWidget {
     required this.onContinue,
     required this.onBack,
     required this.isRegistering,
+    required this.acceptedTerms,
+    required this.onAcceptedTermsChanged,
   });
 
   @override
@@ -50,20 +55,20 @@ class StepPayment extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 16),
-              const Text(
-                'Payment',
+              Text(
+                context.translate('step_payment_title'),
                 textAlign: TextAlign.center,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
-                'You will be redirected to the secure Stripe payment gateway to complete your subscription.',
+              Text(
+                context.translate('payment_redirect_msg'),
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.black54),
+                style: const TextStyle(fontSize: 14, color: Colors.black54),
               ),
               const SizedBox(height: 32),
               Container(
@@ -76,9 +81,9 @@ class StepPayment extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text(
-                      'One-time payment',
-                      style: TextStyle(fontWeight: FontWeight.w400, fontSize: 14, color: Colors.black54),
+                    Text(
+                      context.translate('one_time_payment'),
+                      style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 14, color: Colors.black54),
                     ),
                     Text(
                       initialPayment,
@@ -110,8 +115,44 @@ class StepPayment extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 24),
+              InkWell(
+                onTap: () => onAcceptedTermsChanged(!acceptedTerms),
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        height: 24,
+                        width: 24,
+                        child: Checkbox(
+                          value: acceptedTerms,
+                          onChanged: (val) => onAcceptedTermsChanged(val ?? false),
+                          activeColor: primaryColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          context.translate('accept_terms'),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Colors.black87,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
               ElevatedButton(
-                onPressed: isRegistering ? null : onContinue,
+                onPressed: (isRegistering || !acceptedTerms) ? null : onContinue,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: primaryColor,
                   foregroundColor: Colors.white,
@@ -128,7 +169,7 @@ class StepPayment extends StatelessWidget {
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
-                    : const Text('Simulate payment', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                    : Text(context.translate('simulate_payment'), style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
               ),
             ],
           ),
@@ -139,9 +180,9 @@ class StepPayment extends StatelessWidget {
           child: TextButton.icon(
             onPressed: onBack,
             icon: const Icon(Icons.arrow_back, color: Colors.black87, size: 18),
-            label: const Text(
-              'Back',
-              style: TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 16),
+            label: Text(
+              context.translate('back_btn'),
+              style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.w600, fontSize: 16),
             ),
           ),
         ),

@@ -12,6 +12,8 @@ import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
 import 'package:url_launcher/url_launcher.dart';
 import 'package:tukuntech/core/environment_config.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
+
 
 class PatientCreateAccountPage extends StatefulWidget {
   final String planTitle;
@@ -36,8 +38,8 @@ class PatientCreateAccountPage extends StatefulWidget {
 class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
   int _currentStep = 0;
   int get _totalSteps => 7;
-  List<String> get _stepNames => const [
-    'Plan', 'Account', 'Personal', 'Address', 'Delivery', 'Payment', 'Done'
+  List<String> get _stepNames => [
+    'step_plan', 'step_account', 'step_personal', 'step_address', 'step_delivery', 'step_payment_title', 'step_done'
   ];
 
   final _emailController = TextEditingController();
@@ -63,6 +65,7 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
   String _bloodType = 'Select blood type';
 
   bool _isRegistering = false;
+  bool _acceptedTerms = false;
 
   final String _baseUrl = EnvironmentConfig.baseUrl;
 
@@ -101,6 +104,7 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
           'caregiverEmail': _emailController.text.trim(),
           'caregiverPassword': _passwordController.text,
           'plan': 'INDIVIDUAL',
+          'acceptedTermsAndConditions': _acceptedTerms,
           'patients': [
             {
               'email': _patientEmailController.text.trim(),
@@ -236,18 +240,18 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                     ],
                   ),
                   const SizedBox(height: 24),
-                  const Text(
-                    'Create your TukunTech account',
-                    style: TextStyle(
+                  Text(
+                    context.translate('create_tukuntech_account'),
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF112A24),
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'Register the caregiver first, then the patients included in your plan.',
-                    style: TextStyle(
+                  Text(
+                    context.translate('register_caregiver_first'),
+                    style: const TextStyle(
                       fontSize: 14,
                       color: Colors.black54,
                     ),
@@ -302,6 +306,8 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                     onContinue: _nextStep, 
                     onBack: _previousStep,
                     isRegistering: _isRegistering,
+                    acceptedTerms: _acceptedTerms,
+                    onAcceptedTermsChanged: (val) => setState(() => _acceptedTerms = val),
                   )
                   else if (_currentStep == 6) StepDone(planType: PlanType.personal, onFinish: () => Navigator.of(context).popUntil((route) => route.isFirst)),
                   
@@ -322,18 +328,18 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                           ),
                           elevation: 0,
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              'Continue',
-                              style: TextStyle(
+                              context.translate('continue_btn'),
+                              style: const TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
-                            SizedBox(width: 6),
-                            Icon(Icons.check, size: 18),
+                            const SizedBox(width: 6),
+                            const Icon(Icons.check, size: 18),
                           ],
                         ),
                       ),
@@ -353,9 +359,9 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                         style: TextButton.styleFrom(
                           foregroundColor: Colors.black54,
                         ),
-                        child: const Text(
-                          '← Choose a different plan',
-                          style: TextStyle(fontWeight: FontWeight.w400, fontSize: 13),
+                        child: Text(
+                          context.translate('choose_different_plan'),
+                          style: const TextStyle(fontWeight: FontWeight.w400, fontSize: 13),
                         ),
                       ),
                     ),
@@ -382,7 +388,7 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
               _buildStepCircle(index + 1, isActive, isCompleted, primaryColor),
               const SizedBox(width: 8),
               Text(
-                _stepNames[index],
+                context.translate(_stepNames[index]),
                 style: TextStyle(
                   color: isCompleted || isActive ? Colors.black87 : Colors.black54,
                   fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
@@ -444,12 +450,14 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(
-                      widget.planTitle,
-                      style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: Color(0xFF112A24),
+                    Flexible(
+                      child: Text(
+                        widget.planTitle,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF112A24),
+                        ),
                       ),
                     ),
                     if (widget.isRecommended) ...[
@@ -460,9 +468,9 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                           color: primaryColor,
                           borderRadius: BorderRadius.circular(12),
                         ),
-                        child: const Text(
-                          'RECOMMENDED',
-                          style: TextStyle(
+                        child: Text(
+                          context.translate('recommended'),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 9,
                             fontWeight: FontWeight.bold,
@@ -491,7 +499,7 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                'Initial payment: ${widget.initialPayment}',
+                '${context.translate('initial_payment_label')} ${widget.initialPayment}',
                 style: const TextStyle(
                   fontSize: 10,
                   color: Colors.black54,
@@ -499,7 +507,7 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
               ),
               const SizedBox(height: 2),
               Text(
-                'Monthly: ${widget.monthlyPayment}',
+                '${context.translate('monthly_label')} ${widget.monthlyPayment}',
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.bold,
