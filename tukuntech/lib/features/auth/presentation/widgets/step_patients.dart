@@ -21,6 +21,10 @@ class PatientData {
   String? gender;
   String? bloodType;
 
+  final TextEditingController addressCtrl = TextEditingController();
+  double? latitude;
+  double? longitude;
+
   void dispose() {
     fullNameCtrl.dispose();
     emailCtrl.dispose();
@@ -35,6 +39,7 @@ class PatientData {
     passwordCtrl.dispose();
     confirmPasswordCtrl.dispose();
     dniCtrl.dispose();
+    addressCtrl.dispose();
   }
 }
 

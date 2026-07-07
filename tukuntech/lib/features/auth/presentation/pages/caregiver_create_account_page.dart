@@ -43,8 +43,8 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
 
   final _dummyEmail = TextEditingController();
   final _dummyPassword = TextEditingController();
-  final _dummyAddress = TextEditingController();
   late final List<PatientData> _patients;
+  late final List<AddressData> _addressDataList;
   bool _isRegistering = false;
   bool _acceptedTerms = false;
 
@@ -54,6 +54,10 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
     final match = RegExp(r'\d+').firstMatch(widget.planTitle);
     final count = match != null ? int.parse(match.group(0)!) : 5;
     _patients = List.generate(count, (_) => PatientData());
+    _addressDataList = _patients.asMap().entries.map((e) => AddressData(
+      label: 'Patient ${e.key + 1}', // Se actualizará en build si es necesario
+      controller: e.value.addressCtrl,
+    )).toList();
   }
 
   final String _baseUrl = EnvironmentConfig.baseUrl;
@@ -62,7 +66,6 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
   void dispose() {
     _dummyEmail.dispose();
     _dummyPassword.dispose();
-    _dummyAddress.dispose();
     for (var p in _patients) {
       p.dispose();
     }
@@ -92,8 +95,6 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
     if (_dummyPassword.text.isEmpty) return "La contraseña del cuidador no puede ser nula o vacía.";
     if (_dummyPassword.text.length > 255) return "La contraseña del cuidador excede los 255 caracteres.";
 
-    if (_dummyAddress.text.trim().length > 255) return "La dirección excede los 255 caracteres.";
-
     final activePatients = _patients.where((p) => p.fullNameCtrl.text.trim().isNotEmpty || p.emailCtrl.text.trim().isNotEmpty).toList();
     if (activePatients.isEmpty) {
       return "Debes llenar los datos de al menos un paciente.";
@@ -108,6 +109,9 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
       
       if (p.passwordCtrl.text.isEmpty) return "La contraseña del paciente ${i+1} no puede ser nula o vacía.";
       if (p.passwordCtrl.text.length > 255) return "La contraseña del paciente ${i+1} excede los 255 caracteres.";
+      
+      if (p.addressCtrl.text.trim().isEmpty) return "La dirección del paciente ${i+1} no puede ser nula o vacía.";
+      if (p.addressCtrl.text.trim().length > 255) return "La dirección del paciente ${i+1} excede los 255 caracteres.";
       
       if (p.ageCtrl.text.trim().isNotEmpty && int.tryParse(p.ageCtrl.text.trim()) == null) {
         return "La edad del paciente ${i+1} debe ser un número entero válido.";
@@ -190,7 +194,7 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
               'dni': patient.dniCtrl.text.trim(),
               'fullName': patient.fullNameCtrl.text.trim(),
               'age': int.tryParse(patient.ageCtrl.text.trim()) ?? 0,
-              'address': _dummyAddress.text.trim(),
+              'address': patient.addressCtrl.text.trim(),
               'bloodType': apiBloodType,
               'gender': apiGender,
               'notes': patient.notesCtrl.text.trim(),
@@ -354,7 +358,7 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
                   else if (_currentStep == 3) StepAddress(
                     onContinue: _nextStep, 
                     onBack: _previousStep,
-                    addressController: _dummyAddress,
+                    addresses: _addressDataList,
                   )
                   else if (_currentStep == 4) StepDelivery(onContinue: _nextStep, onBack: _previousStep)
                   else if (_currentStep == 5) StepPayment(

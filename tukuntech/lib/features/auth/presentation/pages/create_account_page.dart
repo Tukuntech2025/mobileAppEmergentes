@@ -32,9 +32,18 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   final _dummyDni = TextEditingController();
   final _dummyAge = TextEditingController();
   final _dummyNotes = TextEditingController();
-  final _dummyAddress = TextEditingController();
   final List<PatientData> _dummyPatients = List.generate(5, (_) => PatientData());
+  late final List<AddressData> _addressDataList;
   bool _acceptedTerms = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _addressDataList = _dummyPatients.asMap().entries.map((e) => AddressData(
+      label: 'Patient ${e.key + 1}',
+      controller: e.value.addressCtrl,
+    )).toList();
+  }
 
   @override
   void dispose() {
@@ -44,7 +53,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     _dummyDni.dispose();
     _dummyAge.dispose();
     _dummyNotes.dispose();
-    _dummyAddress.dispose();
     for (var p in _dummyPatients) {
       p.dispose();
     }
@@ -213,7 +221,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         return StepAddress(
           onContinue: _nextStep, 
           onBack: _previousStep,
-          addressController: _dummyAddress,
+          addresses: widget.planType == PlanType.personal 
+              ? [_addressDataList.first] 
+              : _addressDataList,
         );
       case 4:
         return StepDelivery(onContinue: _nextStep, onBack: _previousStep);

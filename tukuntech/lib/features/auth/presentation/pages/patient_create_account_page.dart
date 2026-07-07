@@ -62,6 +62,8 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
   final _minTempController = TextEditingController();
   final _maxTempController = TextEditingController();
   
+  late final List<AddressData> _addressDataList;
+
   String _gender = 'Select gender';
   String _bloodType = 'Select blood type';
 
@@ -69,6 +71,14 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
   bool _acceptedTerms = false;
 
   final String _baseUrl = EnvironmentConfig.baseUrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _addressDataList = [
+      AddressData(label: 'Patient', controller: _addressController),
+    ];
+  }
 
   @override
   void dispose() {
@@ -368,7 +378,7 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                   else if (_currentStep == 3) StepAddress(
                     onContinue: _nextStep, 
                     onBack: _previousStep,
-                    addressController: _addressController,
+                    addresses: _addressDataList,
                   )
                   else if (_currentStep == 4) StepDelivery(onContinue: _nextStep, onBack: _previousStep)
                   else if (_currentStep == 5) StepPayment(
