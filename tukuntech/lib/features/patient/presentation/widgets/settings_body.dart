@@ -26,6 +26,7 @@ class _SettingsBodyState extends State<SettingsBody> {
   String _userRole = '';
   String? _selectedPatientId;
   List<Map<String, dynamic>> _patients = [];
+  Map<String, dynamic>? _patientProfileData;
 
   final TextEditingController _minHrCtrl = TextEditingController();
   final TextEditingController _maxHrCtrl = TextEditingController();
@@ -69,6 +70,7 @@ class _SettingsBodyState extends State<SettingsBody> {
       }
 
       final profileData = jsonDecode(utf8.decode(profileRes.bodyBytes));
+      _patientProfileData = profileData;
       _userRole = profileData['role'] ?? '';
 
       if (_userRole == 'CAREGIVER') {
@@ -96,26 +98,12 @@ class _SettingsBodyState extends State<SettingsBody> {
     }
   }
 
-  Future<void> _fetchVitalLimits(String patientId) async {
-    try {
-      final token = AuthStore.token;
-      if (token == null) return;
-      
-      // Wait, is there a GET /profiles/{id}/vital-limits? 
-      // If not, we might fall back to what we can get from the profile.
-      // But let's assume personal-info or the profile itself has the data.
-      // We'll try hitting /profiles/me or the patient profile
-      final profileUrl = '${EnvironmentConfig.baseUrl}/profiles/$patientId';
-      final profileRes = await ApiClient.get(
-        Uri.parse(profileUrl),
-        headers: {'Authorization': 'Bearer $token'},
-      );
-      if (profileRes.statusCode == 200 || profileRes.statusCode == 201) {
-        final data = jsonDecode(utf8.decode(profileRes.bodyBytes));
-        _populateThresholds(data);
-      }
-    } catch (e) {
-      debugPrint('Error fetching vital limits: $e');
+  void _fetchVitalLimits(String patientId) {
+    if (_userRole == 'CAREGIVER') {
+      final patientData = _patients.firstWhere((p) => p['id']?.toString() == patientId, orElse: () => {});
+      _populateThresholds(patientData);
+    } else if (_userRole == 'PATIENT' && _patientProfileData != null) {
+      _populateThresholds(_patientProfileData!);
     }
   }
 
@@ -146,18 +134,29 @@ class _SettingsBodyState extends State<SettingsBody> {
     if (_selectedPatientId == null) return;
     
     setState(() => _isLoading = true);
+    String actualId = _selectedPatientId!;
     try {
       final token = AuthStore.token;
       if (token == null) throw Exception('No token');
       
-      final url = '${EnvironmentConfig.baseUrl}/profiles/$_selectedPatientId/vital-limits';
+      // Try to get userId if it exists in the patient map, just in case it's different from profile ID
+      if (_userRole == 'CAREGIVER') {
+        final patientMap = _patients.firstWhere((p) => p['id']?.toString() == _selectedPatientId, orElse: () => {});
+        if (patientMap.containsKey('user') && patientMap['user'] != null && patientMap['user']['id'] != null) {
+          actualId = patientMap['user']['id'].toString();
+        } else if (patientMap.containsKey('userId')) {
+          actualId = patientMap['userId'].toString();
+        }
+      }
+
+      final url = '${EnvironmentConfig.baseUrl}/profiles/$actualId/vital-limits';
       final body = {
         "minHeartRate": int.tryParse(_minHrCtrl.text) ?? 0,
         "maxHeartRate": int.tryParse(_maxHrCtrl.text) ?? 0,
         "minOxygenSaturation": int.tryParse(_minO2Ctrl.text) ?? 0,
         "maxOxygenSaturation": int.tryParse(_maxO2Ctrl.text) ?? 0,
-        "minTemperature": double.tryParse(_minTempCtrl.text) ?? 0,
-        "maxTemperature": double.tryParse(_maxTempCtrl.text) ?? 0,
+        "minTemperature": int.tryParse(_minTempCtrl.text) ?? 0,
+        "maxTemperature": int.tryParse(_maxTempCtrl.text) ?? 0,
         "termsAccepted": true
       };
 
@@ -172,18 +171,12 @@ class _SettingsBodyState extends State<SettingsBody> {
 
       if (!mounted) return;
 
-      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 204) {
+      if (response.statusCode != 200 && response.statusCode != 201 && response.statusCode != 204) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(context.translate('saved_successfully') ?? 'Saved successfully'),
-            backgroundColor: _primary,
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${response.statusCode}'),
+            content: Text('Error: ${response.statusCode} on $actualId - ${response.body}'),
             backgroundColor: Colors.red,
+            duration: const Duration(seconds: 5),
           ),
         );
       }
