@@ -52,8 +52,8 @@ class _ProfileBodyState extends State<ProfileBody> {
   // ── Campos de información personal ──────────────────────────
   late TextEditingController _nameCtrl;
   late TextEditingController _ageCtrl;
-  late TextEditingController _genderCtrl;
   late TextEditingController _addressCtrl;
+  String _gender = 'OTHER';
   String _bloodType = 'A_POSITIVE';
 
   // ── Contactos de emergencia ──────────────────────────────────
@@ -67,7 +67,6 @@ class _ProfileBodyState extends State<ProfileBody> {
     super.initState();
     _nameCtrl = TextEditingController(text: '');
     _ageCtrl = TextEditingController(text: '');
-    _genderCtrl = TextEditingController(text: '');
     _addressCtrl = TextEditingController(text: '');
     _fetchProfile();
   }
@@ -100,11 +99,12 @@ class _ProfileBodyState extends State<ProfileBody> {
             }
             
             String rawGender = data['gender'] ?? 'OTHER';
-            if (rawGender == 'MALE') _patientData['gender'] = 'Male';
-            else if (rawGender == 'FEMALE') _patientData['gender'] = 'Female';
-            else _patientData['gender'] = 'Other';
+            _gender = ['MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY'].contains(rawGender) ? rawGender : 'OTHER';
+            _patientData['gender'] = _gender;
 
             _patientData['address'] = data['address'] ?? '';
+            _patientData['dni'] = data['dni'] ?? '';
+            _patientData['notes'] = data['notes'] ?? '';
 
             String rawBlood = data['bloodType'] ?? 'A_POSITIVE';
             _bloodType = rawBlood;
@@ -118,7 +118,6 @@ class _ProfileBodyState extends State<ProfileBody> {
 
             _nameCtrl.text = _patientData['name']!;
             _ageCtrl.text = _patientData['age']!;
-            _genderCtrl.text = _patientData['gender']!;
             _addressCtrl.text = _patientData['address']!;
 
             _contacts.clear();
@@ -152,7 +151,6 @@ class _ProfileBodyState extends State<ProfileBody> {
   void dispose() {
     _nameCtrl.dispose();
     _ageCtrl.dispose();
-    _genderCtrl.dispose();
     _addressCtrl.dispose();
     for (var contact in _contacts) {
       contact.dispose();
@@ -172,39 +170,20 @@ class _ProfileBodyState extends State<ProfileBody> {
 
       final String baseUrl = EnvironmentConfig.baseUrl;
 
-      // Map gender back to backend enums
-      String apiGender = 'OTHER';
-      final String genderText = _genderCtrl.text.trim().toLowerCase();
-      if (genderText == 'male') {
-        apiGender = 'MALE';
-      } else if (genderText == 'female') {
-        apiGender = 'FEMALE';
-      } else if (genderText.contains('prefer')) {
-        apiGender = 'PREFER_NOT_TO_SAY';
-      }
 
-      // Map emergency contacts
-      final List<Map<String, dynamic>> apiContacts = _contacts.map((c) {
-        String rel = c.relationCtrl.text.trim().toUpperCase();
-        if (rel.isEmpty) rel = 'FAMILY';
-        return {
-          'name': c.nameCtrl.text.trim(),
-          'relationship': rel,
-          'phoneNumber': c.phoneCtrl.text.trim(),
-        };
-      }).toList();
 
       final body = jsonEncode({
         'fullName': _nameCtrl.text.trim(),
+        'dni': _patientData['dni'] ?? '',
+        'gender': _gender,
         'age': int.tryParse(_ageCtrl.text.trim()) ?? 0,
-        'gender': apiGender,
-        'address': _addressCtrl.text.trim(),
         'bloodType': _bloodType,
-        'emergencyContacts': apiContacts,
+        'address': _addressCtrl.text.trim(),
+        'notes': _patientData['notes'] ?? '',
       });
 
       final res = await http.put(
-        Uri.parse('$baseUrl/profiles/me'),
+        Uri.parse('$baseUrl/profiles/$_patientId/personal-info'),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
@@ -212,7 +191,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         body: body,
       ).timeout(const Duration(seconds: 5));
 
-      if (res.statusCode == 200 || res.statusCode == 201) {
+      if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 204) {
         await _fetchProfile();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -508,7 +487,43 @@ class _ProfileBodyState extends State<ProfileBody> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(child: _field(context.translate('gender'), _genderCtrl)),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          context.translate('gender'),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        DropdownButtonFormField<String>(
+                          value: _gender,
+                          isExpanded: true,
+                          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+                            focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12)), borderSide: BorderSide(color: _primary, width: 1.5)),
+                            filled: true,
+                            fillColor: const Color(0xFFFAFAFA),
+                          ),
+                          items: const [
+                            DropdownMenuItem(value: 'MALE', child: Text('Male', overflow: TextOverflow.ellipsis)),
+                            DropdownMenuItem(value: 'FEMALE', child: Text('Female', overflow: TextOverflow.ellipsis)),
+                            DropdownMenuItem(value: 'OTHER', child: Text('Other', overflow: TextOverflow.ellipsis)),
+                            DropdownMenuItem(value: 'PREFER_NOT_TO_SAY', child: Text('Prefer not to say', overflow: TextOverflow.ellipsis)),
+                          ],
+                          onChanged: (v) => setState(() => _gender = v!),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 12),

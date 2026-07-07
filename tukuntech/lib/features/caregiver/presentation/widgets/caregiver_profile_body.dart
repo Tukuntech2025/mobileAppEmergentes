@@ -49,6 +49,8 @@ class PatientProfileData {
   String gender;
   String address;
   String bloodType;
+  String dni;
+  String notes;
   List<EmergencyContactData> contacts;
 
   PatientProfileData({
@@ -59,6 +61,8 @@ class PatientProfileData {
     required this.gender,
     required this.address,
     required this.bloodType,
+    this.dni = '',
+    this.notes = '',
     required this.contacts,
   });
 }
@@ -81,8 +85,8 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
 
   late TextEditingController _nameCtrl;
   late TextEditingController _ageCtrl;
-  late TextEditingController _genderCtrl;
   late TextEditingController _addressCtrl;
+  String _gender = 'OTHER';
   String _bloodType = 'A_POSITIVE';
   List<EmergencyContactController> _contactControllers = [];
 
@@ -91,7 +95,6 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
     super.initState();
     _nameCtrl = TextEditingController(text: '');
     _ageCtrl = TextEditingController(text: '');
-    _genderCtrl = TextEditingController(text: '');
     _addressCtrl = TextEditingController(text: '');
     _fetchPatients();
   }
@@ -133,9 +136,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
           }
 
           String rawGender = p['gender'] ?? 'OTHER';
-          String gender = 'Other';
-          if (rawGender == 'MALE') gender = 'Male';
-          else if (rawGender == 'FEMALE') gender = 'Female';
+          String gender = ['MALE', 'FEMALE', 'OTHER', 'PREFER_NOT_TO_SAY'].contains(rawGender) ? rawGender : 'OTHER';
 
           String rawBlood = p['bloodType'] ?? 'A_POSITIVE';
           String blood = rawBlood;
@@ -160,6 +161,8 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
             gender: gender,
             address: p['address'] ?? '',
             bloodType: blood,
+            dni: p['dni'] ?? '',
+            notes: p['notes'] ?? '',
             contacts: contacts,
           ));
         }
@@ -188,7 +191,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
           initials: 'EM',
           name: 'Eleanor Marsh',
           age: '68',
-          gender: 'Female',
+          gender: 'FEMALE',
           address: 'Av. siempre viva 235',
           bloodType: 'A_POSITIVE',
           contacts: [
@@ -201,7 +204,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
           initials: 'CM',
           name: 'Coco Manlin',
           age: '45',
-          gender: 'Male',
+          gender: 'MALE',
           address: '123 Fake Street',
           bloodType: 'O_POSITIVE',
           contacts: [],
@@ -211,7 +214,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
           initials: 'MM',
           name: 'Miguel Montana',
           age: '50',
-          gender: 'Male',
+          gender: 'MALE',
           address: '456 Another St',
           bloodType: 'B_NEGATIVE',
           contacts: [],
@@ -237,7 +240,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
     final patient = _patients[_selectedPatientIndex];
     _nameCtrl = TextEditingController(text: patient.name);
     _ageCtrl = TextEditingController(text: patient.age);
-    _genderCtrl = TextEditingController(text: patient.gender);
+    _gender = patient.gender;
     _addressCtrl = TextEditingController(text: patient.address);
     _bloodType = patient.bloodType;
 
@@ -254,7 +257,6 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
   void _disposeControllers() {
     _nameCtrl.dispose();
     _ageCtrl.dispose();
-    _genderCtrl.dispose();
     _addressCtrl.dispose();
     for (var c in _contactControllers) {
       c.dispose();
@@ -277,43 +279,58 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
     });
   }
 
-  void _savePersonalInfo() {
+  Future<void> _savePersonalInfo() async {
+    if (_patients.isEmpty) return;
     final patient = _patients[_selectedPatientIndex];
-    patient.name = _nameCtrl.text;
-    patient.age = _ageCtrl.text;
-    patient.gender = _genderCtrl.text;
-    patient.address = _addressCtrl.text;
-    patient.bloodType = _bloodType;
 
-    // Recalcular iniciales si cambió el nombre
-    List<String> parts = _nameCtrl.text.trim().split(' ');
-    String ini = '';
-    if (parts.isNotEmpty && parts[0].isNotEmpty) {
-      ini += parts[0][0].toUpperCase();
+    try {
+      final token = AuthStore.token;
+      if (token == null) throw Exception("No token");
+
+      final body = jsonEncode({
+        'fullName': _nameCtrl.text.trim(),
+        'dni': patient.dni,
+        'gender': _gender,
+        'age': int.tryParse(_ageCtrl.text.trim()) ?? 0,
+        'bloodType': _bloodType,
+        'address': _addressCtrl.text.trim(),
+        'notes': patient.notes,
+      });
+
+      final res = await http.put(
+        Uri.parse('${EnvironmentConfig.baseUrl}/profiles/${patient.id}/personal-info'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: body,
+      ).timeout(const Duration(seconds: 5));
+
+      if (res.statusCode == 200 || res.statusCode == 201 || res.statusCode == 204) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(context.translate('changes_saved_success')),
+              backgroundColor: _primary,
+              behavior: SnackBarBehavior.floating,
+            ),
+          );
+        }
+        await _fetchPatients();
+      } else {
+        throw Exception("Failed to save: ${res.statusCode}");
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${context.translate('error_saving_changes')}: $e'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
     }
-    if (parts.length > 1 && parts[1].isNotEmpty) {
-      ini += parts[1][0].toUpperCase();
-    }
-    if (ini.isNotEmpty) patient.initials = ini;
-
-    // Guardar contactos
-    patient.contacts = _contactControllers
-        .map((c) => EmergencyContactData(
-              internalId: c.internalId,
-              name: c.nameCtrl.text,
-              relation: c.relationCtrl.text,
-              phone: c.phoneCtrl.text,
-            ))
-        .toList();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(context.translate('changes_saved_success')),
-        backgroundColor: _primary,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
-    setState(() {});
   }
 
   Future<void> _addEmergencyContact(String patientId, String name, String relation, String phone, BuildContext ctx) async {
@@ -887,7 +904,43 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
                     ),
                   ),
                   const SizedBox(width: 12),
-                  Expanded(child: _field(context.translate('gender'), _genderCtrl)),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          context.translate('gender'),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        DropdownButtonFormField<String>(
+                          value: _gender,
+                          isExpanded: true,
+                          icon: const Icon(Icons.keyboard_arrow_down, color: Colors.black54),
+                          decoration: InputDecoration(
+                            isDense: true,
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade300)),
+                            focusedBorder: const OutlineInputBorder(borderRadius: BorderRadius.all(Radius.circular(12)), borderSide: BorderSide(color: _primary, width: 1.5)),
+                            filled: true,
+                            fillColor: const Color(0xFFFAFAFA),
+                          ),
+                          items: const [
+                            DropdownMenuItem(value: 'MALE', child: Text('Male', overflow: TextOverflow.ellipsis)),
+                            DropdownMenuItem(value: 'FEMALE', child: Text('Female', overflow: TextOverflow.ellipsis)),
+                            DropdownMenuItem(value: 'OTHER', child: Text('Other', overflow: TextOverflow.ellipsis)),
+                            DropdownMenuItem(value: 'PREFER_NOT_TO_SAY', child: Text('Prefer not to say', overflow: TextOverflow.ellipsis)),
+                          ],
+                          onChanged: (v) => setState(() => _gender = v!),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 12),
