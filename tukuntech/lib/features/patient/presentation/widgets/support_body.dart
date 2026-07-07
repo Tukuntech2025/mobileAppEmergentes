@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/api_client.dart';
 import 'package:tukuntech/core/auth_store.dart';
 import 'package:tukuntech/core/environment_config.dart';
 import 'package:tukuntech/core/localization/app_localizations.dart';
@@ -46,7 +47,7 @@ class _SupportBodyState extends State<SupportBody> {
       final String baseUrl = EnvironmentConfig.baseUrl;
 
       // Fetch tickets
-      final res = await http.get(
+      final res = await ApiClient.get(
         Uri.parse('$baseUrl/tickets/me'),
         headers: {'Authorization': 'Bearer $token'},
       ).timeout(const Duration(seconds: 5));
@@ -110,7 +111,7 @@ class _SupportBodyState extends State<SupportBody> {
       final String baseUrl = EnvironmentConfig.baseUrl;
 
       // 1. Fetch profile to get email
-      final profileRes = await http.get(
+      final profileRes = await ApiClient.get(
         Uri.parse('$baseUrl/profiles/me'),
         headers: {'Authorization': 'Bearer $token'},
       ).timeout(const Duration(seconds: 5));
@@ -133,7 +134,7 @@ class _SupportBodyState extends State<SupportBody> {
         "description": description
       });
 
-      final res = await http.post(
+      final res = await ApiClient.post(
         Uri.parse('$baseUrl/tickets'),
         headers: {
           'Authorization': 'Bearer $token',
@@ -537,3 +538,4 @@ class _SupportBodyState extends State<SupportBody> {
     );
   }
 }
+

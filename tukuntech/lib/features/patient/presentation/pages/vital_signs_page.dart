@@ -8,6 +8,7 @@ import 'package:tukuntech/features/patient/presentation/widgets/settings_body.da
 import 'package:tukuntech/features/patient/presentation/widgets/support_body.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/api_client.dart';
 import 'package:tukuntech/core/auth_store.dart';
 import 'package:tukuntech/core/environment_config.dart';
 import 'package:tukuntech/core/localization/app_localizations.dart';
@@ -45,7 +46,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
       final token = AuthStore.token;
       if (token == null) throw Exception("No token");
 
-      final res = await http.get(
+      final res = await ApiClient.get(
         Uri.parse('$_baseUrl/profiles/me'),
         headers: {'Authorization': 'Bearer $token'},
       ).timeout(const Duration(seconds: 5));
@@ -583,3 +584,4 @@ class _EcgPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
+

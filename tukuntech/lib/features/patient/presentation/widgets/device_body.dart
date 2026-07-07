@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/api_client.dart';
 import 'package:tukuntech/core/localization/app_localizations.dart';
 import 'package:tukuntech/features/patient/presentation/pages/device_form_page.dart';
 import 'package:tukuntech/core/environment_config.dart';
@@ -29,7 +30,7 @@ class _DeviceBodyState extends State<DeviceBody> {
       final token = AuthStore.token;
       if (token == null) return;
 
-      final res = await http.get(
+      final res = await ApiClient.get(
         Uri.parse('${EnvironmentConfig.baseUrl}/dashboard/patient/me'),
         headers: {'Authorization': 'Bearer $token'},
       ).timeout(const Duration(seconds: 5));
@@ -310,3 +311,4 @@ class _DeviceBodyState extends State<DeviceBody> {
     );
   }
 }
+

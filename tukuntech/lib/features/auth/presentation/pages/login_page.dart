@@ -6,6 +6,7 @@ import 'package:tukuntech/features/caregiver/presentation/pages/caregiver_dashbo
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/api_client.dart';
 import 'package:tukuntech/core/auth_store.dart';
 import 'package:tukuntech/core/environment_config.dart';
 
@@ -30,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final response = await http.post(
+      final response = await ApiClient.post(
         Uri.parse(_loginUrl),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
@@ -45,14 +46,20 @@ class _LoginScreenState extends State<LoginScreen> {
         try {
           final Map<String, dynamic> responseData = jsonDecode(response.body);
           final String token = responseData['token'] ?? responseData['accessToken'] ?? '';
+          final String refreshToken = responseData['refreshToken'] ?? '';
           
           if (token.isEmpty) {
             throw Exception(context.translate('error_no_token'));
           }
 
+          AuthStore.token = token;
+          if (refreshToken.isNotEmpty) {
+            AuthStore.refreshToken = refreshToken;
+          }
+
           final String profileUrl = '${EnvironmentConfig.baseUrl}/profiles/me';
 
-          final profileResponse = await http.get(
+          final profileResponse = await ApiClient.get(
             Uri.parse(profileUrl),
             headers: {'Authorization': 'Bearer $token'},
           ).timeout(const Duration(seconds: 10));
@@ -62,7 +69,6 @@ class _LoginScreenState extends State<LoginScreen> {
             final String role = profileData['role'] ?? '';
             
             if (role == 'PATIENT') {
-              AuthStore.token = token;
               if (mounted) {
                 Navigator.push(
                   context,
@@ -72,7 +78,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 );
               }
             } else if (role == 'CAREGIVER') {
-              AuthStore.token = token;
               if (mounted) {
                 Navigator.push(
                   context,
@@ -405,3 +410,4 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 }
+

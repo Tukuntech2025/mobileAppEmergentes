@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:tukuntech/core/environment_config.dart';
 import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/api_client.dart';
 import 'package:tukuntech/core/auth_store.dart';
 import 'package:tukuntech/core/localization/app_localizations.dart';
 
@@ -50,7 +51,7 @@ class _ReportBodyState extends State<ReportBody> {
       if (AuthStore.token != null) {
         headers['Authorization'] = 'Bearer ${AuthStore.token}';
       }
-      final response = await http.get(
+      final response = await ApiClient.get(
         Uri.parse('$_baseUrl/me'),
         headers: headers,
       ).timeout(const Duration(seconds: 5));
@@ -122,7 +123,7 @@ class _ReportBodyState extends State<ReportBody> {
       if (AuthStore.token != null) {
         headers['Authorization'] = 'Bearer ${AuthStore.token}';
       }
-      final response = await http.post(
+      final response = await ApiClient.post(
         Uri.parse('$_baseUrl/me/generate'),
         headers: headers,
         body: jsonEncode(range),
@@ -512,4 +513,5 @@ class _ReportBodyState extends State<ReportBody> {
     );
   }
 }
+
 

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:tukuntech/core/environment_config.dart';
 import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/api_client.dart';
 import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:tukuntech/features/caregiver/presentation/widgets/patient_vital_card.dart';
 import 'package:tukuntech/core/localization/app_localizations.dart';
@@ -68,7 +69,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
       );
       final fakePatientToken = jwt.sign(SecretKey('TuClaveSecretaSuperSeguraYExtremadamenteLargaParaElProyectoTukunTech2026'));
 
-      final response = await http.get(
+      final response = await ApiClient.get(
         Uri.parse('$_baseUrl/me'),
         headers: {'Authorization': 'Bearer $fakePatientToken'},
       ).timeout(const Duration(seconds: 5));
@@ -143,7 +144,7 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
       final fakePatientToken = jwt.sign(SecretKey('TuClaveSecretaSuperSeguraYExtremadamenteLargaParaElProyectoTukunTech2026'));
 
       final range = _getDateRange();
-      final response = await http.post(
+      final response = await ApiClient.post(
         Uri.parse('$_baseUrl/me/generate'),
         headers: {
           'Content-Type': 'application/json',
@@ -544,3 +545,4 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
     );
   }
 }
+

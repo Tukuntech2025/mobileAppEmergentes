@@ -10,6 +10,7 @@ import 'package:tukuntech/features/auth/presentation/pages/create_account_page.d
 import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/api_client.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:tukuntech/core/environment_config.dart';
 import 'package:tukuntech/core/localization/app_localizations.dart';
@@ -97,7 +98,7 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
       String apiGender = _gender == 'Select gender' ? 'OTHER' : _gender;
       String apiBloodType = _bloodType == 'Select blood type' ? 'UNKNOWN' : _bloodType;
 
-      final response = await http.post(
+      final response = await ApiClient.post(
         Uri.parse('$_baseUrl/profiles/onboarding'),
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({
@@ -521,3 +522,4 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
     );
   }
 }
+

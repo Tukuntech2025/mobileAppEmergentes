@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/api_client.dart';
 import 'package:tukuntech/core/auth_store.dart';
 import 'package:tukuntech/core/environment_config.dart';
 import 'package:tukuntech/core/localization/app_localizations.dart';
@@ -78,7 +79,7 @@ class _ProfileBodyState extends State<ProfileBody> {
 
       final String baseUrl = EnvironmentConfig.baseUrl;
 
-      final res = await http.get(
+      final res = await ApiClient.get(
         Uri.parse('$baseUrl/profiles/me'),
         headers: {'Authorization': 'Bearer $token'},
       ).timeout(const Duration(seconds: 5));
@@ -182,7 +183,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         'notes': _patientData['notes'] ?? '',
       });
 
-      final res = await http.put(
+      final res = await ApiClient.put(
         Uri.parse('$baseUrl/profiles/$_patientId/personal-info'),
         headers: {
           'Authorization': 'Bearer $token',
@@ -235,7 +236,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         'phoneNumber': phone,
       });
 
-      final res = await http.post(
+      final res = await ApiClient.post(
         Uri.parse('$baseUrl/profiles/$_patientId/emergency-contacts'),
         headers: {
           'Authorization': 'Bearer $token',
@@ -376,7 +377,7 @@ class _ProfileBodyState extends State<ProfileBody> {
         final token = AuthStore.token;
         if (token == null) throw Exception("No token");
 
-        final res = await http.delete(
+        final res = await ApiClient.delete(
           Uri.parse('${EnvironmentConfig.baseUrl}/profiles/$_patientId/emergency-contacts/${contact.internalId}'),
           headers: {'Authorization': 'Bearer $token'},
         ).timeout(const Duration(seconds: 5));
@@ -805,3 +806,4 @@ class _ProfileBodyState extends State<ProfileBody> {
     );
   }
 }
+

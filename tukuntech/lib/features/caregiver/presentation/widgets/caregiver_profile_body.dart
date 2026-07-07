@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/api_client.dart';
 import 'package:tukuntech/core/auth_store.dart';
 import 'package:tukuntech/core/environment_config.dart';
 import 'package:tukuntech/core/localization/app_localizations.dart';
@@ -104,7 +105,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
       final token = AuthStore.token;
       if (token == null) throw Exception("No token");
 
-      final res = await http.get(
+      final res = await ApiClient.get(
         Uri.parse('${EnvironmentConfig.baseUrl}/profiles/me/patients'),
         headers: {'Authorization': 'Bearer $token'},
       ).timeout(const Duration(seconds: 10));
@@ -297,7 +298,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
         'notes': patient.notes,
       });
 
-      final res = await http.put(
+      final res = await ApiClient.put(
         Uri.parse('${EnvironmentConfig.baseUrl}/profiles/${patient.id}/personal-info'),
         headers: {
           'Authorization': 'Bearer $token',
@@ -345,7 +346,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
         'phoneNumber': phone,
       });
 
-      final res = await http.post(
+      final res = await ApiClient.post(
         Uri.parse('$baseUrl/profiles/$patientId/emergency-contacts'),
         headers: {
           'Authorization': 'Bearer $token',
@@ -488,7 +489,7 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
         final token = AuthStore.token;
         if (token == null) throw Exception("No token");
 
-        final res = await http.delete(
+        final res = await ApiClient.delete(
           Uri.parse('${EnvironmentConfig.baseUrl}/profiles/$patientId/emergency-contacts/${c.internalId}'),
           headers: {'Authorization': 'Bearer $token'},
         ).timeout(const Duration(seconds: 5));
@@ -1222,3 +1223,4 @@ class _CaregiverProfileBodyState extends State<CaregiverProfileBody> {
     );
   }
 }
+

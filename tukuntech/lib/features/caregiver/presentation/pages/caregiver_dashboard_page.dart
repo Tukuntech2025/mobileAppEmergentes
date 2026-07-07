@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/api_client.dart';
 import 'package:tukuntech/core/environment_config.dart';
 import 'package:tukuntech/core/auth_store.dart';
 import 'package:tukuntech/features/auth/presentation/pages/role_selection_page.dart';
@@ -37,7 +38,7 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
       final token = AuthStore.token;
       if (token == null) throw Exception("No token found");
 
-      final response = await http.get(
+      final response = await ApiClient.get(
         Uri.parse('${EnvironmentConfig.baseUrl}/profiles/me/patients'),
         headers: {'Authorization': 'Bearer $token'},
       ).timeout(const Duration(seconds: 10));
@@ -96,7 +97,7 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
           String? lastSyncedAt;
 
           try {
-            final dashRes = await http.get(
+            final dashRes = await ApiClient.get(
               Uri.parse('${EnvironmentConfig.baseUrl}/dashboard/caregiver/patient/$id'),
               headers: {'Authorization': 'Bearer $token'},
             ).timeout(const Duration(seconds: 5));
@@ -485,3 +486,4 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
     );
   }
 }
+
