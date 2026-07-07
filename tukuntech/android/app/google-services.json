@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "779433925045",
+    "project_id": "tukuntech-2026",
+    "storage_bucket": "tukuntech-2026.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779433925045:android:6337bb0518d9866b0661fc",
+        "android_client_info": {
+          "package_name": "com.example.tukuntech"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJGva_qjFoh8ko8JlIPHwgFxZfX9gSvLQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
