@@ -90,8 +90,79 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
     _maxTempController.dispose();
     super.dispose();
   }
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Error de Validación'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String? _validateForm() {
+    if (_emailController.text.trim().isEmpty) return "El correo del cuidador no puede ser nulo o vacío.";
+    if (_emailController.text.trim().length > 255) return "El correo del cuidador excede los 255 caracteres.";
+    
+    if (_passwordController.text.isEmpty) return "La contraseña del cuidador no puede ser nula o vacía.";
+    
+    if (_patientEmailController.text.trim().isEmpty) return "El correo del paciente no puede ser nulo o vacío.";
+    if (_patientEmailController.text.trim().length > 255) return "El correo del paciente excede los 255 caracteres.";
+    
+    if (_patientPasswordController.text.isEmpty) return "La contraseña del paciente no puede ser nula o vacía.";
+    if (_patientPasswordController.text != _patientConfirmPasswordController.text) return "Las contraseñas del paciente no coinciden.";
+
+    if (_fullNameController.text.trim().length > 255) return "El nombre completo excede los 255 caracteres.";
+    if (_dniController.text.trim().length > 255) return "El DNI excede los 255 caracteres.";
+    if (_addressController.text.trim().length > 255) return "La dirección excede los 255 caracteres.";
+
+    if (_ageController.text.trim().isNotEmpty && int.tryParse(_ageController.text.trim()) == null) {
+      return "La edad debe ser un número entero válido.";
+    }
+
+    if (_minHrController.text.trim().isNotEmpty) {
+      int? minHr = int.tryParse(_minHrController.text.trim());
+      if (minHr == null || minHr < 30 || minHr > 200) return "La frecuencia cardíaca mínima debe estar entre 30 y 200 bpm.";
+    }
+    if (_maxHrController.text.trim().isNotEmpty) {
+      int? maxHr = int.tryParse(_maxHrController.text.trim());
+      if (maxHr == null || maxHr < 40 || maxHr > 250) return "La frecuencia cardíaca máxima debe estar entre 40 y 250 bpm.";
+    }
+    if (_minO2Controller.text.trim().isNotEmpty) {
+      int? minO2 = int.tryParse(_minO2Controller.text.trim());
+      if (minO2 == null || minO2 < 50 || minO2 > 100) return "La saturación de oxígeno mínima debe estar entre 50% y 100%.";
+    }
+    if (_maxO2Controller.text.trim().isNotEmpty) {
+      int? maxO2 = int.tryParse(_maxO2Controller.text.trim());
+      if (maxO2 != null && maxO2 > 100) return "La saturación de oxígeno máxima no puede superar el 100%.";
+    }
+    if (_minTempController.text.trim().isNotEmpty) {
+      double? minTemp = double.tryParse(_minTempController.text.trim());
+      if (minTemp == null || minTemp < 30 || minTemp > 42) return "La temperatura mínima debe estar entre 30°C y 42°C.";
+    }
+    if (_maxTempController.text.trim().isNotEmpty) {
+      double? maxTemp = double.tryParse(_maxTempController.text.trim());
+      if (maxTemp == null || maxTemp < 32 || maxTemp > 45) return "La temperatura máxima debe estar entre 32°C y 45°C.";
+    }
+
+    if (!_acceptedTerms) return "Debes aceptar los límites y términos de uso.";
+
+    return null;
+  }
 
   Future<void> _processRegistration() async {
+    final String? validationError = _validateForm();
+    if (validationError != null) {
+      _showErrorDialog(validationError);
+      return;
+    }
+
     setState(() { _isRegistering = true; });
 
     try {

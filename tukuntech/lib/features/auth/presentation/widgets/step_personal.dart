@@ -288,7 +288,7 @@ class _StepPersonalState extends State<StepPersonal> {
                       children: [
                         _buildLabel(context.translate('min_heart_rate')),
                         const SizedBox(height: 4),
-                        _buildSuffixTextField('bpm', keyboardType: TextInputType.number, controller: widget.minHrController),
+                        _buildSuffixTextField('bpm', keyboardType: TextInputType.number, controller: widget.minHrController, min: 30, max: 200),
                       ],
                     ),
                   ),
@@ -299,7 +299,7 @@ class _StepPersonalState extends State<StepPersonal> {
                       children: [
                         _buildLabel(context.translate('max_heart_rate')),
                         const SizedBox(height: 4),
-                        _buildSuffixTextField('bpm', keyboardType: TextInputType.number, controller: widget.maxHrController),
+                        _buildSuffixTextField('bpm', keyboardType: TextInputType.number, controller: widget.maxHrController, min: 40, max: 250),
                       ],
                     ),
                   ),
@@ -315,7 +315,7 @@ class _StepPersonalState extends State<StepPersonal> {
                       children: [
                         _buildLabel(context.translate('min_o2_sat')),
                         const SizedBox(height: 4),
-                        _buildSuffixTextField('%', keyboardType: TextInputType.number, controller: widget.minO2Controller),
+                        _buildSuffixTextField('%', keyboardType: TextInputType.number, controller: widget.minO2Controller, min: 50, max: 100),
                       ],
                     ),
                   ),
@@ -342,7 +342,7 @@ class _StepPersonalState extends State<StepPersonal> {
                       children: [
                         _buildLabel(context.translate('min_temp')),
                         const SizedBox(height: 4),
-                        _buildSuffixTextField('°C', keyboardType: TextInputType.number, controller: widget.minTempController),
+                        _buildSuffixTextField('°C', keyboardType: TextInputType.number, controller: widget.minTempController, min: 30, max: 42),
                       ],
                     ),
                   ),
@@ -353,7 +353,7 @@ class _StepPersonalState extends State<StepPersonal> {
                       children: [
                         _buildLabel(context.translate('max_temp')),
                         const SizedBox(height: 4),
-                        _buildSuffixTextField('°C', keyboardType: TextInputType.number, controller: widget.maxTempController),
+                        _buildSuffixTextField('°C', keyboardType: TextInputType.number, controller: widget.maxTempController, min: 32, max: 45),
                       ],
                     ),
                   ),
@@ -520,7 +520,7 @@ class _StepPersonalState extends State<StepPersonal> {
     );
   }
 
-  Widget _buildSuffixTextField(String suffix, {TextInputType? keyboardType, TextEditingController? controller}) {
+  Widget _buildSuffixTextField(String suffix, {TextInputType? keyboardType, TextEditingController? controller, double? min, double? max}) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
@@ -542,9 +542,35 @@ class _StepPersonalState extends State<StepPersonal> {
         ),
         suffixIcon: Padding(
           padding: const EdgeInsets.only(right: 12),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
+              if (min != null && max != null)
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        double current = double.tryParse(controller?.text ?? '') ?? min;
+                        if (current < max) {
+                          controller?.text = (current + 1).toInt().toString();
+                        }
+                      },
+                      child: const Icon(Icons.arrow_drop_up, size: 20, color: Colors.black54),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        double current = double.tryParse(controller?.text ?? '') ?? min;
+                        if (current > min) {
+                          controller?.text = (current - 1).toInt().toString();
+                        }
+                      },
+                      child: const Icon(Icons.arrow_drop_down, size: 20, color: Colors.black54),
+                    ),
+                  ],
+                ),
+              if (min != null && max != null) const SizedBox(width: 4),
               Text(suffix, style: const TextStyle(color: Colors.black54, fontSize: 13)),
             ],
           ),

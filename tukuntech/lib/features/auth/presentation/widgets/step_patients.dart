@@ -344,7 +344,7 @@ class _StepPatientsState extends State<StepPatients> {
                       children: [
                         _buildLabel(context.translate('min_heart_rate')),
                         const SizedBox(height: 4),
-                        _buildSuffixTextField('bpm', keyboardType: TextInputType.number, controller: currentPatient.minHrCtrl),
+                        _buildSuffixTextField('bpm', keyboardType: TextInputType.number, controller: currentPatient.minHrCtrl, min: 30, max: 200),
                       ],
                     ),
                   ),
@@ -355,7 +355,7 @@ class _StepPatientsState extends State<StepPatients> {
                       children: [
                         _buildLabel(context.translate('max_heart_rate')),
                         const SizedBox(height: 4),
-                        _buildSuffixTextField('bpm', keyboardType: TextInputType.number, controller: currentPatient.maxHrCtrl),
+                        _buildSuffixTextField('bpm', keyboardType: TextInputType.number, controller: currentPatient.maxHrCtrl, min: 40, max: 250),
                       ],
                     ),
                   ),
@@ -371,7 +371,7 @@ class _StepPatientsState extends State<StepPatients> {
                       children: [
                         _buildLabel(context.translate('min_o2_sat')),
                         const SizedBox(height: 4),
-                        _buildSuffixTextField('%', keyboardType: TextInputType.number, controller: currentPatient.minO2Ctrl),
+                        _buildSuffixTextField('%', keyboardType: TextInputType.number, controller: currentPatient.minO2Ctrl, min: 50, max: 100),
                       ],
                     ),
                   ),
@@ -398,7 +398,7 @@ class _StepPatientsState extends State<StepPatients> {
                       children: [
                         _buildLabel(context.translate('min_temp')),
                         const SizedBox(height: 4),
-                        _buildSuffixTextField('°C', keyboardType: TextInputType.number, controller: currentPatient.minTempCtrl),
+                        _buildSuffixTextField('°C', keyboardType: TextInputType.number, controller: currentPatient.minTempCtrl, min: 30, max: 42),
                       ],
                     ),
                   ),
@@ -409,7 +409,7 @@ class _StepPatientsState extends State<StepPatients> {
                       children: [
                         _buildLabel(context.translate('max_temp')),
                         const SizedBox(height: 4),
-                        _buildSuffixTextField('°C', keyboardType: TextInputType.number, controller: currentPatient.maxTempCtrl),
+                        _buildSuffixTextField('°C', keyboardType: TextInputType.number, controller: currentPatient.maxTempCtrl, min: 32, max: 45),
                       ],
                     ),
                   ),
@@ -617,16 +617,14 @@ class _StepPatientsState extends State<StepPatients> {
     );
   }
 
-  Widget _buildSuffixTextField(String suffix, {TextInputType? keyboardType, TextEditingController? controller}) {
+  Widget _buildSuffixTextField(String suffix, {TextInputType? keyboardType, TextEditingController? controller, double? min, double? max}) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
       decoration: InputDecoration(
-        suffixText: suffix,
-        suffixStyle: const TextStyle(color: Colors.black54, fontSize: 13),
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -638,6 +636,41 @@ class _StepPatientsState extends State<StepPatients> {
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: Color(0xFF3B9784), width: 2),
+        ),
+        suffixIcon: Padding(
+          padding: const EdgeInsets.only(right: 12),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (min != null && max != null)
+                Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        double current = double.tryParse(controller?.text ?? '') ?? min;
+                        if (current < max) {
+                          controller?.text = (current + 1).toInt().toString();
+                        }
+                      },
+                      child: const Icon(Icons.arrow_drop_up, size: 20, color: Colors.black54),
+                    ),
+                    InkWell(
+                      onTap: () {
+                        double current = double.tryParse(controller?.text ?? '') ?? min;
+                        if (current > min) {
+                          controller?.text = (current - 1).toInt().toString();
+                        }
+                      },
+                      child: const Icon(Icons.arrow_drop_down, size: 20, color: Colors.black54),
+                    ),
+                  ],
+                ),
+              if (min != null && max != null) const SizedBox(width: 4),
+              Text(suffix, style: const TextStyle(color: Colors.black54, fontSize: 13)),
+            ],
+          ),
         ),
       ),
       style: const TextStyle(fontSize: 13),

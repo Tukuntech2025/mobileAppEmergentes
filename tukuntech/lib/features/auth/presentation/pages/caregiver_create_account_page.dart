@@ -69,7 +69,88 @@ class _CaregiverCreateAccountPageState extends State<CaregiverCreateAccountPage>
     super.dispose();
   }
 
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Error de Validación'),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String? _validateForm() {
+    if (_dummyEmail.text.trim().isEmpty) return "El correo del cuidador no puede ser nulo o vacío.";
+    if (_dummyEmail.text.trim().length > 255) return "El correo del cuidador excede los 255 caracteres.";
+    
+    if (_dummyPassword.text.isEmpty) return "La contraseña del cuidador no puede ser nula o vacía.";
+    if (_dummyPassword.text.length > 255) return "La contraseña del cuidador excede los 255 caracteres.";
+
+    if (_dummyAddress.text.trim().length > 255) return "La dirección excede los 255 caracteres.";
+
+    final activePatients = _patients.where((p) => p.fullNameCtrl.text.trim().isNotEmpty || p.emailCtrl.text.trim().isNotEmpty).toList();
+    if (activePatients.isEmpty) {
+      return "Debes llenar los datos de al menos un paciente.";
+    }
+
+    for (int i = 0; i < activePatients.length; i++) {
+      final p = activePatients[i];
+      if (p.fullNameCtrl.text.trim().length > 255) return "El nombre del paciente ${i+1} excede los 255 caracteres.";
+      
+      if (p.emailCtrl.text.trim().isEmpty) return "El correo del paciente ${i+1} no puede ser nulo o vacío.";
+      if (p.emailCtrl.text.trim().length > 255) return "El correo del paciente ${i+1} excede los 255 caracteres.";
+      
+      if (p.passwordCtrl.text.isEmpty) return "La contraseña del paciente ${i+1} no puede ser nula o vacía.";
+      if (p.passwordCtrl.text.length > 255) return "La contraseña del paciente ${i+1} excede los 255 caracteres.";
+      
+      if (p.ageCtrl.text.trim().isNotEmpty && int.tryParse(p.ageCtrl.text.trim()) == null) {
+        return "La edad del paciente ${i+1} debe ser un número entero válido.";
+      }
+
+      if (p.minHrCtrl.text.trim().isNotEmpty) {
+        int? minHr = int.tryParse(p.minHrCtrl.text.trim());
+        if (minHr == null || minHr < 30 || minHr > 200) return "La frecuencia cardíaca mínima del paciente ${i+1} debe estar entre 30 y 200 bpm.";
+      }
+      if (p.maxHrCtrl.text.trim().isNotEmpty) {
+        int? maxHr = int.tryParse(p.maxHrCtrl.text.trim());
+        if (maxHr == null || maxHr < 40 || maxHr > 250) return "La frecuencia cardíaca máxima del paciente ${i+1} debe estar entre 40 y 250 bpm.";
+      }
+      if (p.minO2Ctrl.text.trim().isNotEmpty) {
+        int? minO2 = int.tryParse(p.minO2Ctrl.text.trim());
+        if (minO2 == null || minO2 < 50 || minO2 > 100) return "La saturación de oxígeno mínima del paciente ${i+1} debe estar entre 50% y 100%.";
+      }
+      if (p.maxO2Ctrl.text.trim().isNotEmpty) {
+        int? maxO2 = int.tryParse(p.maxO2Ctrl.text.trim());
+        if (maxO2 != null && maxO2 > 100) return "La saturación de oxígeno máxima del paciente ${i+1} no puede superar el 100%.";
+      }
+      if (p.minTempCtrl.text.trim().isNotEmpty) {
+        double? minTemp = double.tryParse(p.minTempCtrl.text.trim());
+        if (minTemp == null || minTemp < 30 || minTemp > 42) return "La temperatura mínima del paciente ${i+1} debe estar entre 30°C y 42°C.";
+      }
+      if (p.maxTempCtrl.text.trim().isNotEmpty) {
+        double? maxTemp = double.tryParse(p.maxTempCtrl.text.trim());
+        if (maxTemp == null || maxTemp < 32 || maxTemp > 45) return "La temperatura máxima del paciente ${i+1} debe estar entre 32°C y 45°C.";
+      }
+    }
+
+    if (!_acceptedTerms) return "Debes aceptar los límites y términos de uso.";
+
+    return null;
+  }
+
   Future<void> _processRegistration() async {
+    final String? validationError = _validateForm();
+    if (validationError != null) {
+      _showErrorDialog(validationError);
+      return;
+    }
+
     setState(() { _isRegistering = true; });
 
     try {

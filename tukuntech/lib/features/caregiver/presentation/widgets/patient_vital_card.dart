@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:tukuntech/core/localization/app_localizations.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:tukuntech/core/auth_store.dart';
+import 'package:tukuntech/core/environment_config.dart';
 
 class PatientVitalData {
   final String initials;
@@ -49,13 +53,81 @@ class PatientVitalData {
   });
 }
 
-class PatientVitalCard extends StatelessWidget {
+class PatientVitalCard extends StatefulWidget {
   final PatientVitalData data;
 
   const PatientVitalCard({super.key, required this.data});
 
   @override
+  State<PatientVitalCard> createState() => _PatientVitalCardState();
+}
+
+class _PatientVitalCardState extends State<PatientVitalCard> {
+  double? currentHeartRate;
+  double? currentOxygen;
+  double? currentTemperature;
+  http.Client? _sseClient;
+
+  @override
+  void initState() {
+    super.initState();
+    _startVitalSignsStream();
+  }
+
+  void _startVitalSignsStream() async {
+    final patientId = widget.data.patientId;
+    if (patientId == null || patientId.isEmpty) return;
+
+    final token = AuthStore.token;
+    if (token == null) return;
+
+    _sseClient = http.Client();
+    final request = http.Request('GET', Uri.parse('${EnvironmentConfig.baseUrl}/vital-signs/stream/$patientId'));
+    request.headers['Authorization'] = 'Bearer $token';
+    request.headers['Accept'] = 'text/event-stream';
+
+    try {
+      final response = await _sseClient!.send(request);
+      response.stream
+          .transform(utf8.decoder)
+          .transform(const LineSplitter())
+          .listen((line) {
+        if (line.startsWith('data:')) {
+          final dataString = line.substring(5).trim();
+          if (dataString.isNotEmpty) {
+            try {
+              final parsed = jsonDecode(dataString);
+              if (mounted) {
+                setState(() {
+                  if (parsed['heartRate'] != null) currentHeartRate = (parsed['heartRate'] as num).toDouble();
+                  if (parsed['oxygenSaturation'] != null) currentOxygen = (parsed['oxygenSaturation'] as num).toDouble();
+                  if (parsed['temperature'] != null) currentTemperature = (parsed['temperature'] as num).toDouble();
+                });
+              }
+            } catch (e) {
+              debugPrint('Error parsing SSE data: $e');
+            }
+          }
+        }
+      }, onError: (err) {
+        debugPrint('SSE Stream Error: $err');
+      }, onDone: () {
+        debugPrint('SSE Stream closed');
+      });
+    } catch (e) {
+      debugPrint('Error connecting to SSE: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _sseClient?.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final data = widget.data;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
@@ -187,7 +259,7 @@ class PatientVitalCard extends StatelessWidget {
                   child: _buildStatColumn(
                     context.translate('heart_rate'),
                     Icons.favorite_border,
-                    data.heartRate,
+                    currentHeartRate != null ? '${currentHeartRate!.toInt()} bpm' : data.heartRate,
                     context.translate(data.heartRateSubtitleKey),
                     const Color(0xFF3B9784),
                   ),
@@ -197,7 +269,7 @@ class PatientVitalCard extends StatelessWidget {
                   child: _buildStatColumn(
                     context.translate('oxygen_label'),
                     Icons.air,
-                    data.oxygen,
+                    currentOxygen != null ? '${currentOxygen!.toInt()}%' : data.oxygen,
                     context.translate(data.oxygenSubtitleKey),
                     const Color(0xFF3B9784),
                   ),
@@ -207,7 +279,7 @@ class PatientVitalCard extends StatelessWidget {
                   child: _buildStatColumn(
                     context.translate('temperature_label'),
                     Icons.thermostat,
-                    data.temperature,
+                    currentTemperature != null ? '${currentTemperature!.toStringAsFixed(1)} °C' : data.temperature,
                     context.translate(data.temperatureSubtitleKey),
                     Colors.orange.shade300,
                   ),

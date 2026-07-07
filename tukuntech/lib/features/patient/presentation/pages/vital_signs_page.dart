@@ -35,6 +35,11 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
   Map<String, dynamic>? _profileData;
   bool _isLoading = true;
 
+  double? currentHeartRate;
+  double? currentOxygen;
+  double? currentTemperature;
+  http.Client? _sseClient;
+
   @override
   void initState() {
     super.initState();
@@ -57,6 +62,9 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
             _profileData = jsonDecode(utf8.decode(res.bodyBytes));
             _isLoading = false;
           });
+          if (_profileData != null && _profileData!['id'] != null) {
+            _startVitalSignsStream(_profileData!['id']);
+          }
         }
       } else {
         throw Exception("Failed to fetch profile");
@@ -69,6 +77,54 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
         });
       }
     }
+  }
+
+  void _startVitalSignsStream(String patientId) async {
+    final token = AuthStore.token;
+    if (token == null) return;
+
+    _sseClient = http.Client();
+    final request = http.Request('GET', Uri.parse('$_baseUrl/vital-signs/stream/$patientId'));
+    request.headers['Authorization'] = 'Bearer $token';
+    request.headers['Accept'] = 'text/event-stream';
+
+    try {
+      final response = await _sseClient!.send(request);
+      response.stream
+          .transform(utf8.decoder)
+          .transform(const LineSplitter())
+          .listen((line) {
+        if (line.startsWith('data:')) {
+          final dataString = line.substring(5).trim();
+          if (dataString.isNotEmpty) {
+            try {
+              final data = jsonDecode(dataString);
+              if (mounted) {
+                setState(() {
+                  if (data['heartRate'] != null) currentHeartRate = (data['heartRate'] as num).toDouble();
+                  if (data['oxygenSaturation'] != null) currentOxygen = (data['oxygenSaturation'] as num).toDouble();
+                  if (data['temperature'] != null) currentTemperature = (data['temperature'] as num).toDouble();
+                });
+              }
+            } catch (e) {
+              debugPrint('Error parsing SSE data: $e');
+            }
+          }
+        }
+      }, onError: (err) {
+        debugPrint('SSE Stream Error: $err');
+      }, onDone: () {
+        debugPrint('SSE Stream closed');
+      });
+    } catch (e) {
+      debugPrint('Error connecting to SSE: $e');
+    }
+  }
+
+  @override
+  void dispose() {
+    _sseClient?.close();
+    super.dispose();
   }
 
   void _showLogoutConfirmation(BuildContext context) {
@@ -277,7 +333,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
         const SizedBox(height: 12),
         _buildMetricCard(
           label: context.translate('heart_rate'),
-          value: '74 bpm',
+          value: currentHeartRate != null ? '${currentHeartRate!.toInt()} bpm' : '74 bpm',
           sub: context.translate('resting_normal'),
           color: _primaryLight,
           icon: Icons.favorite_border,
@@ -286,7 +342,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
         const SizedBox(height: 12),
         _buildMetricCard(
           label: context.translate('oxygen_label'),
-          value: '98%',
+          value: currentOxygen != null ? '${currentOxygen!.toInt()}%' : '98%',
           sub: context.translate('spo2'),
           color: const Color(0xFFE8F4F8),
           icon: Icons.air,
@@ -295,7 +351,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
         const SizedBox(height: 12),
         _buildMetricCard(
           label: context.translate('temperature_label'),
-          value: '36.7 °C',
+          value: currentTemperature != null ? '${currentTemperature!.toStringAsFixed(1)} °C' : '36.7 °C',
           sub: context.translate('normal'),
           color: const Color(0xFFF9F5E8),
           icon: Icons.thermostat,
