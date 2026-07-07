@@ -59,9 +59,9 @@ class DeviceStatusCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(context.translate('device_name'), style: const TextStyle(color: Colors.black54, fontSize: 11)),
-                      const Text('CB-9F32-01', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87)),
+                      Text(data.deviceId ?? 'No device', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87)),
                       const SizedBox(height: 2),
-                      Text('${context.translate('version')} 1.0.5', style: const TextStyle(color: Colors.black54, fontSize: 12)),
+                      Text('${context.translate('version')} ${data.deviceModel ?? ''}', style: const TextStyle(color: Colors.black54, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -105,7 +105,7 @@ class DeviceStatusCard extends StatelessWidget {
                         color: primaryColor,
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: Text(context.translate('online'), style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
+                      child: Text(data.isOnline == true ? context.translate('online') : 'Offline', style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -118,21 +118,30 @@ class DeviceStatusCard extends StatelessWidget {
             padding: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
             child: Column(
               children: [
-                _buildProgressRow(context.translate('battery'), '88%', Icons.battery_full, primaryColor, 0.88),
+                _buildProgressRow(context.translate('battery'), data.batteryLevel != null ? '${data.batteryLevel}%' : 'N/A', Icons.battery_full, primaryColor, (data.batteryLevel ?? 0) / 100),
                 const SizedBox(height: 12),
                 Divider(color: Colors.grey.shade100, height: 1),
                 const SizedBox(height: 12),
-                _buildProgressRow(context.translate('wifi'), context.translate('strong'), Icons.wifi, primaryColor, 0.9),
+                _buildProgressRow(context.translate('wifi'), data.wifiNetwork ?? 'N/A', Icons.wifi, primaryColor, 0.9),
                 const SizedBox(height: 12),
                 Divider(color: Colors.grey.shade100, height: 1),
                 const SizedBox(height: 12),
-                _buildProgressRow(context.translate('sync'), context.translate('good'), Icons.check_circle_outline, primaryColor, 0.9),
+                _buildProgressRow(context.translate('sync'), data.lastSyncedAt != null ? _formatDate(data.lastSyncedAt!) : 'N/A', Icons.check_circle_outline, primaryColor, 0.9),
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  String _formatDate(String isoDate) {
+    try {
+      final date = DateTime.parse(isoDate);
+      return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')} ${date.day}/${date.month}';
+    } catch (e) {
+      return isoDate;
+    }
   }
 
   Widget _buildProgressRow(String label, String value, IconData icon, Color primaryColor, double progress) {

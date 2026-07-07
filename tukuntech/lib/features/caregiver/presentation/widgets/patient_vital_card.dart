@@ -17,6 +17,12 @@ class PatientVitalData {
   final String temperatureSubtitleKey;
   final String? patientId;
   final String? email;
+  final String? deviceId;
+  final String? deviceModel;
+  final int? batteryLevel;
+  final String? wifiNetwork;
+  final bool? isOnline;
+  final String? lastSyncedAt;
 
   PatientVitalData({
     required this.initials,
@@ -34,6 +40,12 @@ class PatientVitalData {
     required this.temperatureSubtitleKey,
     this.patientId,
     this.email,
+    this.deviceId,
+    this.deviceModel,
+    this.batteryLevel,
+    this.wifiNetwork,
+    this.isOnline,
+    this.lastSyncedAt,
   });
 }
 

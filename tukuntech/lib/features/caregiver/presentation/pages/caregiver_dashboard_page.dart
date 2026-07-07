@@ -87,6 +87,41 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
             temperature = '36.7 °C';
           }
 
+          // Fetch device data
+          String? deviceId;
+          String? deviceModel;
+          int? batteryLevel;
+          String? wifiNetwork;
+          bool? isOnline;
+          String? lastSyncedAt;
+
+          try {
+            final dashRes = await http.get(
+              Uri.parse('${EnvironmentConfig.baseUrl}/dashboard/caregiver/patient/$id'),
+              headers: {'Authorization': 'Bearer $token'},
+            ).timeout(const Duration(seconds: 5));
+            if (dashRes.statusCode == 200) {
+              final dashData = jsonDecode(utf8.decode(dashRes.bodyBytes));
+              final deviceData = dashData['device'];
+              if (deviceData != null) {
+                deviceId = deviceData['deviceId'];
+                deviceModel = deviceData['model'];
+                batteryLevel = deviceData['batteryLevel'];
+                wifiNetwork = deviceData['wifiNetwork'];
+                isOnline = deviceData['isOnline'];
+                lastSyncedAt = deviceData['lastSyncedAt'];
+              }
+              final vitalsData = dashData['currentVitals'];
+              if (vitalsData != null) {
+                heartRate = '${vitalsData['heartRate']} bpm';
+                oxygen = '${vitalsData['oxygenSaturation']}%';
+                temperature = '${vitalsData['temperature']} °C';
+              }
+            }
+          } catch (e) {
+            debugPrint("Error fetching dashboard for $id: $e");
+          }
+
           fetchedPatients.add(
             PatientVitalData(
               initials: initials,
@@ -104,6 +139,12 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
               temperatureSubtitleKey: 'normal',
               patientId: id,
               email: email,
+              deviceId: deviceId,
+              deviceModel: deviceModel,
+              batteryLevel: batteryLevel,
+              wifiNetwork: wifiNetwork,
+              isOnline: isOnline,
+              lastSyncedAt: lastSyncedAt,
             ),
           );
         }

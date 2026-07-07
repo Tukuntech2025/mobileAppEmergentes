@@ -1,16 +1,76 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/localization/app_localizations.dart';
 import 'package:tukuntech/features/patient/presentation/pages/device_form_page.dart';
+import 'package:tukuntech/core/environment_config.dart';
+import 'package:tukuntech/core/auth_store.dart';
 
-class DeviceBody extends StatelessWidget {
+class DeviceBody extends StatefulWidget {
   final String email;
   const DeviceBody({super.key, required this.email});
+
+  @override
+  State<DeviceBody> createState() => _DeviceBodyState();
+}
+
+class _DeviceBodyState extends State<DeviceBody> {
+  Map<String, dynamic>? _deviceData;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchDeviceData();
+  }
+
+  Future<void> _fetchDeviceData() async {
+    try {
+      final token = AuthStore.token;
+      if (token == null) return;
+
+      final res = await http.get(
+        Uri.parse('${EnvironmentConfig.baseUrl}/dashboard/patient/me'),
+        headers: {'Authorization': 'Bearer $token'},
+      ).timeout(const Duration(seconds: 5));
+
+      if (res.statusCode == 200) {
+        final data = jsonDecode(utf8.decode(res.bodyBytes));
+        if (mounted) {
+          setState(() {
+            _deviceData = data['device'];
+            _isLoading = false;
+          });
+        }
+      } else {
+        if (mounted) {
+          setState(() => _isLoading = false);
+        }
+      }
+    } catch (e) {
+      debugPrint("Error fetching device data: $e");
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  String _formatDate(String isoDate) {
+    try {
+      final date = DateTime.parse(isoDate);
+      return '${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')} ${date.day}/${date.month}';
+    } catch (e) {
+      return isoDate;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.transparent,
-      body: ListView(
+      body: _isLoading 
+          ? const Center(child: CircularProgressIndicator(color: Color(0xFF3B9784)))
+          : ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
         children: [
           Text(
@@ -30,7 +90,10 @@ class DeviceBody extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          _buildDeviceCard(context),
+          if (_deviceData != null)
+            _buildDeviceCard(context)
+          else
+            _buildNoDeviceCard(context),
           const SizedBox(height: 24),
           _buildInfoAlert(context),
           const SizedBox(height: 16),
@@ -41,9 +104,9 @@ class DeviceBody extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => DeviceFormPage(initialEmail: email),
+              builder: (context) => DeviceFormPage(initialEmail: widget.email),
             ),
-          );
+          ).then((_) => _fetchDeviceData());
         },
         backgroundColor: const Color(0xFF3B9784),
         elevation: 4,
@@ -55,7 +118,40 @@ class DeviceBody extends StatelessWidget {
     );
   }
 
+  Widget _buildNoDeviceCard(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Column(
+        children: [
+          const Icon(Icons.device_unknown, size: 48, color: Colors.grey),
+          const SizedBox(height: 16),
+          Text(
+            'No hay dispositivo conectado',
+            style: TextStyle(fontSize: 16, color: Colors.grey[800], fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'Presione el botón + para registrar uno',
+            style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildDeviceCard(BuildContext context) {
+    final deviceId = _deviceData?['deviceId'] ?? 'Desconocido';
+    final model = _deviceData?['model'] ?? '';
+    final isOnline = _deviceData?['isOnline'] == true;
+    final batteryLevel = _deviceData?['batteryLevel'] ?? 0;
+    final wifiNetwork = _deviceData?['wifiNetwork'] ?? 'N/A';
+    final lastSyncedAt = _deviceData?['lastSyncedAt'];
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -101,16 +197,16 @@ class DeviceBody extends StatelessWidget {
                         context.translate('device_name'),
                         style: TextStyle(color: Colors.grey[700], fontSize: 11),
                       ),
-                      const Text(
-                        'CB-9F32-01',
-                        style: TextStyle(
+                      Text(
+                        deviceId,
+                        style: const TextStyle(
                           color: Colors.black87,
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
                         ),
                       ),
                       Text(
-                        '${context.translate('version')} 1.0.5',
+                        '${context.translate('version')} $model',
                         style: TextStyle(color: Colors.grey[600], fontSize: 11),
                       ),
                     ],
@@ -119,11 +215,11 @@ class DeviceBody extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
-                    color: Colors.green[400],
+                    color: isOnline ? Colors.green[400] : Colors.grey,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    context.translate('online'),
+                    isOnline ? context.translate('online') : 'Offline',
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 11,
@@ -140,11 +236,11 @@ class DeviceBody extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                _buildStatusRow(context.translate('battery'), '88%', Icons.battery_full, 0.88),
+                _buildStatusRow(context.translate('battery'), '$batteryLevel%', Icons.battery_full, batteryLevel / 100),
                 const Divider(height: 24),
-                _buildStatusRow(context.translate('wifi'), context.translate('strong'), Icons.wifi, 0.9),
+                _buildStatusRow(context.translate('wifi'), wifiNetwork, Icons.wifi, 0.9),
                 const Divider(height: 24),
-                _buildStatusRow(context.translate('sync'), context.translate('good'), Icons.check_circle_outline, 0.95),
+                _buildStatusRow(context.translate('sync'), lastSyncedAt != null ? _formatDate(lastSyncedAt) : 'N/A', Icons.check_circle_outline, 0.95),
               ],
             ),
           ),
