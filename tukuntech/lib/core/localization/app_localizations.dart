@@ -14,6 +14,20 @@ class AppLocalizations {
 
   static const Map<String, Map<String, String>> _localizedValues = {
     'en': {
+      'configure_device': 'Configure TukunTech Band',
+      'ble_scan': 'BLE Scan',
+      'searching_device': 'Searching device: TukunTech Band',
+      'scan': 'Scan',
+      'stop': 'Stop',
+      'scanning': 'Scanning...',
+      'connecting': 'Connecting...',
+      'scan_stopped': 'Scan stopped',
+      'devices_found': 'Devices found:',
+      'unnamed': 'Unnamed',
+      'tap_to_connect': 'Tap to connect',
+      'searching_devices': 'Searching devices...',
+      'press_scan': 'Press Scan to search',
+      'select_patient': 'Select Patient',
       // Role Selection / Welcome
       'welcome_title': 'Welcome to TukunTech',
       'welcome_subtitle': 'Choose your role to continue.',
@@ -295,6 +309,20 @@ class AppLocalizations {
       'device_label': 'Device',
     },
     'es': {
+      'configure_device': 'Configurar TukunTech Band',
+      'ble_scan': 'Escaneo BLE',
+      'searching_device': 'Buscando dispositivo: TukunTech Band',
+      'scan': 'Escanear',
+      'stop': 'Detener',
+      'scanning': 'Escaneando...',
+      'connecting': 'Conectando...',
+      'scan_stopped': 'Escaneo detenido',
+      'devices_found': 'Dispositivos encontrados:',
+      'unnamed': 'Sin nombre',
+      'tap_to_connect': 'Tocar para conectar',
+      'searching_devices': 'Buscando dispositivos...',
+      'press_scan': 'Presiona Escanear para buscar',
+      'select_patient': 'Seleccionar Paciente',
       // Role Selection / Welcome
       'welcome_title': 'Bienvenido a TukunTech',
       'welcome_subtitle': 'Selecciona tu rol para continuar.',

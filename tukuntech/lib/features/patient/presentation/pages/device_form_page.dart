@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
+import 'package:tukuntech/core/localization/app_localizations.dart';
 
 class DeviceFormPage extends StatefulWidget {
   final String initialEmail;
@@ -377,8 +378,8 @@ class _DeviceFormPageState extends State<DeviceFormPage> {
           icon: const Icon(Icons.arrow_back, color: Colors.black87),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
-          'Configurar TukunTech Band',
+        title: Text(
+          context.translate('configure_device') ?? 'Configurar TukunTech Band',
           style: TextStyle(
             color: Colors.black87,
             fontWeight: FontWeight.bold,
@@ -449,13 +450,13 @@ class _DeviceFormPageState extends State<DeviceFormPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        'Escaneo BLE',
+                      Text(
+                        context.translate('ble_scan') ?? 'Escaneo BLE',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        'Buscando dispositivo: TukunTech Band',
+                        context.translate('searching_device') ?? 'Buscando dispositivo: TukunTech Band',
                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],
@@ -482,7 +483,7 @@ class _DeviceFormPageState extends State<DeviceFormPage> {
                 child: ElevatedButton.icon(
                   onPressed: _isScanning || _isConnecting ? null : _startScan,
                   icon: const Icon(Icons.search, size: 18),
-                  label: const Text('Escanear'),
+                  label: Text(context.translate('scan') ?? 'Escanear'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _primary,
                     foregroundColor: Colors.white,
@@ -497,7 +498,7 @@ class _DeviceFormPageState extends State<DeviceFormPage> {
                 child: OutlinedButton.icon(
                   onPressed: !_isScanning ? null : _stopScan,
                   icon: const Icon(Icons.stop, size: 18),
-                  label: const Text('Detener'),
+                  label: Text(context.translate('stop') ?? 'Detener'),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: Colors.red[400],
                     side: BorderSide(color: Colors.red.shade200),
@@ -513,10 +514,10 @@ class _DeviceFormPageState extends State<DeviceFormPage> {
           // Status & Progress indicator
           Text(
             _isScanning
-                ? 'Escaneando...'
+                ? (context.translate('scanning') ?? 'Escaneando...')
                 : _isConnecting
-                    ? 'Conectando...'
-                    : 'Escaneo detenido',
+                    ? (context.translate('connecting') ?? 'Conectando...')
+                    : (context.translate('scan_stopped') ?? 'Escaneo detenido'),
             style: TextStyle(fontSize: 13, color: Colors.grey[600], fontWeight: FontWeight.w500),
           ),
           const SizedBox(height: 4),
@@ -527,8 +528,8 @@ class _DeviceFormPageState extends State<DeviceFormPage> {
           const SizedBox(height: 16),
 
           // Discovered Devices list
-          const Text(
-            'Dispositivos encontrados:',
+          Text(
+            context.translate('devices_found') ?? 'Dispositivos encontrados:',
             style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87),
           ),
           const SizedBox(height: 8),
@@ -544,7 +545,7 @@ class _DeviceFormPageState extends State<DeviceFormPage> {
                           ? result.advertisementData.advName
                           : device.platformName.isNotEmpty
                               ? device.platformName
-                              : 'Sin nombre';
+                              : context.translate('unnamed') ?? 'Sin nombre';
 
                       return Card(
                         margin: const EdgeInsets.symmetric(vertical: 6),
@@ -586,8 +587,8 @@ class _DeviceFormPageState extends State<DeviceFormPage> {
                                         style: TextStyle(color: Colors.grey[500], fontSize: 11),
                                       ),
                                       const SizedBox(height: 4),
-                                      const Text(
-                                        'Tocar para conectar',
+                                      Text(
+                                        context.translate('tap_to_connect') ?? 'Tocar para conectar',
                                         style: TextStyle(
                                           color: _primary,
                                           fontSize: 12,
@@ -619,7 +620,7 @@ class _DeviceFormPageState extends State<DeviceFormPage> {
           Icon(Icons.bluetooth_searching, size: 40, color: Colors.grey[300]),
           const SizedBox(height: 12),
           Text(
-            _isScanning ? 'Buscando dispositivos...' : 'Presiona Escanear para buscar',
+            _isScanning ? (context.translate('searching_devices') ?? 'Buscando dispositivos...') : (context.translate('press_scan') ?? 'Presiona Escanear para buscar'),
             style: TextStyle(color: Colors.grey[400], fontSize: 14),
           ),
         ],
