@@ -519,21 +519,20 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  mainAxisSize: MainAxisSize.min,
+                Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  spacing: 8,
+                  runSpacing: 4,
                   children: [
-                    Flexible(
-                      child: Text(
-                        widget.planTitle,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF112A24),
-                        ),
+                    Text(
+                      widget.planTitle,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF112A24),
                       ),
                     ),
-                    if (widget.isRecommended) ...[
-                      const SizedBox(width: 8),
+                    if (widget.isRecommended)
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                         decoration: BoxDecoration(
@@ -550,7 +549,6 @@ class _PatientCreateAccountPageState extends State<PatientCreateAccountPage> {
                           ),
                         ),
                       ),
-                    ],
                   ],
                 ),
                 const SizedBox(height: 6),
