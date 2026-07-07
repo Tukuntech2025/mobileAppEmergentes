@@ -7,6 +7,7 @@ import 'package:tukuntech/features/patient/presentation/widgets/patient_profile_
 import 'package:tukuntech/features/patient/presentation/widgets/settings_body.dart';
 import 'package:tukuntech/features/patient/presentation/widgets/support_body.dart';
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/api_client.dart';
 import 'package:tukuntech/core/auth_store.dart';
@@ -39,6 +40,8 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
   double? currentOxygen;
   double? currentTemperature;
   http.Client? _sseClient;
+  bool _hasSignal = false;
+  Timer? _signalTimer;
 
   @override
   void initState() {
@@ -101,9 +104,16 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
               final data = jsonDecode(dataString);
               if (mounted) {
                 setState(() {
+                  _hasSignal = true;
                   if (data['heartRate'] != null) currentHeartRate = (data['heartRate'] as num).toDouble();
                   if (data['oxygenSaturation'] != null) currentOxygen = (data['oxygenSaturation'] as num).toDouble();
                   if (data['temperature'] != null) currentTemperature = (data['temperature'] as num).toDouble();
+                });
+                _signalTimer?.cancel();
+                _signalTimer = Timer(const Duration(seconds: 15), () {
+                  if (mounted) {
+                    setState(() => _hasSignal = false);
+                  }
                 });
               }
             } catch (e) {
@@ -123,6 +133,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
 
   @override
   void dispose() {
+    _signalTimer?.cancel();
     _sseClient?.close();
     super.dispose();
   }
@@ -316,6 +327,26 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
       children: [
+        if (!_hasSignal && !_isLoading)
+          Container(
+            padding: const EdgeInsets.all(12),
+            margin: const EdgeInsets.only(bottom: 12),
+            decoration: BoxDecoration(
+              color: Colors.red.shade50,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.red.shade200),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.warning_amber_rounded, color: Colors.red.shade700),
+                const SizedBox(width: 8),
+                Text(
+                  context.translate('no_signal'),
+                  style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
         Text(
           context.translate('vital_signs'),
           style: const TextStyle(
@@ -333,7 +364,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
         const SizedBox(height: 12),
         _buildMetricCard(
           label: context.translate('heart_rate'),
-          value: currentHeartRate != null ? '${currentHeartRate!.toInt()} bpm' : '74 bpm',
+          value: _hasSignal ? (currentHeartRate != null ? '${currentHeartRate!.toInt()} bpm' : '74 bpm') : '0 bpm',
           sub: context.translate('resting_normal'),
           color: _primaryLight,
           icon: Icons.favorite_border,
@@ -342,7 +373,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
         const SizedBox(height: 12),
         _buildMetricCard(
           label: context.translate('oxygen_label'),
-          value: currentOxygen != null ? '${currentOxygen!.toInt()}%' : '98%',
+          value: _hasSignal ? (currentOxygen != null ? '${currentOxygen!.toInt()}%' : '98%') : '0%',
           sub: context.translate('spo2'),
           color: const Color(0xFFE8F4F8),
           icon: Icons.air,
@@ -351,7 +382,7 @@ class _VitalSignsPageState extends State<VitalSignsPage> {
         const SizedBox(height: 12),
         _buildMetricCard(
           label: context.translate('temperature_label'),
-          value: currentTemperature != null ? '${currentTemperature!.toStringAsFixed(1)} °C' : '36.7 °C',
+          value: _hasSignal ? (currentTemperature != null ? '${currentTemperature!.toStringAsFixed(1)} °C' : '36.7 °C') : '0.0 °C',
           sub: context.translate('normal'),
           color: const Color(0xFFF9F5E8),
           icon: Icons.thermostat,

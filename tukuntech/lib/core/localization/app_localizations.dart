@@ -22,6 +22,7 @@ class AppLocalizations {
       'lang_en': 'English',
       'lang_es': 'Spanish',
       'accept_terms': 'I accept the terms and conditions',
+      'no_signal': 'No signal',
       
       // Onboarding / Plan Selection
       'create_account_title': 'Create your account',
@@ -302,6 +303,7 @@ class AppLocalizations {
       'lang_en': 'Inglés',
       'lang_es': 'Español',
       'accept_terms': 'Acepto los términos y condiciones',
+      'no_signal': 'No existe señal',
       
       // Onboarding / Plan Selection
       'create_account_title': 'Crea tu cuenta',

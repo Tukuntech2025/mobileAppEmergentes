@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tukuntech/core/localization/app_localizations.dart';
 import 'dart:convert';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/auth_store.dart';
 import 'package:tukuntech/core/environment_config.dart';
@@ -67,6 +68,8 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
   double? currentOxygen;
   double? currentTemperature;
   http.Client? _sseClient;
+  bool _hasSignal = false;
+  Timer? _signalTimer;
 
   @override
   void initState() {
@@ -99,9 +102,16 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
               final parsed = jsonDecode(dataString);
               if (mounted) {
                 setState(() {
+                  _hasSignal = true;
                   if (parsed['heartRate'] != null) currentHeartRate = (parsed['heartRate'] as num).toDouble();
                   if (parsed['oxygenSaturation'] != null) currentOxygen = (parsed['oxygenSaturation'] as num).toDouble();
                   if (parsed['temperature'] != null) currentTemperature = (parsed['temperature'] as num).toDouble();
+                });
+                _signalTimer?.cancel();
+                _signalTimer = Timer(const Duration(seconds: 15), () {
+                  if (mounted) {
+                    setState(() => _hasSignal = false);
+                  }
                 });
               }
             } catch (e) {
@@ -121,6 +131,7 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
 
   @override
   void dispose() {
+    _signalTimer?.cancel();
     _sseClient?.close();
     super.dispose();
   }
@@ -246,6 +257,28 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
                     ],
                   ),
                 ),
+                if (!_hasSignal)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 12.0),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.red.shade50,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.red.shade200),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 16),
+                          const SizedBox(width: 8),
+                          Text(
+                            context.translate('no_signal'),
+                            style: TextStyle(color: Colors.red.shade700, fontWeight: FontWeight.bold, fontSize: 12),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -259,7 +292,7 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
                   child: _buildStatColumn(
                     context.translate('heart_rate'),
                     Icons.favorite_border,
-                    currentHeartRate != null ? '${currentHeartRate!.toInt()} bpm' : data.heartRate,
+                    _hasSignal ? (currentHeartRate != null ? '${currentHeartRate!.toInt()} bpm' : data.heartRate) : '0 bpm',
                     context.translate(data.heartRateSubtitleKey),
                     const Color(0xFF3B9784),
                   ),
@@ -269,7 +302,7 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
                   child: _buildStatColumn(
                     context.translate('oxygen_label'),
                     Icons.air,
-                    currentOxygen != null ? '${currentOxygen!.toInt()}%' : data.oxygen,
+                    _hasSignal ? (currentOxygen != null ? '${currentOxygen!.toInt()}%' : data.oxygen) : '0%',
                     context.translate(data.oxygenSubtitleKey),
                     const Color(0xFF3B9784),
                   ),
@@ -279,7 +312,7 @@ class _PatientVitalCardState extends State<PatientVitalCard> {
                   child: _buildStatColumn(
                     context.translate('temperature_label'),
                     Icons.thermostat,
-                    currentTemperature != null ? '${currentTemperature!.toStringAsFixed(1)} °C' : data.temperature,
+                    _hasSignal ? (currentTemperature != null ? '${currentTemperature!.toStringAsFixed(1)} °C' : data.temperature) : '0.0 °C',
                     context.translate(data.temperatureSubtitleKey),
                     Colors.orange.shade300,
                   ),
