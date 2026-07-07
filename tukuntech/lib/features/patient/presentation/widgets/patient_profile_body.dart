@@ -513,11 +513,11 @@ class _ProfileBodyState extends State<ProfileBody> {
                             filled: true,
                             fillColor: const Color(0xFFFAFAFA),
                           ),
-                          items: const [
-                            DropdownMenuItem(value: 'MALE', child: Text('Male', overflow: TextOverflow.ellipsis)),
-                            DropdownMenuItem(value: 'FEMALE', child: Text('Female', overflow: TextOverflow.ellipsis)),
-                            DropdownMenuItem(value: 'OTHER', child: Text('Other', overflow: TextOverflow.ellipsis)),
-                            DropdownMenuItem(value: 'PREFER_NOT_TO_SAY', child: Text('Prefer not to say', overflow: TextOverflow.ellipsis)),
+                          items: [
+                            DropdownMenuItem(value: 'MALE', child: Text(context.translate('male'), overflow: TextOverflow.ellipsis)),
+                            DropdownMenuItem(value: 'FEMALE', child: Text(context.translate('female'), overflow: TextOverflow.ellipsis)),
+                            DropdownMenuItem(value: 'OTHER', child: Text(context.translate('other'), overflow: TextOverflow.ellipsis)),
+                            DropdownMenuItem(value: 'PREFER_NOT_TO_SAY', child: Text(context.translate('prefer_not_to_say'), overflow: TextOverflow.ellipsis)),
                           ],
                           onChanged: (v) => setState(() => _gender = v!),
                         ),
