@@ -382,7 +382,7 @@ class _StepPatientsState extends State<StepPatients> {
                       children: [
                         _buildLabel(context.translate('max_o2_sat')),
                         const SizedBox(height: 4),
-                        _buildSuffixTextField('%', keyboardType: TextInputType.number, controller: currentPatient.maxO2Ctrl),
+                        _buildSuffixTextField('%', keyboardType: TextInputType.number, controller: currentPatient.maxO2Ctrl, min: 50, max: 100, initialStepperValue: 81),
                       ],
                     ),
                   ),
@@ -704,7 +704,7 @@ class _StepPatientsState extends State<StepPatients> {
     );
   }
 
-  Widget _buildSuffixTextField(String suffix, {TextInputType? keyboardType, TextEditingController? controller, double? min, double? max}) {
+  Widget _buildSuffixTextField(String suffix, {TextInputType? keyboardType, TextEditingController? controller, double? min, double? max, double? initialStepperValue}) {
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
@@ -736,18 +736,28 @@ class _StepPatientsState extends State<StepPatients> {
                   children: [
                     InkWell(
                       onTap: () {
-                        double current = double.tryParse(controller?.text ?? '') ?? min;
-                        if (current < max) {
-                          controller?.text = (current + 1).toInt().toString();
+                        double defaultStart = initialStepperValue ?? min;
+                        if (controller?.text.isEmpty ?? true) {
+                          controller?.text = defaultStart.toInt().toString();
+                        } else {
+                          double current = double.tryParse(controller!.text) ?? defaultStart;
+                          if (current < max) {
+                            controller.text = (current + 1).toInt().toString();
+                          }
                         }
                       },
                       child: const Icon(Icons.arrow_drop_up, size: 20, color: Colors.black54),
                     ),
                     InkWell(
                       onTap: () {
-                        double current = double.tryParse(controller?.text ?? '') ?? min;
-                        if (current > min) {
-                          controller?.text = (current - 1).toInt().toString();
+                        double defaultStart = initialStepperValue ?? min;
+                        if (controller?.text.isEmpty ?? true) {
+                          controller?.text = defaultStart.toInt().toString();
+                        } else {
+                          double current = double.tryParse(controller!.text) ?? defaultStart;
+                          if (current > min) {
+                            controller.text = (current - 1).toInt().toString();
+                          }
                         }
                       },
                       child: const Icon(Icons.arrow_drop_down, size: 20, color: Colors.black54),
