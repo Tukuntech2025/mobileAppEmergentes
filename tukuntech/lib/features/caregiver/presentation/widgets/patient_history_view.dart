@@ -2,9 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:tukuntech/core/environment_config.dart';
-import 'package:http/http.dart' as http;
 import 'package:tukuntech/core/api_client.dart';
-import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
 import 'package:tukuntech/features/caregiver/presentation/widgets/patient_vital_card.dart';
 import 'package:tukuntech/core/localization/app_localizations.dart';
 
@@ -25,8 +23,6 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
   List<dynamic> _reports = [];
   String? _error;
   Timer? _pollingTimer;
-
-  final String _baseUrl = '${EnvironmentConfig.baseUrl}/reports';
 
   @override
   void initState() {
@@ -49,11 +45,6 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
     return widget.patients[_selectedPatientIndex].patientId ?? '${_selectedPatientIndex + 2}';
   }
 
-  String get _currentPatientEmail {
-    if (widget.patients.isEmpty) return 'patient$_currentPatientId@test.com';
-    return widget.patients[_selectedPatientIndex].email ?? 'patient$_currentPatientId@test.com';
-  }
-
   Future<void> _fetchReports({bool silent = false}) async {
     if (!silent && _reports.isEmpty) {
       setState(() {
@@ -62,19 +53,12 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
       });
     }
     try {
-      // Generamos un token al vuelo simulando ser el paciente para poder usar el endpoint /me
-      final jwt = JWT(
-        {'role': 'PATIENT', 'email': _currentPatientEmail},
-        subject: '$_currentPatientId',
-      );
-      final fakePatientToken = jwt.sign(SecretKey('TuClaveSecretaSuperSeguraYExtremadamenteLargaParaElProyectoTukunTech2026'));
-
       final response = await ApiClient.get(
-        Uri.parse('$_baseUrl/me'),
-        headers: {'Authorization': 'Bearer $fakePatientToken'},
-      ).timeout(const Duration(seconds: 5));
+        Uri.parse('${EnvironmentConfig.baseUrl}/reports/caregiver/patient/$_currentPatientId'),
+      ).timeout(const Duration(seconds: 10));
+      
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final List<dynamic> data = jsonDecode(response.body);
+        final List<dynamic> data = jsonDecode(utf8.decode(response.bodyBytes));
         if (mounted) {
           setState(() {
             _reports = data;
@@ -136,28 +120,18 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
       _error = null;
     });
     try {
-      // Generamos un token al vuelo simulando ser el paciente para poder usar el endpoint /me/generate
-      final jwt = JWT(
-        {'role': 'PATIENT', 'email': _currentPatientEmail},
-        subject: '$_currentPatientId',
-      );
-      final fakePatientToken = jwt.sign(SecretKey('TuClaveSecretaSuperSeguraYExtremadamenteLargaParaElProyectoTukunTech2026'));
-
       final range = _getDateRange();
       final response = await ApiClient.post(
-        Uri.parse('$_baseUrl/me/generate'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $fakePatientToken',
-        },
+        Uri.parse('${EnvironmentConfig.baseUrl}/reports/caregiver/patient/$_currentPatientId/generate'),
         body: jsonEncode(range),
       ).timeout(const Duration(seconds: 10));
+      
       if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
         await _fetchReports();
       } else {
         if (mounted) {
           setState(() {
-            _error = '${context.translate('err_failed_generate')}: ${response.statusCode}';
+            _error = 'Failed to generate: ${response.statusCode}';
             _isLoading = false;
           });
         }
@@ -224,8 +198,6 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
         case 'Daily':
           return date.year == now.year && date.month == now.month && date.day == now.day;
         case 'Weekly':
-          // Current week (assuming week starts on Monday, or just last 7 days as an approximation)
-          // To be precise with "this week":
           final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
           final endOfWeek = startOfWeek.add(const Duration(days: 6));
           final dateOnly = DateTime(date.year, date.month, date.day);
@@ -280,53 +252,59 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
               children: List.generate(widget.patients.length, (index) {
                 final isSelected = _selectedPatientIndex == index;
                 final patient = widget.patients[index];
+                
                 return Padding(
                   padding: const EdgeInsets.only(right: 8.0),
-                  child: ChoiceChip(
-                    label: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 18,
-                          height: 18,
-                          decoration: BoxDecoration(
-                            color: patient.badgeDotColor,
-                            shape: BoxShape.circle,
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            patient.initials,
-                            style: const TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        Text(patient.name, style: const TextStyle(fontSize: 12)),
-                      ],
-                    ),
-                    selected: isSelected,
-                    onSelected: (selected) {
-                      if (selected && _selectedPatientIndex != index) {
+                  child: GestureDetector(
+                    onTap: () {
+                      if (_selectedPatientIndex != index) {
                         setState(() {
                           _selectedPatientIndex = index;
-                          _reports = []; // Clear reports immediately when switching patient
+                          _reports = [];
                         });
                         _fetchReports();
                       }
                     },
-                    selectedColor: Colors.white,
-                    backgroundColor: Colors.white,
-                    labelStyle: TextStyle(
-                      color: isSelected ? primaryColor : Colors.black87,
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(
-                        color: isSelected ? primaryColor : Colors.grey.shade300,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isSelected ? primaryColor.withOpacity(0.1) : Colors.transparent,
+                        border: Border.all(
+                          color: isSelected ? primaryColor : Colors.grey.shade400,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 24,
+                            height: 24,
+                            decoration: BoxDecoration(
+                              color: isSelected ? primaryColor : Colors.grey.shade400,
+                              shape: BoxShape.circle,
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              patient.initials,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            patient.name,
+                            style: TextStyle(
+                              color: isSelected ? primaryColor : Colors.grey.shade600,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    showCheckmark: false,
-                    padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 0),
                   ),
                 );
               }),
@@ -545,4 +523,3 @@ class _PatientHistoryViewState extends State<PatientHistoryView> {
     );
   }
 }
-

@@ -10,6 +10,7 @@ import 'package:tukuntech/features/caregiver/presentation/widgets/patient_vital_
 import 'package:tukuntech/features/caregiver/presentation/widgets/device_status_card.dart';
 import 'package:tukuntech/features/caregiver/presentation/widgets/patient_history_view.dart';
 import 'package:tukuntech/features/caregiver/presentation/widgets/caregiver_profile_body.dart';
+import 'package:tukuntech/features/caregiver/presentation/widgets/caregiver_reports_body.dart';
 import 'package:tukuntech/features/patient/presentation/widgets/settings_body.dart';
 import 'package:tukuntech/features/patient/presentation/widgets/support_body.dart';
 import 'package:tukuntech/core/localization/app_localizations.dart';
@@ -470,7 +471,7 @@ class _CaregiverDashboardPageState extends State<CaregiverDashboardPage> {
                             ),
                             PatientHistoryView(patients: _patients),
                             CaregiverProfileBody(onPatientAdded: _addNewPatient),
-                            Center(child: Text(context.translate('reports'))),
+                            CaregiverReportsBody(patients: _patients),
                           ],
                         ),
       ),
