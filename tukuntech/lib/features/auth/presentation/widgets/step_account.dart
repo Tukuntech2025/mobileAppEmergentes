@@ -22,6 +22,13 @@ class StepAccount extends StatefulWidget {
 class _StepAccountState extends State<StepAccount> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  final TextEditingController _confirmPasswordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +54,7 @@ class _StepAccountState extends State<StepAccount> {
           const SizedBox(height: 20),
           _buildLabel(context.translate('confirm_caregiver_password')),
           const SizedBox(height: 2),
-          _buildPasswordField('••••••••', obscureText: _obscureConfirmPassword, onToggle: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword)), // mock confirm
+          _buildPasswordField('••••••••', obscureText: _obscureConfirmPassword, controller: _confirmPasswordController, onToggle: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword)),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -62,7 +69,7 @@ class _StepAccountState extends State<StepAccount> {
               ),
               Flexible(
                 child: ElevatedButton(
-                  onPressed: widget.onContinue,
+                  onPressed: _validateAndContinue,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: primaryColor,
                     foregroundColor: Colors.white,
@@ -89,6 +96,52 @@ class _StepAccountState extends State<StepAccount> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _validateAndContinue() {
+    final email = widget.emailController.text.trim();
+    final password = widget.passwordController.text;
+    final confirmPassword = _confirmPasswordController.text;
+
+    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+      _showErrorDialog(context.translate('error_fill_all_fields'));
+      return;
+    }
+
+    if (password.length < 6) {
+      _showErrorDialog(context.translate('error_password_too_short'));
+      return;
+    }
+
+    if (password != confirmPassword) {
+      _showErrorDialog(context.translate('error_passwords_do_not_match'));
+      return;
+    }
+
+    widget.onContinue();
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.orange),
+            const SizedBox(width: 8),
+            Text(context.translate('error_label')),
+          ],
+        ),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK', style: TextStyle(color: Color(0xFF3B9784))),
           ),
         ],
       ),

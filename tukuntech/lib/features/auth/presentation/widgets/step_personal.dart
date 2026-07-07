@@ -397,7 +397,7 @@ class _StepPersonalState extends State<StepPersonal> {
               ),
             ),
             ElevatedButton(
-              onPressed: widget.onContinue,
+              onPressed: _validateAndContinue,
               style: ElevatedButton.styleFrom(
                 backgroundColor: primaryColor,
                 foregroundColor: Colors.white,
@@ -419,6 +419,89 @@ class _StepPersonalState extends State<StepPersonal> {
           ],
         ),
       ],
+    );
+  }
+
+  void _validateAndContinue() {
+    if (widget.patientEmailController.text.trim().isEmpty || 
+        widget.patientPasswordController.text.isEmpty || 
+        widget.patientConfirmPasswordController.text.isEmpty || 
+        widget.dniController.text.trim().isEmpty || 
+        widget.fullNameController.text.trim().isEmpty || 
+        widget.ageController.text.trim().isEmpty || 
+        widget.minHrController.text.trim().isEmpty || 
+        widget.maxHrController.text.trim().isEmpty || 
+        widget.minO2Controller.text.trim().isEmpty || 
+        widget.maxO2Controller.text.trim().isEmpty || 
+        widget.minTempController.text.trim().isEmpty || 
+        widget.maxTempController.text.trim().isEmpty || 
+        widget.gender == 'Select gender' || 
+        widget.bloodType == 'Select blood type') {
+      _showErrorDialog(context.translate('error_fill_all_fields'));
+      return;
+    }
+
+    if (widget.patientPasswordController.text.length < 6) {
+      _showErrorDialog(context.translate('error_password_too_short'));
+      return;
+    }
+
+    if (widget.patientPasswordController.text != widget.patientConfirmPasswordController.text) {
+      _showErrorDialog(context.translate('error_passwords_do_not_match'));
+      return;
+    }
+
+    if (widget.dniController.text.trim().length != 8) {
+      _showErrorDialog(context.translate('error_dni_length'));
+      return;
+    }
+
+    int? age = int.tryParse(widget.ageController.text.trim());
+    if (age == null || age < 0 || age > 130) {
+      _showErrorDialog(context.translate('error_invalid_age'));
+      return;
+    }
+
+    double? minHeartRate = double.tryParse(widget.minHrController.text);
+    double? maxHeartRate = double.tryParse(widget.maxHrController.text);
+    if (minHeartRate != null && (minHeartRate < 30 || minHeartRate > 200)) { _showErrorDialog("Frecuencia cardíaca mínima irreal."); return; }
+    if (maxHeartRate != null && (maxHeartRate < 40 || maxHeartRate > 250)) { _showErrorDialog("Frecuencia cardíaca máxima irreal."); return; }
+    if (minHeartRate != null && maxHeartRate != null && minHeartRate >= maxHeartRate) { _showErrorDialog("Frecuencia cardíaca mínima no puede ser mayor o igual a la máxima."); return; }
+    
+    double? minOxygenSaturation = double.tryParse(widget.minO2Controller.text);
+    double? maxOxygenSaturation = double.tryParse(widget.maxO2Controller.text);
+    if (minOxygenSaturation != null && (minOxygenSaturation < 50 || minOxygenSaturation > 100)) { _showErrorDialog("Saturación de oxígeno irreal."); return; }
+    if (minOxygenSaturation != null && maxOxygenSaturation != null && minOxygenSaturation >= maxOxygenSaturation) { _showErrorDialog("Saturación mínima no puede ser mayor o igual a la máxima."); return; }
+    
+    double? minTemperature = double.tryParse(widget.minTempController.text);
+    double? maxTemperature = double.tryParse(widget.maxTempController.text);
+    if (minTemperature != null && (minTemperature < 30 || minTemperature > 42)) { _showErrorDialog("Temperatura mínima irreal."); return; }
+    if (maxTemperature != null && (maxTemperature < 32 || maxTemperature > 45)) { _showErrorDialog("Temperatura máxima irreal."); return; }
+    if (minTemperature != null && maxTemperature != null && minTemperature >= maxTemperature) { _showErrorDialog("Temperatura mínima no puede ser mayor o igual a la máxima."); return; }
+    
+    widget.onContinue();
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Row(
+          children: [
+            const Icon(Icons.warning_amber_rounded, color: Colors.orange),
+            const SizedBox(width: 8),
+            Text(context.translate('error_label')),
+          ],
+        ),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK', style: TextStyle(color: Color(0xFF3B9784))),
+          ),
+        ],
+      ),
     );
   }
 
